@@ -1,7 +1,7 @@
 {
     "name": "xo-logging",
     "description": "A component for front end logging",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "keywords": [
         "css",
         "js",
@@ -23,7 +23,6 @@
         ".npmignore",
         ".bowerrc",
         ".jshintrc",
-        "index.js",
         "Gruntfile.js",
         "node_modules",
         "bower_components",
