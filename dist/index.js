@@ -3,12 +3,12 @@
 define(['angular',
     './api',
     './level',
-    './logCache',
-    './logData'], function (angular) {
-    return angular.module('logging', [
-            'logging.api',
-            'logging.level',
-            'logging.data',
-            'logging.cache'
+    './cache',
+    './data'], function (angular) {
+    return angular.module('logger', [
+            'logger.api',
+            'logger.level',
+            'logger.data',
+            'logger.cache'
         ]);
 });

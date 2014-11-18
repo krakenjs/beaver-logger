@@ -1,7 +1,7 @@
 "use strict";
 
 define(['angular'], function (angular) {
-    return angular.module('logging.level', [])
+    return angular.module('logger.level', [])
         .service('$logLevel', function() {
             return {
                 INFO: 'info',

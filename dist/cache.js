@@ -1,12 +1,23 @@
 "use strict";
 
-define(['angular', 'squid/index', './api'], function (angular) {
-    return angular.module('logging.cache',
+define(['angular',
+    'squid/index',
+    './api',
+    './data',
+    "./level"], function (angular) {
+    return angular.module('logger.cache',
             ['squid.class',
             'squid.api',
-            'logging.api'
+            'logger.api',
+            'logger.data',
+            'logger.level'
             ])
-        .service('$logCache', function($Class, $logApi, $interval){
+        .service('$logCache', function($Class,
+                                       $logApi,
+                                       $LogData,
+                                       $logLevel,
+                                       $interval,
+                                       $window){
             var LogCache = $Class.extend('LogCache', {
 
                 init: function(){
@@ -16,6 +27,15 @@ define(['angular', 'squid/index', './api'], function (angular) {
                     $interval(function(){
                         this.flush();
                     }.bind(this), this.flushInterval);
+
+                    $window.onbeforeunload = function(event){
+                        var logData = new $LogData({
+                            name: "Window_onbeforeunload",
+                            level: $logLevel.DEBUG
+                        });
+                        this.push(logData);
+                        this.flush();
+                    }.bind(this);
                 },
 
                 push : function(logData){

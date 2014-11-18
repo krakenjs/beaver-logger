@@ -28,10 +28,12 @@ define(['angular',
             logCache,
             logLevel,
             interval,
-            flushInterval = 20000;
+            flushInterval = 20000,
+            angularWindow,
+            timeout;
 
 
-        beforeEach(module('logging'));
+        beforeEach(module('logger'));
 
         beforeEach(inject(function ($rootScope,
                                     $q,
@@ -39,7 +41,10 @@ define(['angular',
                                     $LogData,
                                     $logLevel,
                                     $httpBackend,
-                                    $interval
+                                    $interval,
+                                    $window,
+                                    $timeout
+
             ) {
 
             q = $q;
@@ -49,9 +54,11 @@ define(['angular',
             logCache = $logCache;
             logLevel = $logLevel;
             interval = $interval;
+            angularWindow = $window;
+            timeout = $timeout;
         }));
 
-        it('should get log data after specified time', function (done) {
+        it('should post log data after specified time', function (done) {
             var expectedData = [
                 new LogData({level: logLevel.INFO, eventName: "test"}),
                 new LogData({level: logLevel.DEBUG, eventName: "test"}),
@@ -103,5 +110,20 @@ define(['angular',
             done();
         });
 
+        it('should post the log data on window.onbeforeunload', function (done) {
+            var expectedData = [
+                new LogData({level: logLevel.INFO, eventName: "test"})
+            ];
+
+            createMockResponse(httpBackend, true, expectedData);
+
+            angular.element(angularWindow).triggerHandler('onbeforeunload');
+
+            timeout(function(){
+                httpBackend.flush();
+            },2000);
+
+            done();
+        });
     });
 });
