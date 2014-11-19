@@ -24,9 +24,7 @@ define(['angular',
                     this.cache = [];
                     this.logApi = $logApi;
                     this.flushInterval = 10000; //in milliseconds
-                    $interval(function(){
-                        this.flush();
-                    }.bind(this), this.flushInterval);
+                    $interval(this.flush.bind(this), this.flushInterval);
 
                     $window.onbeforeunload = function(event){
                         var logData = new $LogData({
@@ -35,7 +33,7 @@ define(['angular',
                         });
                         this.push(logData);
                         this.flush();
-                    }.bind(this);
+                    };
                 },
 
                 push : function(logData){
@@ -45,11 +43,11 @@ define(['angular',
                 flush: function(){
 
                     if(this.cache.length > 0){
-                        var that = this;
+                        var self = this;
                         this.logApi.post({
-                            data: this.cache
+                            data: self.cache
                         });
-                        this.cache = [];
+                        self.cache = [];
                     }
                 }
 
