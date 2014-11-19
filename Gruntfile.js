@@ -44,7 +44,7 @@ module.exports = function(grunt) {
         karma: {
             unit: {
                 configFile: 'test/karma.config.js',
-                singleRun: false,
+                singleRun: true,
                 browsers: ['Chrome'],
                 src: ["test/spec/**/*.js"],
                 preprocessors: {

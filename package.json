@@ -1,6 +1,6 @@
 {
   "name": "xo-logging-component",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A component for frontend logging",
   "main": "index.js",
   "scripts": {

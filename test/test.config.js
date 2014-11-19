@@ -14,7 +14,8 @@ requirejs.config({
         angularSanitize: '../components/angular-sanitize/angular-sanitize.min',
         jquery: '../components/jquery/dist/jquery',
         requirejs: '../components/requirejs/require',
-        squid: '../components/squid/dist'
+        squid: '../test/mocks/squid',
+        originalSquid: '../components/squid/dist'
     },
     shim: {
         'angular': {

@@ -20,6 +20,10 @@ module.exports = function(config) {
             included: false
         },
         {
+            pattern: 'test/mocks/**/*.js',
+            included: false
+        },
+        {
             pattern: 'dist/*',
             included: false
         },
