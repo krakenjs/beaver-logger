@@ -35,8 +35,8 @@ define(['angular',
                             name: "Window_onbeforeunload",
                             level: $logLevel.DEBUG
                         });
-                        this.push(logData);
-                        this.flush();
+                        self.push(logData);
+                        self.flush();
                     };
                 },
 
