@@ -24,5 +24,5 @@ module as angular dependency then, you can access these.
     1. Every 10sec.
     2. window.onbeforeunload
 
-It makes a POST on the following api end point for now: `webapps/helios/api/log`
+It makes a POST on the following api end point for now: `{baseUrl}/api/log`
 
