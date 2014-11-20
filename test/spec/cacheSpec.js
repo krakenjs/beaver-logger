@@ -1,5 +1,12 @@
 "use strict";
 
+window.config = {
+    urls: {
+        baseUrl: "/webapps/helios",
+        authBaseUrl: "/webapps/helios"
+    }
+} ;
+
 define(['angular',
     'angularMocks',
     'index'], function (angular) {
@@ -32,7 +39,6 @@ define(['angular',
             angularWindow,
             timeout;
 
-
         beforeEach(module('logger'));
 
         beforeEach(inject(function ($rootScope,
@@ -56,7 +62,9 @@ define(['angular',
             interval = $interval;
             angularWindow = $window;
             timeout = $timeout;
+
         }));
+
 
         it('should post log data after specified time', function (done) {
             var expectedData = [
