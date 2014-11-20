@@ -1,5 +1,5 @@
 {
-  "name": "xo-logging-component",
+  "name": "xo-beaver-component",
   "version": "0.0.9",
   "description": "A component for frontend logging",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.paypal.com:vgorthy/xo-logging-component.git"
+    "url": "git@github.paypal.com:Checkout-R/xo-beaver-component.git"
   },
   "keywords": [
     "logging"

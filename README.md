@@ -1,5 +1,5 @@
-xo-logging-component
-====================
+xo-beaver-component
+===================
 
 A ui logging component for Hermes
 
