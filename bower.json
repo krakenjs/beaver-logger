@@ -1,45 +1,45 @@
 {
-    "name": "xo-beaver",
-    "description": "A component for front end logging",
-    "version": "0.0.9",
-    "keywords": [
-        "css",
-        "js",
-        "less",
-        "paypal",
-        "paypalui",
-        "front-end",
-        "framework",
-        "web"
-    ],
-    "homepage": "",
-    "main": [
-        "dist/*"
-    ],
-    "ignore": [
-        ".DS_Store",
-        ".git",
-        ".gitignore",
-        ".npmignore",
-        ".bowerrc",
-        ".jshintrc",
-        "Gruntfile.js",
-        "node_modules",
-        "bower_components",
-        "package.json",
-        "test",
-        "coverage"
-    ],
-    "dependencies": {
-        "squid": "*"
-    },
-    "devDependencies": {
-        "angular-mocks": "~1.3.0",
-        "angular-route": "~1.3.0",
-        "angular": "~1.3.0",
-        "angular-resource": "~1.3.1",
-        "angular-sanitize": "~1.3.0",
-        "requirejs": "^2.1.11",
-        "requirejs-text": "~2.0.12"
-    }
+  "name": "xo-beaver",
+  "description": "A component for front end logging",
+  "version": "0.0.10",
+  "keywords": [
+    "css",
+    "js",
+    "less",
+    "paypal",
+    "paypalui",
+    "front-end",
+    "framework",
+    "web"
+  ],
+  "homepage": "",
+  "main": [
+    "dist/*"
+  ],
+  "ignore": [
+    ".DS_Store",
+    ".git",
+    ".gitignore",
+    ".npmignore",
+    ".bowerrc",
+    ".jshintrc",
+    "Gruntfile.js",
+    "node_modules",
+    "bower_components",
+    "package.json",
+    "test",
+    "coverage"
+  ],
+  "dependencies": {
+    "squid": "*"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.3.0",
+    "angular-route": "~1.3.0",
+    "angular": "~1.3.0",
+    "angular-resource": "~1.3.1",
+    "angular-sanitize": "~1.3.0",
+    "requirejs": "^2.1.11",
+    "requirejs-text": "~2.0.12"
+  }
 }
