@@ -7,7 +7,7 @@ define(['angular', 'squid/index'], function (angular) {
 
             var LogData = $Class.extend('LogData', {
                 init : function(){
-                    this.payload = {};
+                    this.payload = this.payload || {};
                     this.level = this.level || $logLevel.INFO;
                     this.timeStamp = new Date();
                 }
