@@ -7,7 +7,8 @@ define(['angular', 'squid/index'], function (angular) {
 
             var $logApi = $Api.extend('LogApi', {
                 baseURI: $window.config.urls.baseUrl,
-                uri: '/api/log'
+                uri: '/api/log',
+                event: false
             });
             return new $logApi;
         })
