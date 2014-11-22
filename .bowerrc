@@ -4,5 +4,5 @@
         "register" : "http://xo-bower-registry-8681.lvs01.dev.ebayc3.com:8080"
     },
 	"json": "bower.json",
-	"directory": "public/components"
+	"directory": "components"
 }

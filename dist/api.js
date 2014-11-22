@@ -1,7 +1,7 @@
 "use strict";
 
 define(['angular', 'squid/index'], function (angular) {
-    return angular.module('logger.api', ['squid.class', 'squid.api'])
+    return angular.module('logger.api', ['squid.class', 'squid.api', 'squid.config'])
 
         .service('$logApi', function($Api, $config) {
 
