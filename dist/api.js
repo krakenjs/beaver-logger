@@ -3,10 +3,10 @@
 define(['angular', 'squid/index'], function (angular) {
     return angular.module('logger.api', ['squid.class', 'squid.api'])
 
-        .service('$logApi', function($Api, $window) {
+        .service('$logApi', function($Api, $config) {
 
             var $logApi = $Api.extend('LogApi', {
-                baseURI: $window.config.urls.baseUrl,
+                baseURI: $config.urls.baseUrl,
                 uri: '/api/log',
                 event: false
             });
