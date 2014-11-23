@@ -9,7 +9,15 @@ define([
 
     return angular.module('beaver', ['squid', 'beaver.api', 'beaver.level'])
 
-        .factory('$Logger', function($Class, $window, $interval, $timeout, $log, $config, $rootScope, $logLevel, $consoleLogLevel) {
+        .factory('$Logger', function($Class,
+                                     $window,
+                                     $interval,
+                                     $timeout,
+                                     $log,
+                                     $config,
+                                     $rootScope,
+                                     $logLevel,
+                                     $consoleLogLevel) {
 
             var proto = {};
 
@@ -55,7 +63,7 @@ define([
                         payload: payload || {}
                     });
 
-                    if (~this.autoLog.indexOf(level)) {
+                    if (this.autoLog.indexOf(level)) {
                         this.flush();
                     }
 
@@ -91,6 +99,7 @@ define([
                         }
                     }).catch(function(err) {
                         logger.buffer.unshift.apply(logger.buffer, buffer);
+                        logger.debug("log_publish_fail", {error: err.stack || err.toString()});
                         $log.error('Unable to send logs', err);
                     });
 
