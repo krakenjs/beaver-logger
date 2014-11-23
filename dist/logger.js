@@ -9,11 +9,11 @@ define([
 
     return angular.module('beaver', ['squid', 'beaver.api', 'beaver.level'])
 
-        .factory('$Logger', function($Class, $window, $interval, $timeout, $log, $config, $rootScope, $logLevel, $consoleLogLevel, $q) {
+        .factory('$Logger', function($Class, $window, $interval, $timeout, $log, $config, $rootScope, $logLevel, $consoleLogLevel) {
 
             var proto = {};
 
-            angular.forEach($logLevel, function(level, key) {
+            angular.forEach($logLevel, function(level) {
                 proto[level] = function(event, payload) {
                     return this.log(level, event, payload);
                 }
@@ -51,6 +51,7 @@ define([
                     this.buffer.push({
                         level: level,
                         event: event,
+                        timestamp: new Date(),
                         payload: payload || {}
                     });
 
