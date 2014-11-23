@@ -113,26 +113,6 @@ define([
             done();
         });
 
-
-        it('should post the log data on $stateChangeSuccess ', function (done) {
-
-            $logger.log($logLevel.INFO, "test");
-
-            $rootScope.$broadcast('$stateChangeSuccess', { test : 'test' });
-
-            var promise = $q(function(resolve, reject){
-                $httpBackend.flush();
-                resolve();
-            })
-            .finally(done);
-
-            $rootScope.$apply();
-
-            return promise;
-
-
-        });
-
         it('should print the info logs to console', function (done) {
 
             $logger.print("somerandom", "INFO_LOG", {info: "test"});

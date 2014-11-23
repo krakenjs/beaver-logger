@@ -40,10 +40,6 @@ define([
                         logger.info('window_unload').flush();
                     };
 
-                    $rootScope.$on('$stateChangeSuccess', function() {
-                        logger.flush();
-                    });
-
                     this.daemon();
                 },
 
