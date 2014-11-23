@@ -41,9 +41,7 @@ define([
                     };
 
                     $rootScope.$on('$stateChangeSuccess', function() {
-                        $timeout(function() {
-                            logger.flush();
-                        });
+                        logger.flush();
                     });
 
                     this.daemon();
@@ -63,7 +61,7 @@ define([
                         payload: payload || {}
                     });
 
-                    if (this.autoLog.indexOf(level)) {
+                    if (~this.autoLog.indexOf(level)) {
                         this.flush();
                     }
 

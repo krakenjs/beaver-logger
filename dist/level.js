@@ -9,7 +9,7 @@ define(['angular'], function (angular) {
                 INFO:    'info',
                 DEBUG:   'debug',
                 ERROR:   'error',
-                WARNING: 'warning',
+                WARN: 'warn',
                 ALERT:   'alert'
             }
         })
@@ -20,7 +20,7 @@ define(['angular'], function (angular) {
                 info:    'info',
                 debug:   'debug',
                 error:   'error',
-                warning: 'warn',
+                warn: 'warn',
                 alert:   'info'
             };
         });
