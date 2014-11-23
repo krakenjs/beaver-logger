@@ -10,16 +10,19 @@ This module was written to support logging from browser for checkout angular app
 
 ## Current support:
 
-1. Registers these objects `$LogData`, `$logLevel`, `$logCache` under `logger` module. So if you add `logger`
+1. Registers these objects `$Logger`, `$logLevel`, `$LoggerApi` under `beaver` module. So if you add `beaver`
 module as angular dependency then, you can access these.
-2. `$logCache` provides a interface to add `$LogData` instance.
 
+2. `$logger` provides interface:
 
-    $logCache.push(new $LogData())
+    $logger.error('event_name', {
+        payload_prop: 'payload value'
+    })
+
 
 ## Log Flushing:
 
-`logCache` flushes data to api server
+`$logger.flush()` flushes data to api server
 
     1. Every 10sec.
     2. window.onbeforeunload
