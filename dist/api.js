@@ -1,15 +1,14 @@
 "use strict";
 
 define(['angular', 'squid/index'], function (angular) {
-    return angular.module('logger.api', ['squid.class', 'squid.api', 'squid.config'])
+    return angular.module('beaver.api', ['squid'])
 
-        .service('$logApi', function($Api, $config) {
+        .factory('$LoggerApi', function($Api, $config) {
 
-            var $logApi = $Api.extend('LogApi', {
+            return $Api.extend('LoggerApi', {
                 baseURI: $config.urls.baseUrl,
                 uri: '/api/log',
                 event: false
             });
-            return new $logApi;
-        })
+        });
 });
