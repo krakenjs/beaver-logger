@@ -30,7 +30,8 @@ define([
             return $Class.extend('Logger', proto, {
 
                 autoLog: [$logLevel.WARNING, $logLevel.ERROR],
-                interval: 30000,
+                interval: 5*60*1000, //5 minutes
+                sizeLimit: 100,
 
                 init: function() {
                     var logger = this;
@@ -44,8 +45,14 @@ define([
                 },
 
                 log: function(level, event, payload) {
+
+                    if(this.buffer.length >= this.sizeLimit){
+                        return this;
+                    }
+
                     payload = payload;
 
+                    //Print to console only in local and stage
                     if ($config.deploy.isLocal() || $config.deploy.isStage()) {
                         this.print(level, event, payload);
                     }
@@ -57,6 +64,7 @@ define([
                         payload: payload || {}
                     });
 
+                    //If the log level is classified as autolog, then flush the data
                     if (~this.autoLog.indexOf(level)) {
                         this.flush();
                     }

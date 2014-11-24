@@ -5,6 +5,7 @@ define([
 ], function (angular) {
 
     var INTERVAL = 500;
+    var SIZE_LIMIT = 100;
 
     describe('Logger :: Tests', function () {
         var $logger,
@@ -50,7 +51,8 @@ define([
                 api: new $LoggerApi({
                     baseURI: '/webapps/test'
                 }),
-                interval: INTERVAL
+                interval: INTERVAL,
+                sizeLimit: SIZE_LIMIT
             });
 
             $httpBackend.whenPOST('/webapps/test/api/log', function(data) {
@@ -104,6 +106,14 @@ define([
             done();
         });
 
+
+        it('should STOP accumulating logs after size limit of SIZE_LIMIT', function(done){
+            for(var i =0; i< 200; i++){
+                $logger.log($logLevel.INFO, "test");
+            }
+            assert($logger.buffer.length === SIZE_LIMIT, "Expected the size of the buffer to be SIZE_LIMIT = 100")
+            done();
+        });
 
         it('should post the log data on window.onbeforeunload', function (done) {
             $logger.log($logLevel.INFO, "test");
