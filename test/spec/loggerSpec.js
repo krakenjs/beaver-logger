@@ -212,7 +212,7 @@ define([
 
             buildHttpMock($httpBackend, function(data){
                 var data = JSON.parse(data);
-                assert(data.events[0].payload.meta.BCNTRY === METADATA.BCNTRY, "Expect BCNTRY in metadata")
+                assert(data.events[0].payload.BCNTRY === METADATA.BCNTRY, "Expect BCNTRY in metadata")
                 return true;
             })
 

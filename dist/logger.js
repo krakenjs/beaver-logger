@@ -79,7 +79,11 @@ define([
 
                     try {
                         var metaBuilder = $injector.get('$metaBuilder');
-                        payload.meta = metaBuilder();
+                        var metaData = metaBuilder();
+                        payload = payload || {};
+                        angular.forEach(metaData, function(value, key) {
+                            payload[key] = value;
+                        });
                     }catch(err){
                         this.print($consoleLogLevel.error, "$metaBuilder_notFound", {
                             error: err.stack || err.toString()
