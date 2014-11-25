@@ -6,10 +6,6 @@ define([
 
     var INTERVAL = 500;
     var SIZE_LIMIT = 100;
-    var METADATA = {
-            token: "EC-1234",
-            BCNTRY: "US"
-    };
 
     function buildHttpMock($httpBackend, verifier){
         $httpBackend.whenPOST('/webapps/test/api/log', function(data) {
@@ -52,11 +48,7 @@ define([
         }
 
 
-        beforeEach(module('beaver', function($provide){
-            $provide.value('$metaBuilder', function(){
-                return METADATA;
-            });
-        }));
+        beforeEach(module('beaver'));
 
         beforeEach(inject(function ($injector) {
 
