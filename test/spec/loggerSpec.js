@@ -6,6 +6,69 @@ define([
 
     var INTERVAL = 500;
     var SIZE_LIMIT = 100;
+    var METADATA = {
+            token: "EC-1234",
+            BCNTRY: "US"
+    };
+
+    function buildHttpMock($httpBackend, verifier){
+        $httpBackend.whenPOST('/webapps/test/api/log', function(data) {
+            if(verifier){
+                return verifier(data);
+            }else{
+                return Boolean(JSON.parse(data).events.length);
+            }
+
+        }).respond({ack: 'success'});
+    }
+
+
+    describe('Logger :: $metaBuilder error tests', function () {
+        var $logger,
+            $logLevel,
+            $rootScope,
+            $httpBackend,
+            $log;
+
+        function setTestLocals($injector){
+            //Core angular services/factories
+            $rootScope = $injector.get('$rootScope');
+            $httpBackend = $injector.get('$httpBackend');
+            $log = $injector.get('$log');
+
+            //our custom services
+            $logLevel = $injector.get('$logLevel');
+        }
+
+        beforeEach(module('beaver'));
+
+        beforeEach(inject(function ($injector) {
+
+            setTestLocals($injector);
+
+            var $Logger    = $injector.get('$Logger');
+            var $LoggerApi = $injector.get('$LoggerApi');
+
+
+            $logger = new $Logger({
+                api: new $LoggerApi({
+                    baseURI: '/webapps/test'
+                }),
+                interval: INTERVAL,
+                sizeLimit: SIZE_LIMIT
+            });
+
+        }));
+
+        it('should print console error if $metaBuilder is not found', function(done){
+            buildHttpMock($httpBackend);
+            $logger.log($logLevel.ERROR, "test");
+            assert($log.error.logs.length === 2, "Expect to print logs to console");
+            $httpBackend.flush();
+            done();
+        });
+
+    });
 
     describe('Logger :: Tests', function () {
         var $logger,
@@ -37,7 +100,11 @@ define([
         }
 
 
-        beforeEach(module('beaver'));
+        beforeEach(module('beaver', function($provide){
+            $provide.value('$metaBuilder', function(){
+                return METADATA;
+            });
+        }));
 
         beforeEach(inject(function ($injector) {
 
@@ -55,11 +122,6 @@ define([
                 sizeLimit: SIZE_LIMIT
             });
 
-            $httpBackend.whenPOST('/webapps/test/api/log', function(data) {
-                return Boolean(JSON.parse(data).events.length);
-            }).respond({ack: 'success'});
-
-
             expectedData = [
                 {level: $logLevel.INFO,    eventName: "test"},
                 {level: $logLevel.DEBUG,   eventName: "test"},
@@ -68,7 +130,7 @@ define([
         }));
 
         it('should post data after a specified time', function(done) {
-
+            buildHttpMock($httpBackend);
             angular.forEach(expectedData, function(data){
                 $logger.log(data.level, data.eventName);
             });
@@ -80,15 +142,15 @@ define([
         });
 
         it('should not post data when there are no logs', function(done) {
-
-            $logger.flush();
+            buildHttpMock($httpBackend);
+            $logger.flush($httpBackend);
             $interval.flush(INTERVAL);
 
             done();
         });
 
         it('should make two posts', function(done) {
-
+            buildHttpMock($httpBackend);
             angular.forEach(expectedData, function(data){
                 $logger.log(data.level, data.eventName);
             });
@@ -108,6 +170,7 @@ define([
 
 
         it('should STOP accumulating logs after size limit of SIZE_LIMIT', function(done){
+            buildHttpMock($httpBackend);
             for(var i =0; i< 200; i++){
                 $logger.log($logLevel.INFO, "test");
             }
@@ -116,6 +179,7 @@ define([
         });
 
         it('should post the log data on window.onbeforeunload', function (done) {
+            buildHttpMock($httpBackend);
             $logger.log($logLevel.INFO, "test");
             angular.element($window).triggerHandler('onbeforeunload');
             $interval.flush(INTERVAL);
@@ -124,25 +188,41 @@ define([
         });
 
         it('should print the info logs to console', function (done) {
-
+            buildHttpMock($httpBackend);
             $logger.print("somerandom", "INFO_LOG", {info: "test"});
             assert($log.info.logs.length === 1, "Expect to print logs to console");
             done();
         });
 
         it('should print the error logs to console', function (done) {
-
+            buildHttpMock($httpBackend);
             $logger.print($consoleLogLevel.error, "ERROR_LOG" ,{error: "test"});
             assert($log.error.logs.length === 1, "Expect to print logs to console");
             done();
         });
 
         it('should print the warning logs to console', function (done) {
-
+            buildHttpMock($httpBackend);
             $logger.print($consoleLogLevel.warn, "WARNING_LOG" ,{warning: "test"});
             assert($log.warn.logs.length === 1, "Expect to print logs to console");
             done();
         });
 
+        it('should call $metaBuilder to build metadata', function(done){
+
+            buildHttpMock($httpBackend, function(data){
+                return true;
+            })
+
+            $logger.log($logLevel.ERROR, "test");
+
+            $httpBackend.flush();
+            done();
+        });
     });
+
+
+
+
+
 });

@@ -9,7 +9,8 @@ define([
 
     return angular.module('beaver', ['squid', 'beaver.api', 'beaver.level'])
 
-        .factory('$Logger', function($Class,
+        .factory('$Logger', function($injector,
+                                     $Class,
                                      $window,
                                      $interval,
                                      $timeout,
@@ -50,7 +51,9 @@ define([
                         return this;
                     }
 
-                    payload = payload;
+                    payload = payload || {};
+
+                    this.buildMeta(payload);
 
                     //Print to console only in local and stage
                     if ($config.deploy.isLocal() || $config.deploy.isStage()) {
@@ -61,7 +64,7 @@ define([
                         level: level,
                         event: event,
                         timestamp: new Date(),
-                        payload: payload || {}
+                        payload: payload
                     });
 
                     //If the log level is classified as autolog, then flush the data
@@ -70,6 +73,20 @@ define([
                     }
 
                     return this;
+                },
+
+                buildMeta: function(payload){
+                    var metaBuilder;
+
+                    try {
+                        metaBuilder = $injector.get('$metaBuilder');
+                    }catch(err){
+                        this.print($consoleLogLevel.error, "$metaBuilder_notFound", {
+                            error: err.stack || err.toString()
+                        });
+                        return;
+                    }
+                    payload.meta = metaBuilder();
                 },
 
                 print: function(level, event, payload) {
