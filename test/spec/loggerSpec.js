@@ -22,54 +22,6 @@ define([
         }).respond({ack: 'success'});
     }
 
-
-    describe('Logger :: $metaBuilder error tests', function () {
-        var $logger,
-            $logLevel,
-            $rootScope,
-            $httpBackend,
-            $log;
-
-        function setTestLocals($injector){
-            //Core angular services/factories
-            $rootScope = $injector.get('$rootScope');
-            $httpBackend = $injector.get('$httpBackend');
-            $log = $injector.get('$log');
-
-            //our custom services
-            $logLevel = $injector.get('$logLevel');
-        }
-
-        beforeEach(module('beaver'));
-
-        beforeEach(inject(function ($injector) {
-
-            setTestLocals($injector);
-
-            var $Logger    = $injector.get('$Logger');
-            var $LoggerApi = $injector.get('$LoggerApi');
-
-
-            $logger = new $Logger({
-                api: new $LoggerApi({
-                    baseURI: '/webapps/test'
-                }),
-                interval: INTERVAL,
-                sizeLimit: SIZE_LIMIT
-            });
-
-        }));
-
-        it('should print console error if $metaBuilder is not found', function(done){
-            buildHttpMock($httpBackend);
-            $logger.log($logLevel.ERROR, "test");
-            assert($log.error.logs.length === 2, "Expect to print logs to console");
-            $httpBackend.flush();
-            done();
-        });
-
-    });
-
     describe('Logger :: Tests', function () {
         var $logger,
             $logLevel,
@@ -208,23 +160,6 @@ define([
             done();
         });
 
-        it('should call $metaBuilder to build metadata', function(done){
-
-            buildHttpMock($httpBackend, function(data){
-                var data = JSON.parse(data);
-                assert(data.events[0].payload.BCNTRY === METADATA.BCNTRY, "Expect BCNTRY in metadata")
-                return true;
-            })
-
-            $logger.log($logLevel.ERROR, "test");
-
-            $httpBackend.flush();
-            done();
-        });
     });
-
-
-
-
 
 });

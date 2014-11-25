@@ -53,7 +53,6 @@ define([
 
                     payload = payload || {};
 
-                    this.buildMeta(payload);
 
                     //Print to console only in local and stage
                     if ($config.deploy.isLocal() || $config.deploy.isStage()) {
@@ -75,23 +74,6 @@ define([
                     return this;
                 },
 
-                buildMeta: function(payload){
-
-                    try {
-                        var metaBuilder = $injector.get('$metaBuilder');
-                        var metaData = metaBuilder();
-                        payload = payload || {};
-                        angular.forEach(metaData, function(value, key) {
-                            payload[key] = value;
-                        });
-                    }catch(err){
-                        this.print($consoleLogLevel.error, "$metaBuilder_notFound", {
-                            error: err.stack || err.toString()
-                        });
-                        return;
-                    }
-
-                },
 
                 print: function(level, event, payload) {
                     var args = [event];
