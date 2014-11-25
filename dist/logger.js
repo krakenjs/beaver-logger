@@ -76,17 +76,17 @@ define([
                 },
 
                 buildMeta: function(payload){
-                    var metaBuilder;
 
                     try {
-                        metaBuilder = $injector.get('$metaBuilder');
+                        var metaBuilder = $injector.get('$metaBuilder');
+                        payload.meta = metaBuilder();
                     }catch(err){
                         this.print($consoleLogLevel.error, "$metaBuilder_notFound", {
                             error: err.stack || err.toString()
                         });
                         return;
                     }
-                    payload.meta = metaBuilder();
+
                 },
 
                 print: function(level, event, payload) {

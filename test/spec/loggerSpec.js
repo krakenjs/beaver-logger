@@ -211,6 +211,8 @@ define([
         it('should call $metaBuilder to build metadata', function(done){
 
             buildHttpMock($httpBackend, function(data){
+                var data = JSON.parse(data);
+                assert(data.events[0].payload.meta.BCNTRY === METADATA.BCNTRY, "Expect BCNTRY in metadata")
                 return true;
             })
 
