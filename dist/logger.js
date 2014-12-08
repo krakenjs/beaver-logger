@@ -33,13 +33,14 @@ define([
                 autoLog: [$logLevel.WARNING, $logLevel.ERROR],
                 interval: 5*60*1000, //5 minutes
                 sizeLimit: 100,
+                debounceInterval: 10,
 
                 init: function() {
                     var logger = this;
                     this.buffer = [];
 
                     $window.onbeforeunload = function(event) {
-                        logger.info('window_unload').flush();
+                        logger.info('window_unload').flush(true);
                     };
 
                     this.daemon();
@@ -89,15 +90,32 @@ define([
                     $log[$consoleLogLevel[level] || 'info'].apply($log, args);
                 },
 
-                flush: function() {
+                flush: function(immediate) {
                     var logger = this;
-                    var buffer = this.buffer;
 
-                    if (!this.buffer.length) {
+                    if (immediate) {
+                        return this._flush();
+                    }
+
+                    if (logger.debouncer) {
+                        $timeout.cancel(logger.debouncer);
+                    }
+
+                    logger.debouncer = $timeout(function() {
+                        logger._flush();
+                    }, this.debounceInterval);
+                },
+
+                _flush: function() {
+                    var logger = this;
+
+                    if (!logger.buffer.length) {
                         return;
                     }
 
-                    this.api.post({
+                    var buffer = logger.buffer;
+
+                    logger.api.post({
                         data: {
                             events: this.buffer,
                             meta: {}
@@ -108,9 +126,7 @@ define([
                         $log.error('Unable to send logs', err);
                     });
 
-                    this.buffer = [];
-
-                    this.daemon();
+                    logger.buffer = [];
                 },
 
                 daemon: function() {

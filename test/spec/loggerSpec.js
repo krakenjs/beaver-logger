@@ -80,6 +80,7 @@ define([
             });
 
             $interval.flush(INTERVAL);
+            $timeout.flush(INTERVAL + 10);
             $httpBackend.flush();
 
             done();
@@ -87,7 +88,7 @@ define([
 
         it('should not post data when there are no logs', function(done) {
             buildHttpMock($httpBackend);
-            $logger.flush($httpBackend);
+            $logger.flush();
             $interval.flush(INTERVAL);
 
             done();
@@ -100,6 +101,7 @@ define([
             });
 
             $interval.flush(INTERVAL);
+            $timeout.flush(10);
             $httpBackend.flush();
 
             angular.forEach(expectedData, function(data){
@@ -107,6 +109,7 @@ define([
             });
 
             $interval.flush(INTERVAL);
+            $timeout.flush(10);
             $httpBackend.flush();
 
             done();
@@ -127,6 +130,7 @@ define([
             $logger.log($logLevel.INFO, "test");
             angular.element($window).triggerHandler('onbeforeunload');
             $interval.flush(INTERVAL);
+            $timeout.flush(10);
             $httpBackend.flush();
             done();
         });
