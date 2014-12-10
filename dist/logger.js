@@ -152,5 +152,65 @@ define([
             return new $Logger({
                 api: new $LoggerApi
             });
+        })
+
+        .factory('$fpti', function ($config) {
+
+            var _beaconUrl = $config.fptiBeaconUrl;
+
+            function _buildDataString(buzname, pageQualifier) {
+
+                if (!buzname) return;
+
+                var buznameDiff = buzname[pageQualifier];
+                if (!buznameDiff) return;
+
+                var dataProto = {
+                    "pagename": "main:ec:hermes",
+                    "oldpagename": "",
+                    "pagename2": "main:ec:hermes",
+                    "hier1": "main_ec_hermes_",
+                    "hier2": "",
+                    "hier3": "",
+                    "hier4": "",
+                    "hier5": "",
+                    "website": "main",
+                    "inout": "inout",
+                    "version": "hermes",
+                    "feature": "ec",
+                    "subfeature1": "hermes",
+                    "flowgatename": "",
+                    "flowname": "ec:hermes:",
+                    "subfeature2": "",
+                    "country": "glb",
+                    "product": ";ec"
+                };
+
+                var dataObj = {};
+                Object.keys(dataProto).forEach(function (key) {
+                    dataObj[key] = (buznameDiff[key]) ?
+                        buznameDiff[key].replace('%', dataProto[key]) : dataProto[key];
+                });
+
+                var dataAry = [];
+                angular.forEach(dataObj, function (v, k) {
+                    dataAry.push(k + '=' + v);
+                });
+
+                return dataAry.join('&');
+            }
+
+
+            return {
+                setupDataString: function (buzname, pageQualifier) {
+                    if (typeof PAYPAL.analytics != "undefined") {
+                        PAYPAL.core = PAYPAL.core || {};
+                        PAYPAL.core.pta = PAYPAL.analytics.setup({
+                            data: _buildDataString(buzname, pageQualifier),
+                            url: _beaconUrl
+                        });
+                    }
+                }
+            };
         });
 });
