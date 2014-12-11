@@ -4,10 +4,11 @@ define([
     'angular',
     'squid/index',
     './api',
-    './level'
+    './level',
+    './builder'
 ], function (angular) {
 
-    return angular.module('beaver', ['squid', 'beaver.api', 'beaver.level'])
+    return angular.module('beaver', ['squid', 'beaver.api', 'beaver.level', 'beaver.builder'])
 
         .factory('$Logger', function($injector,
                                      $Class,
