@@ -8,7 +8,8 @@ define(['angular', 'squid/index'], function (angular) {
             return $Api.extend('LoggerApi', {
                 baseURI: $config.urls.baseUrl,
                 uri: '/api/log',
-                event: false
+                event: false,
+		fireAndForget: true
             });
         });
 });
