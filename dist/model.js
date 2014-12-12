@@ -1,10 +1,10 @@
 "use strict";
 
-define(['angular'], function (angular) {
-    angular.module('beaver.model', [])
+define(['angular', 'squid/index'], function (angular) {
+    angular.module('beaver.model', ['squid'])
         .constant('FptiConstants', {
             // The prototype of buzname data object
-            fromBuzname: {
+            buznameMap: {
                 country: {
                     placeHolder: "glb",
                     fptiKey: "ccpg"
@@ -57,31 +57,109 @@ define(['angular'], function (angular) {
                 //            "website": "main"
             },
 
-            // Additional attributes to be populated depending on the context
-            decorators: {
+            // Full list of FPTI keys indexed by readable names
+            // This mapping can also be served as default decorator
+            fptiKeys: {
                 "businessType": "bztp",
                 "correlationId": "calc",
-                "countryOfPage": "ccpg",
+                "countryOfPage": "ccpg", // buzname
                 "errorCode": "eccd",
                 "fieldError": "erfd",
-                "locale": "rsta",
-                "loggedIn": "lgin",
+                "flowgatename": "fltp", // buzname
+                "flowname": "flnm", // buzname
+                "locale": "rsta", // $LocaleModel
+                "loggedIn": "lgin", // buzname
                 "merchantId": "mrid",
                 "merchantType": "mbtp",
                 "pageError": "erpg",
                 "pageGoal": "goal",
-                "pageQualifer": "qual",
-                "pageStartTime": "pgst",
-                "pageTechnologyFlag": "pgtf",
+                "pageGroup": "pgrp", // buzname
+                "pageName": "page", // buzname
+                "pageQualifer": "qual", // buzname
+                "pageStartTime": "pgst", // FptiBuilder
+                "pageTechnologyFlag": "pgtf", // productConfig
                 "paymentFlowId": "pfid",
                 "rLogId": "teal",
                 "sessionId": "fpti",
-                "sourceCi": "s",
+                "siteHierarchy": "shir", // buzname
+                "sourceCi": "s", // productConfig
                 "tealeaf": "teal",
                 "templateName": "tmpl",
                 "uuid": "csci",
+                "version": "vers", // buzname
                 "visitorId": "vid"
             }
+        })
+        .factory('FptiDataModel', function ($Class, FptiConstants) {
+            var productConfig = {};
+            // TODO to read from config.json
+            productConfig[FptiConstants.fptiKeys.sourceCi] = 'ci';
+            productConfig[FptiConstants.fptiKeys.pageTechnologyFlag] = 'NodeJS';
+
+            /**
+             * Utilizing Decorator pattern to allow defining additional logic for specific keys
+             */
+            return $Class.extend('FptiDataModel', {
+                _dataObj: productConfig,
+                _decoratorList: [],
+                decorators: {
+                    buzname: function (buzname, pageQualifier) {
+
+                        if (!buzname) return;
+
+                        var buznameDiff = buzname[pageQualifier];
+                        if (!buznameDiff) return;
+
+                        var dataObj = this._dataObj;
+                        var buznameMap = FptiConstants.buznameMap;
+                        Object.keys(buznameMap).forEach(function (key) {
+                            var buznameEntry = buznameMap[key],
+                                fptiKey = buznameEntry.fptiKey,
+                                placeHolder = buznameEntry.placeHolder;
+                            dataObj[fptiKey] = (buznameDiff[key]) ?
+                                buznameDiff[key].replace('%', placeHolder) : placeHolder;
+                        });
+                        dataObj[FptiConstants.fptiKeys.pageQualifer] = pageQualifier;
+                    },
+
+                    locale: function (locale) {
+                        if (locale && locale.country) {
+                            this._dataObj[FptiConstants.fptiKeys.locale] = locale.country;
+                        }
+                    }
+                },
+                decorate: function (name) {
+                    this._decoratorList.push({
+                        name: name,
+                        params: Array.prototype.slice.call(arguments, 1)
+                    });
+                    return this;
+                },
+                getDataObject: function () {
+                    var i, decorator;
+
+                    for (i = 0; i < this._decoratorList.length; i++) {
+                        decorator = this._decoratorList[i];
+                        if (!decorator) continue;
+                        var name = decorator.name,
+                            params = decorator.params;
+                        if (angular.isFunction(this.decorators[name])) {
+                            // Invoke the decorator and pass in the parameter list
+                            this.decorators[name].apply(this, params);
+                        } else {
+                            var fptiKey = FptiConstants.fptiKeys[name];
+                            // If the fptiKey is defined and value is present, add the k-v pair
+                            if (fptiKey && params) {
+                                this._dataObj[fptiKey] = params;
+                            }
+                        }
+                    }
+                    return this._dataObj;
+                }
+            })
+        })
+        .service('fptiDataModel', function (FptiDataModel) {
+            return new FptiDataModel;
         });
 
 });
