@@ -53,19 +53,16 @@ define([
                         return this;
                     }
 
-                    payload = payload || {};
-
-
                     //Print to console only in local and stage
                     if ($config.deploy.isLocal() || $config.deploy.isStage()) {
                         this.print(level, event, payload);
                     }
-
+                    
                     this.buffer.push({
                         level: level,
                         event: event,
                         timestamp: new Date(),
-                        payload: payload
+                        payload: payload || {}
                     });
 
                     //If the log level is classified as autolog, then flush the data
