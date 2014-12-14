@@ -2,7 +2,7 @@
 
 define(['angular', 'squid/index'], function (angular) {
     angular.module('beaver.model', ['squid'])
-        .constant('FptiConstants', {
+        .constant('$FptiConstants', {
             // The prototype of buzname data object
             buznameMap: {
                 country: {
@@ -90,11 +90,11 @@ define(['angular', 'squid/index'], function (angular) {
                 "visitorId": "vid"
             }
         })
-        .factory('FptiDataModel', function ($Class, FptiConstants) {
+        .factory('$FptiDataModel', function ($Class, $FptiConstants) {
             var productConfig = {};
             // TODO to read from config.json
-            productConfig[FptiConstants.fptiKeys.sourceCi] = 'ci';
-            productConfig[FptiConstants.fptiKeys.pageTechnologyFlag] = 'NodeJS';
+            productConfig[$FptiConstants.fptiKeys.sourceCi] = 'ci';
+            productConfig[$FptiConstants.fptiKeys.pageTechnologyFlag] = 'NodeJS';
 
             /**
              * Utilizing Decorator pattern to allow defining additional logic for specific keys
@@ -111,7 +111,7 @@ define(['angular', 'squid/index'], function (angular) {
                         if (!buznameDiff) return;
 
                         var dataObj = this._dataObj;
-                        var buznameMap = FptiConstants.buznameMap;
+                        var buznameMap = $FptiConstants.buznameMap;
                         Object.keys(buznameMap).forEach(function (key) {
                             var buznameEntry = buznameMap[key],
                                 fptiKey = buznameEntry.fptiKey,
@@ -119,12 +119,12 @@ define(['angular', 'squid/index'], function (angular) {
                             dataObj[fptiKey] = (buznameDiff[key]) ?
                                 buznameDiff[key].replace('%', placeHolder) : placeHolder;
                         });
-                        dataObj[FptiConstants.fptiKeys.pageQualifer] = pageQualifier;
+                        dataObj[$FptiConstants.fptiKeys.pageQualifer] = pageQualifier;
                     },
 
                     locale: function (locale) {
                         if (locale && locale.country) {
-                            this._dataObj[FptiConstants.fptiKeys.locale] = locale.country;
+                            this._dataObj[$FptiConstants.fptiKeys.locale] = locale.country;
                         }
                     }
                 },
@@ -147,7 +147,7 @@ define(['angular', 'squid/index'], function (angular) {
                             // Invoke the decorator and pass in the parameter list
                             this.decorators[name].apply(this, params);
                         } else {
-                            var fptiKey = FptiConstants.fptiKeys[name];
+                            var fptiKey = $FptiConstants.fptiKeys[name];
                             // If the fptiKey is defined and value is present, add the k-v pair
                             if (fptiKey && params) {
                                 this._dataObj[fptiKey] = params;
@@ -157,9 +157,6 @@ define(['angular', 'squid/index'], function (angular) {
                     return this._dataObj;
                 }
             })
-        })
-        .service('fptiDataModel', function (FptiDataModel) {
-            return new FptiDataModel;
         });
 
 });

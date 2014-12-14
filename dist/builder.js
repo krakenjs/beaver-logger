@@ -4,7 +4,7 @@ define(['angular',
     'squid/index',
     './model'], function (angular) {
     angular.module('beaver.builder', ['squid', 'beaver.model'])
-        .factory('FptiBuilder', function ($Class, $LocaleModel, FptiConstants, fptiDataModel) {
+        .factory('$FptiBuilder', function ($Class, $LocaleModel, $FptiConstants, $FptiDataModel) {
             /**
              *  Build the front-end FPTI event from three data sources
              *      1. the per-product configuration
@@ -15,24 +15,17 @@ define(['angular',
 
             var locale = $LocaleModel.instance();
 
-            return $Class.extend('FptiBuilder', {
-                // default to "fullpage" before more pageQualifier is defined for various flows
-                _pageQualifier: "fullpage"
-            }, {
-                setBuzname: function (buzname) {
-                    this._buzname = buzname;
-                    return this;
-                },
-
-                setPageQualifier: function (pageQualifier) {
-                    this._pageQualifier = pageQualifier;
-                    return this;
+            return $Class.extend('FptiBuilder',  {
+                resolvePageQualifier: function () {
+                    // TODO implment page qualifier resolver 
+                    // based on flow data passed in
+                    return "fullpage";
                 },
 
                 build: function () {
 
-                    this._dataObj = fptiDataModel
-                        .decorate('buzname', this._buzname, this._pageQualifier)
+                    this._dataObj = (new $FptiDataModel())
+                        .decorate('buzname', this.buzname, this.resolvePageQualifier())
                         .decorate('locale', locale)
                         .decorate('pageStartTime', (new Date()).getTime())
                         .getDataObject();
@@ -50,8 +43,5 @@ define(['angular',
                     return dataAry.join('&');
                 }
             });
-        })
-        .service('fptiBuilder', function (FptiBuilder) {
-            return new FptiBuilder();
         });
 });
