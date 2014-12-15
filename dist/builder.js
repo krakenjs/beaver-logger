@@ -4,7 +4,7 @@ define(['angular',
     'squid/index',
     './model'], function (angular) {
     angular.module('beaver.builder', ['squid', 'beaver.model'])
-        .factory('$FptiBuilder', function ($Class, $LocaleModel, $FptiConstants, $FptiDataModel) {
+        .factory('$FptiBuilder', function ($Class, $LocaleModel, $FptiConstants, $FptiDataModel, $CalDataModel) {
             /**
              *  Build the front-end FPTI event from three data sources
              *      1. the per-product configuration
@@ -15,7 +15,7 @@ define(['angular',
 
             var locale = $LocaleModel.instance();
 
-            return $Class.extend('FptiBuilder',  {
+            return $Class.extend('FptiBuilder', {
                 resolvePageQualifier: function () {
                     // TODO implment page qualifier resolver 
                     // based on flow data passed in

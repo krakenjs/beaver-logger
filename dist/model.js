@@ -1,6 +1,8 @@
 "use strict";
 
-define(['angular', 'squid/index'], function (angular) {
+define(['angular',
+        'components/node-uuid/uuid',    // Using the same moduel as used in NodeInfra
+        'squid/index'], function (angular, uuid) {
     angular.module('beaver.model', ['squid'])
         .constant('$FptiConstants', {
             // The prototype of buzname data object
@@ -157,6 +159,18 @@ define(['angular', 'squid/index'], function (angular) {
                     return this._dataObj;
                 }
             })
+        }).service('$CalDataModel', function () {
+            return $Class.extend('CalDataModel', {
+                getCorrelationId: function () {
+                    var uidRandom = uuid.v4();
+                    var uidRandomArr = uidRandom.split('-');
+                    var uidTime = uuid.v1().split('-');
+                    var correlationId = uidTime[0] + uidRandomArr[0].substr(0, 5);
+                    return correlationId;
+                },
+                getUuid: function () {
+                    return uuid.v4().replace(/-/g, '');
+                }
+            });
         });
-
 });
