@@ -15,7 +15,8 @@ requirejs.config({
         jquery: '../components/jquery/dist/jquery',
         requirejs: '../components/requirejs/require',
         squid: '../test/mocks/squid',
-        originalSquid: '../components/squid/dist'
+        originalSquid: '../components/squid/dist',
+        "components/node-uuid/uuid": '../components/node-uuid/uuid'
     },
     shim: {
         'angular': {
