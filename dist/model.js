@@ -74,7 +74,7 @@ define(['angular',
                 "merchantId": "mrid",
                 "merchantType": "mbtp",
                 "pageError": "erpg",
-                "pageGoal": "goal",
+                "pageGoal": "goal", //route
                 "pageGroup": "pgrp", // buzname
                 "pageName": "page", // buzname
                 "pageQualifer": "qual", // buzname
@@ -86,7 +86,7 @@ define(['angular',
                 "siteHierarchy": "shir", // buzname
                 "sourceCi": "s", // productConfig
                 "tealeaf": "teal",
-                "templateName": "tmpl",
+                "templateName": "tmpl", // route
                 "uuid": "csci", // $CalDataHelper
                 "version": "vers", // buzname
                 "visitorId": "vid"
@@ -105,8 +105,11 @@ define(['angular',
                 _dataObj: productConfig,
                 _decoratorList: [],
                 decorators: {
-                    buzname: function (buzname, pageQualifier) {
+                    buzname: function (trackingData, pageQualifier) {
 
+                        if (!trackingData) return;
+
+                        var buzname = trackingData.buzname;
                         if (!buzname) return;
 
                         var buznameDiff = buzname[pageQualifier];
@@ -127,6 +130,13 @@ define(['angular',
                     locale: function (locale) {
                         if (locale && locale.country) {
                             this._dataObj[$FptiConstants.fptiKeys.locale] = locale.country;
+                        }
+                    },
+
+                    templateName: function (trackingData, pageQualifier) {
+                        if (trackingData && trackingData.templateName) {
+                            this._dataObj[$FptiConstants.fptiKeys.templateName] =
+                                trackingData.templateName + ((pageQualifier) ? (':' + pageQualifier) : '');
                         }
                     }
                 },

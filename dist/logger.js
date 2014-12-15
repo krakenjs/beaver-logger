@@ -158,12 +158,12 @@ define([
 
             var _beaconUrl = $config.fptiBeaconUrl;
             return {
-                setupDataString: function (buzname, pageQualifier) {
+                setupDataString: function (route) {
                     if (typeof PAYPAL.analytics != "undefined") {
                         PAYPAL.core = PAYPAL.core || {};
                         PAYPAL.core.pta = PAYPAL.analytics.setup({
                             data: new $FptiBuilder({
-                                buzname: buzname
+                                trackingData: (route || {}).trackingData
                                 //... Other flow data pass-in here to resolve page qualifier
                             })
                                 .build()

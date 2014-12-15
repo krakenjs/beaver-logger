@@ -5,11 +5,11 @@ define(['angular',
     './model'], function (angular) {
     angular.module('beaver.builder', ['squid', 'beaver.model'])
         .factory('$FptiBuilder', function ($Class,
-                                           $LocaleModel,
-                                           $rootScope,
-                                           $FptiConstants,
-                                           $FptiDataModel,
-                                           $CalDataModel) {
+            $LocaleModel,
+            $rootScope,
+            $FptiConstants,
+            $FptiDataModel,
+            $CalDataModel) {
             /**
              *  Build the front-end FPTI event from three data sources
              *      1. the per-product configuration
@@ -19,13 +19,18 @@ define(['angular',
              */
 
             return $Class.extend('FptiBuilder', {
+
                 resolvePageQualifier: function () {
                     // TODO implment page qualifier resolver 
                     // based on flow data passed in
-                    return "fullpage";
+                    this.pageQualifier = "fullpage";
                 },
 
                 build: function () {
+
+                    if (!this.trackingData) return this;
+
+                    this.resolvePageQualifier();
 
                     // Generate the IDs in front-end and send to server-side by logging calls
                     var calDataModel = $CalDataModel.instance();
@@ -36,8 +41,10 @@ define(['angular',
                     });
 
                     this._dataObj = (new $FptiDataModel())
-                        .decorate('buzname', this.buzname, this.resolvePageQualifier())
+                        .decorate('buzname', this.trackingData, this.pageQualifier)
                         .decorate('locale', $LocaleModel.instance())
+                        .decorate('templateName', this.trackingData, this.pageQualifier)
+                        .decorate('pageGoal', this.trackingData.pageGoal)
                         .decorate('correlationId', $rootScope.metaData.correlationId)
                         .decorate('uuid', $rootScope.metaData.uuid)
                         .decorate('pageStartTime', (new Date()).getTime())
