@@ -1,7 +1,7 @@
 "use strict";
 
 define(['angular',
-        'components/node-uuid/uuid',    // Using the same moduel as used in NodeInfra
+        'components/node-uuid/uuid', // Using the same moduel as used in NodeInfra
         'squid/index'], function (angular, uuid) {
     angular.module('beaver.model', ['squid'])
         .constant('$FptiConstants', {
@@ -63,7 +63,7 @@ define(['angular',
             // This mapping can also be served as default decorator
             fptiKeys: {
                 "businessType": "bztp",
-                "correlationId": "calc",
+                "correlationId": "calc", // CalDataHelper
                 "countryOfPage": "ccpg", // buzname
                 "errorCode": "eccd",
                 "fieldError": "erfd",
@@ -87,7 +87,7 @@ define(['angular',
                 "sourceCi": "s", // productConfig
                 "tealeaf": "teal",
                 "templateName": "tmpl",
-                "uuid": "csci",
+                "uuid": "csci", // $CalDataHelper
                 "version": "vers", // buzname
                 "visitorId": "vid"
             }
@@ -151,25 +151,28 @@ define(['angular',
                         } else {
                             var fptiKey = $FptiConstants.fptiKeys[name];
                             // If the fptiKey is defined and value is present, add the k-v pair
-                            if (fptiKey && params) {
-                                this._dataObj[fptiKey] = params;
+                            if (fptiKey && params && params.length > 0) {
+                                this._dataObj[fptiKey] = params[0];
                             }
                         }
                     }
                     return this._dataObj;
                 }
             })
-        }).service('$CalDataModel', function () {
-            return $Class.extend('CalDataModel', {
+        }).factory('$CalDataModel', function () {
+
+            var uuid_v4_mask = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+            var uuid_v1_mask = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX";
+
+            return $Model.extend('CalDataModel', {
                 getCorrelationId: function () {
-                    var uidRandom = uuid.v4();
-                    var uidRandomArr = uidRandom.split('-');
-                    var uidTime = uuid.v1().split('-');
+                    var uidRandomArr = (uuid.v4() || uuid_v4_mask).split('-');
+                    var uidTime = (uuid.v1() || uuid_v1_mask).split('-');
                     var correlationId = uidTime[0] + uidRandomArr[0].substr(0, 5);
                     return correlationId;
                 },
                 getUuid: function () {
-                    return uuid.v4().replace(/-/g, '');
+                    return (uuid.v4() || uuid_v4_mask).replace(/-/g, '');
                 }
             });
         });
