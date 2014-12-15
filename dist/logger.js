@@ -161,15 +161,19 @@ define([
                 setupDataString: function (route) {
                     if (typeof PAYPAL.analytics != "undefined") {
                         PAYPAL.core = PAYPAL.core || {};
-                        PAYPAL.core.pta = PAYPAL.analytics.setup({
-                            data: new $FptiBuilder({
+                        
+                        var data = new $FptiBuilder({
                                 trackingData: (route || {}).trackingData
                                 //... Other flow data pass-in here to resolve page qualifier
-                            })
-                                .build()
-                                .toString(),
+                                }).build();
+
+                        PAYPAL.core.pta = PAYPAL.analytics.setup({
+                            data: data.toString(),
                             url: _beaconUrl
                         });
+
+                        //Seting pagename data to OpinionLab object
+                        PAYPAL.core.OL = data._dataObj;
                     }
                 }
             };
