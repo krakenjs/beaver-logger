@@ -8,11 +8,11 @@ define([
     var SIZE_LIMIT = 100;
 
     function buildHttpMock($httpBackend, verifier){
-        $httpBackend.whenPOST('/webapps/test/api/log', function(data) {
+        $httpBackend.whenPOST('/webapps/test/api/log', function(body) {
             if(verifier){
-                return verifier(data);
+                return verifier(body);
             }else{
-                return Boolean(JSON.parse(data).events.length);
+                return Boolean(JSON.parse(body).data.events.length);
             }
 
         }).respond({ack: 'success'});
