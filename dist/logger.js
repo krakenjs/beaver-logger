@@ -4,11 +4,10 @@ define([
     'angular',
     'squid/index',
     './api',
-    './level',
-    './builder'
+    './level'
 ], function (angular) {
 
-    return angular.module('beaver', ['squid', 'beaver.api', 'beaver.level', 'beaver.builder'])
+    return angular.module('beaver', ['squid', 'beaver.api', 'beaver.level'])
 
         .factory('$Logger', function ($injector,
                                       $Class,
@@ -152,30 +151,6 @@ define([
             return new $Logger({
                 api: new $LoggerApi
             });
-        })
-
-        .service('$fpti', function ($config, $FptiBuilder) {
-
-            var _beaconUrl = $config.fptiBeaconUrl;
-            return {
-                setupDataString: function (route) {
-                    if (typeof PAYPAL.analytics != "undefined") {
-                        PAYPAL.core = PAYPAL.core || {};
-                        
-                        var data = new $FptiBuilder({
-                                trackingData: (route || {}).trackingData
-                                //... Other flow data pass-in here to resolve page qualifier
-                                }).build();
-
-                        PAYPAL.core.pta = PAYPAL.analytics.setup({
-                            data: data.toString(),
-                            url: _beaconUrl
-                        });
-
-                        //Seting pagename data to OpinionLab object
-                        PAYPAL.core.OL = data._dataObj;
-                    }
-                }
-            };
         });
+
 });
