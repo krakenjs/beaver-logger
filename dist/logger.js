@@ -20,6 +20,8 @@ define([
                                       $logLevel,
                                       $consoleLogLevel) {
 
+            var windowUnloaded = false;
+
             var proto = {};
 
             angular.forEach($logLevel, function (level) {
@@ -44,6 +46,8 @@ define([
                     $window.onbeforeunload = function (event) {
                         logger.info('window_unload').flush(true);
 
+                        windowUnloaded = true;
+
                         if (previousBeforeUnloadHandler) {
                             previousBeforeUnloadHandler.apply(this, arguments);
                         }
@@ -53,6 +57,9 @@ define([
                 },
 
                 log: function (level, event, payload) {
+                    if (windowUnloaded) {
+                        return this;
+                    }
 
                     if (this.buffer.length >= this.sizeLimit) {
                         return this;
