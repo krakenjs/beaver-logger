@@ -39,8 +39,14 @@ define([
                     var logger = this;
                     this.buffer = [];
 
+                    var previousBeforeUnloadHandler = $window.onbeforeunload;
+
                     $window.onbeforeunload = function (event) {
                         logger.info('window_unload').flush(true);
+
+                        if (previousBeforeUnloadHandler) {
+                            previousBeforeUnloadHandler.apply(this, arguments);
+                        }
                     };
 
                     this.daemon();
