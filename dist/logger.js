@@ -2,40 +2,58 @@
 
 define([
     'angular',
-    'squid/index',
-    './api',
     './level'
 ], function (angular) {
 
-    return angular.module('beaver', ['squid', 'beaver.api', 'beaver.level'])
+    return angular.module('beaver', ['beaver.level'])
 
         .factory('$Logger', function ($injector,
-                                      $Class,
+                                      $http,
                                       $window,
                                       $interval,
                                       $timeout,
                                       $log,
-                                      $config,
                                       $rootScope,
                                       $logLevel,
                                       $consoleLogLevel) {
 
             var windowUnloaded = false;
 
-            var proto = {};
+            var logger = {};
+
+            var jwt = angular.element(document.getElementById('x-csrf-jwt')).text();
+            $rootScope.csrfJWT = $rootScope.csrfJWT || (jwt && JSON.parse(jwt));
 
             angular.forEach($logLevel, function (level) {
-                proto[level] = function (event, payload) {
+                logger[level] = function (event, payload) {
                     return this.log(level, event, payload);
                 }
             });
 
-            return $Class.extend('Logger', proto, {
+            var hostname = $window.location && $window.location.hostname || '';
+
+            var deploy = {
+                isLocal: function() {
+                    return $window.location.hostname === 'localhost' ||
+                        hostname === 'localhost.paypal.com';
+                },
+
+                isStage: function() {
+                    return Boolean(hostname.match(/^.*\.qa\.paypal\.com$/));
+                },
+
+                isLive: function() {
+                    return hostname === 'www.paypal.com';
+                }
+            };
+
+            angular.extend(logger, {
 
                 autoLog: [$logLevel.WARNING, $logLevel.ERROR],
                 interval: 5 * 60 * 1000, //5 minutes
                 sizeLimit: 100,
                 debounceInterval: 10,
+                uri: '/api/log',
 
                 init: function () {
                     var logger = this;
@@ -66,7 +84,7 @@ define([
                     }
 
                     //Print to console only in local and stage
-                    if ($config.deploy.isLocal() || $config.deploy.isStage()) {
+                    if (deploy.isLocal() || deploy.isStage()) {
                         this.print(level, event, payload);
                     }
 
@@ -125,12 +143,31 @@ define([
 
                     var buffer = logger.buffer;
 
-                    logger.api.post({
-                        data: {
-                            events: this.buffer,
-                            meta: {}
-                        }
-                    }).catch(function (err) {
+                    var meta = {};
+
+                    try {
+                        meta = $injector.get('$metaBuilder').build();
+                    }
+                    catch(err) {}
+
+                    $http({
+                        method: 'post',
+                        url:    $window.config.urls.baseUrl + this.uri,
+                        data:   {
+                            data: {
+                                events: logger.buffer
+                            },
+                            meta: meta
+                        },
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'x-csrf-jwt': $rootScope.csrfJWT
+                        },
+                        requestType: 'json',
+                        responseType: 'json'
+
+                    }).catch(function(err) {
+
                         logger.buffer.unshift.apply(logger.buffer, buffer);
                         logger.debug("log_publish_fail", {
                             error: err.stack || err.toString()
@@ -157,13 +194,19 @@ define([
                     }
                 }
             });
+
+            function Logger(val) {
+                angular.extend(this, val);
+                this.init();
+            }
+
+            Logger.prototype = logger;
+            Logger.prototype.constructor = Logger;
+
+            return Logger;
+
+        }).factory('$logger', function($Logger) {
+            return new $Logger();
         })
-
-        .service('$logger', function ($Logger, $LoggerApi) {
-
-            return new $Logger({
-                api: new $LoggerApi
-            });
-        });
 
 });

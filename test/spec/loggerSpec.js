@@ -55,13 +55,14 @@ define([
             setTestLocals($injector);
 
             var $Logger    = $injector.get('$Logger');
-            var $LoggerApi = $injector.get('$LoggerApi');
 
+            $window.config = {
+                urls: {
+                    baseUrl: '/webapps/test'
+                }
+            };
 
             $logger = new $Logger({
-                api: new $LoggerApi({
-                    baseURI: '/webapps/test'
-                }),
                 interval: INTERVAL,
                 sizeLimit: SIZE_LIMIT
             });

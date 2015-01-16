@@ -3,7 +3,7 @@
 define(['angular'], function (angular) {
     return angular.module('beaver.level', [])
 
-        .factory('$logLevel', function($Api, $config) {
+        .factory('$logLevel', function() {
 
             return {
                 INFO:    'info',
@@ -14,7 +14,7 @@ define(['angular'], function (angular) {
             }
         })
 
-        .factory('$consoleLogLevel', function($Api, $config, $log) {
+        .factory('$consoleLogLevel', function() {
 
             return {
                 info:    'info',
