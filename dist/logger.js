@@ -18,11 +18,9 @@ define([
                                       $consoleLogLevel) {
 
             var windowUnloaded = false;
+            $rootScope.csrfJWT = $rootScope.csrfJWT || window.config.csrfJwt;
 
             var logger = {};
-
-            var jwt = angular.element(document.getElementById('x-csrf-jwt')).text();
-            $rootScope.csrfJWT = $rootScope.csrfJWT || (jwt && JSON.parse(jwt));
 
             angular.forEach($logLevel, function (level) {
                 logger[level] = function (event, payload) {
