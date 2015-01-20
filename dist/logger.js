@@ -82,7 +82,7 @@ define([
                     }
 
                     //Print to console only in local and stage
-                    if (deploy.isLocal() || deploy.isStage()) {
+                    if (window.config.enableLogs || deploy.isLocal() || deploy.isStage()) {
                         this.print(level, event, payload);
                     }
 
