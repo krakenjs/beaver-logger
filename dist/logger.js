@@ -164,7 +164,7 @@ define([
                         requestType: 'json',
                         responseType: 'json'
 
-                    }).catch(function(err) {
+                    }, function(err) {
 
                         logger.buffer.unshift.apply(logger.buffer, buffer);
                         logger.debug("log_publish_fail", {
