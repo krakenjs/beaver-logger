@@ -17,7 +17,6 @@ define([
                                       $logLevel,
                                       $consoleLogLevel) {
 
-            var windowUnloaded = false;
             $rootScope.csrfJWT = $rootScope.csrfJWT || window.config.csrfJwt;
 
             var logger = {};
@@ -62,7 +61,7 @@ define([
                     $window.onbeforeunload = function (event) {
                         logger.info('window_unload').flush(true);
 
-                        windowUnloaded = true;
+                        logger.done();
 
                         if (previousBeforeUnloadHandler) {
                             previousBeforeUnloadHandler.apply(this, arguments);
@@ -72,12 +71,12 @@ define([
                     this.daemon();
                 },
 
-                log: function (level, event, payload) {
-                    if (windowUnloaded) {
-                        return this;
-                    }
+                done: function() {
+                    this.isDone = true;
+                },
 
-                    if (this.buffer.length >= this.sizeLimit) {
+                log: function (level, event, payload) {
+                    if (this.isDone || this.buffer.length >= this.sizeLimit) {
                         return this;
                     }
 
