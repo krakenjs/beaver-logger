@@ -13,6 +13,7 @@ define([
                                       $interval,
                                       $timeout,
                                       $log,
+                                      $q,
                                       $rootScope,
                                       $logLevel,
                                       $consoleLogLevel) {
@@ -66,6 +67,8 @@ define([
                         }
                     };
 
+                    this.debouncer_resolvers = [];
+
                     this.daemon();
                 },
 
@@ -74,13 +77,14 @@ define([
                 },
 
                 log: function (level, event, payload) {
-                    if (this.isDone || this.buffer.length >= this.sizeLimit) {
-                        return this;
-                    }
 
                     //Print to console only in local and stage
                     if (window.config.enableLogs || deploy.isLocal() || deploy.isStage()) {
                         this.print(level, event, payload);
+                    }
+
+                    if (this.isDone || this.buffer.length >= this.sizeLimit) {
+                        return this;
                     }
 
                     this.buffer.push({
@@ -117,16 +121,25 @@ define([
                     var logger = this;
 
                     if (immediate) {
-                        return this._flush();
+                        return $q.when(this._flush());
                     }
 
                     if (logger.debouncer) {
                         $timeout.cancel(logger.debouncer);
                     }
 
-                    logger.debouncer = $timeout(function () {
-                        logger._flush();
+                    logger.debouncer = $timeout(function() {
+                        return logger._flush().then(function() {
+                            while (logger.debouncer_resolvers.length) {
+                                logger.debouncer_resolvers.pop().call();
+                            }
+                        });
+
                     }, this.debounceInterval);
+
+                    return $q(function(resolve) {
+                        logger.debouncer_resolvers.push(resolve);
+                    });
                 },
 
                 _flush: function () {
@@ -145,7 +158,7 @@ define([
                     }
                     catch(err) {}
 
-                    $http({
+                    var req = $http({
                         method: 'post',
                         url:    $window.config.urls.baseUrl + this.uri,
                         data:   {
@@ -160,7 +173,7 @@ define([
                         requestType: 'json',
                         responseType: 'json'
 
-                    }, function(err) {
+                    }).then(null, function(err) {
 
                         logger.buffer.unshift.apply(logger.buffer, buffer);
                         logger.debug("log_publish_fail", {
@@ -170,6 +183,8 @@ define([
                     });
 
                     logger.buffer = [];
+
+                    return req;
                 },
 
                 daemon: function () {
