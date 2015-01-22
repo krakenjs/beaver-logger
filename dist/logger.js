@@ -17,8 +17,6 @@ define([
                                       $logLevel,
                                       $consoleLogLevel) {
 
-            $rootScope.csrfJWT = $rootScope.csrfJWT || window.config.csrfJwt;
-
             var logger = {};
 
             angular.forEach($logLevel, function (level) {
@@ -157,8 +155,7 @@ define([
                             meta: meta
                         },
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'x-csrf-jwt': $rootScope.csrfJWT
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
                         requestType: 'json',
                         responseType: 'json'
