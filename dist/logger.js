@@ -67,8 +67,6 @@ define([
                         }
                     };
 
-                    this.debouncer_resolvers = [];
-
                     this.daemon();
                 },
 
@@ -124,21 +122,26 @@ define([
                         return $q.when(this._flush());
                     }
 
-                    if (logger.debouncer) {
-                        $timeout.cancel(logger.debouncer);
+                    if (logger.debouncer_timeout) {
+                        $timeout.cancel(logger.debouncer_timeout);
                     }
 
-                    logger.debouncer = $timeout(function() {
-                        return logger._flush().then(function() {
-                            while (logger.debouncer_resolvers.length) {
-                                logger.debouncer_resolvers.pop().call();
-                            }
-                        });
+                    logger.debouncer_timeout = $timeout(function() {
+
+                        logger.debouncer_resolver();
+
+                        delete logger.debouncer_resolver;
+                        delete logger.debouncer_resolver;
+                        delete logger.debouncer_timeout;
 
                     }, this.debounceInterval);
 
-                    return $q(function(resolve) {
-                        logger.debouncer_resolvers.push(resolve);
+                    if (logger.debouncer_promise) {
+                        return logger.debouncer_promise;
+                    }
+
+                    return logger.debouncer_promise = $q(function(resolver) {
+                        logger.debouncer_resolver = resolver;
                     });
                 },
 
