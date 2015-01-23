@@ -130,7 +130,7 @@ define([
 
                         logger.debouncer_resolver();
 
-                        delete logger.debouncer_resolver;
+                        delete logger.debouncer_promise;
                         delete logger.debouncer_resolver;
                         delete logger.debouncer_timeout;
 
