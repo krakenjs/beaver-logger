@@ -58,7 +58,7 @@ define([
                     var previousBeforeUnloadHandler = $window.onbeforeunload;
 
                     $window.onbeforeunload = function (event) {
-                        logger.info('window_unload').flush(true);
+                        logger.info('window_unload')._flush(true);
 
                         logger.done();
 
@@ -145,7 +145,7 @@ define([
                     });
                 },
 
-                _flush: function () {
+                _flush: function (sync) {
                     var logger = this;
 
                     if (!logger.buffer.length) {
@@ -161,33 +161,31 @@ define([
                     }
                     catch(err) {}
 
-                    var req = $http({
-                        method: 'post',
-                        url:    $window.config.urls.baseUrl + this.uri,
-                        data:   {
-                            data: {
-                                events: logger.buffer
-                            },
-                            meta: meta
+                    var req = this.ajax('post', $window.config.urls.baseUrl + this.uri, {
+                        data: {
+                            events: logger.buffer
                         },
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        requestType: 'json',
-                        responseType: 'json'
-
-                    }).then(null, function(err) {
-
-                        logger.buffer.unshift.apply(logger.buffer, buffer);
-                        logger.debug("log_publish_fail", {
-                            error: err.stack || err.toString()
-                        });
-                        $log.error('Unable to send logs', err);
-                    });
+                        meta: meta
+                    }, sync);
 
                     logger.buffer = [];
 
                     return req;
+                },
+
+                ajax: function(method, url, json, sync) {
+                    return $q(function(resolve) {
+                        var req = new(this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                        req.open(method.toUpperCase(), url, !sync);
+                        req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                        req.setRequestHeader('Content-type', 'application/json');
+                        req.onreadystatechange = function () {
+                            if (req.readyState > 3) {
+                                resolve();
+                            }
+                        };
+                        req.send(JSON.stringify(json));
+                    });
                 },
 
                 daemon: function () {
