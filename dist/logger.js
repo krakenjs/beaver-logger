@@ -128,19 +128,19 @@ define([
 
                     logger.debouncer_timeout = $timeout(function() {
 
-                        logger.debouncer_resolver();
+                        var resolver = logger.debouncer_resolver;
 
                         delete logger.debouncer_promise;
                         delete logger.debouncer_resolver;
                         delete logger.debouncer_timeout;
 
+                        logger._flush().then(function() {
+                            resolver();
+                        });
+
                     }, this.debounceInterval);
 
-                    if (logger.debouncer_promise) {
-                        return logger.debouncer_promise;
-                    }
-
-                    return logger.debouncer_promise = $q(function(resolver) {
+                    return logger.debouncer_promise = logger.debouncer_promise || $q(function(resolver) {
                         logger.debouncer_resolver = resolver;
                     });
                 },
