@@ -146,7 +146,7 @@ define([
                     var logger = this;
 
                     if (!logger.buffer.length) {
-                        return;
+                        return $q.when();
                     }
 
                     var buffer = logger.buffer;
