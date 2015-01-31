@@ -21,8 +21,8 @@ define([
             var logger = {};
 
             angular.forEach($logLevel, function (level) {
-                logger[level] = function (event, payload) {
-                    return this.log(level, event, payload);
+                logger[level] = function (event, payload, settings) {
+                    return this.log(level, event, payload, settings);
                 }
             });
 
@@ -50,6 +50,7 @@ define([
                 sizeLimit: 100,
                 debounceInterval: 10,
                 uri: '/api/log',
+                debounceCache: {},
 
                 init: function () {
                     var logger = this;
@@ -74,16 +75,7 @@ define([
                     this.isDone = true;
                 },
 
-                log: function (level, event, payload) {
-
-                    //Print to console only in local and stage
-                    if (window.config.enableLogs || deploy.isLocal() || deploy.isStage()) {
-                        this.print(level, event, payload);
-                    }
-
-                    if (this.isDone || this.buffer.length >= this.sizeLimit) {
-                        return this;
-                    }
+                enqueue: function(level, event, payload){
 
                     this.buffer.push({
                         level: level,
@@ -97,7 +89,61 @@ define([
                         this.flush();
                     }
 
-                    return this;
+                },
+
+                log: function (level, event, payload, settings) {
+
+                    var self = this;
+
+                    //Print to console only in local and stage
+                    if (window.config.enableLogs || deploy.isLocal() || deploy.isStage()) {
+                        self.print(level, event, payload);
+                    }
+
+                    if (this.isDone || this.buffer.length >= this.sizeLimit) {
+                        return self;
+                    }
+
+                    if(settings){
+                        if(settings.debounceFactor){
+                            //First check the debounceCache to see if we have same event+message
+                            var debouncedEvent = self.debounceCache[event+settings.debounceFactor];
+
+                            if(debouncedEvent){
+                                debouncedEvent.payload['count'] += 1;
+                                self.debounceCache[event+settings.debounceFactor] = debouncedEvent;
+                            }
+                            //If not already present create an entry for this event+message in debounce cache.
+                            else {
+                                payload = payload || {};
+                                payload['count'] = 1;
+
+                                self.debounceCache[event+settings.debounceFactor] = {
+                                    level: level,
+                                    event: event,
+                                    payload: payload
+                                };
+
+                                var debounceInterval = settings.debounceInterval || 1000;
+
+                                //Add to the log buffer after a interval specified by settings
+                                $timeout(function(){
+                                    var debouncedLog = self.debounceCache[event+settings.debounceFactor];
+                                    self.enqueue(debouncedLog.level, debouncedLog.event, debouncedLog.payload);
+                                    delete self.debounceCache[event+settings.debounceFactor];
+                                }, debounceInterval);
+                            }
+                        }
+                        else {
+                            //Handle Other settings and enqueue the log.
+                            self.enqueue(level, event, payload);
+                        }
+
+                    } else{
+                        self.enqueue(level, event, payload);
+                    }
+
+                    return self;
                 },
 
 
