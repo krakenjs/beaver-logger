@@ -89,11 +89,15 @@ define([
                         this.flush();
                     }
 
+                    return this;
                 },
 
                 log: function (level, event, payload, settings) {
 
                     var self = this;
+
+                    payload  = payload  || {};
+                    settings = settings || {};
 
                     //Print to console only in local and stage
                     if (window.config.enableLogs || deploy.isLocal() || deploy.isStage()) {
@@ -104,43 +108,34 @@ define([
                         return self;
                     }
 
-                    if(settings){
-                        if(settings.debounceFactor){
-                            //First check the debounceCache to see if we have same event+message
-                            var debouncedEvent = self.debounceCache[event+settings.debounceFactor];
+                    if (!settings.debounceFactor) {
+                        return self.enqueue(level, event, payload);
+                    }
 
-                            if(debouncedEvent){
-                                debouncedEvent.payload['count'] += 1;
-                                self.debounceCache[event+settings.debounceFactor] = debouncedEvent;
-                            }
-                            //If not already present create an entry for this event+message in debounce cache.
-                            else {
-                                payload = payload || {};
-                                payload['count'] = 1;
+                    var eventName = event + '_' + settings.debounceFactor;
 
-                                self.debounceCache[event+settings.debounceFactor] = {
-                                    level: level,
-                                    event: event,
-                                    payload: payload
-                                };
+                    // First check the debounceCache to see if we have same event+message
+                    var debouncedEvent = self.debounceCache[eventName];
 
-                                var debounceInterval = settings.debounceInterval || 1000;
+                    if(debouncedEvent){
+                        debouncedEvent.payload.count += 1;
+                    }
 
-                                //Add to the log buffer after a interval specified by settings
-                                $timeout(function(){
-                                    var debouncedLog = self.debounceCache[event+settings.debounceFactor];
-                                    self.enqueue(debouncedLog.level, debouncedLog.event, debouncedLog.payload);
-                                    delete self.debounceCache[event+settings.debounceFactor];
-                                }, debounceInterval);
-                            }
-                        }
-                        else {
-                            //Handle Other settings and enqueue the log.
-                            self.enqueue(level, event, payload);
-                        }
+                    // If not already present create an entry for this event+message in debounce cache.
+                    else {
+                        payload.count = 1;
 
-                    } else{
-                        self.enqueue(level, event, payload);
+                        debouncedEvent = self.debounceCache[eventName] = {
+                            level: level,
+                            event: event,
+                            payload: payload
+                        };
+
+                        //Add to the log buffer after a interval specified by settings
+                        $timeout(function(){
+                            self.enqueue(debouncedEvent.level, debouncedEvent.event, debouncedEvent.payload);
+                            delete self.debounceCache[eventName];
+                        }, settings.debounceInterval || 1000);
                     }
 
                     return self;
