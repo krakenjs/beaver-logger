@@ -59,6 +59,11 @@ define([
                     var previousBeforeUnloadHandler = $window.onbeforeunload;
 
                     $window.onbeforeunload = function (event) {
+
+                        if (logger.isDone) {
+                            return;
+                        }
+
                         logger.info('window_unload')._flush(true);
 
                         logger.done();
