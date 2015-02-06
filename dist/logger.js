@@ -69,7 +69,7 @@ define([
                         logger.done();
 
                         if (previousBeforeUnloadHandler) {
-                            previousBeforeUnloadHandler.apply(this, arguments);
+                            return previousBeforeUnloadHandler.apply(this, arguments);
                         }
                     };
 
