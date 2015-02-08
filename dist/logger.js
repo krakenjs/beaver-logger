@@ -79,9 +79,9 @@ define([
                             return;
                         }
 
-                        logger.done();
-
                         logger.info('window_unload')._flush(true);
+
+                        logger.done();
 
                         if (previousUnloadHandler) {
                             return previousUnloadHandler.apply(this, arguments);
@@ -246,7 +246,9 @@ define([
                 },
 
                 ajax: function(method, url, json, sync) {
+
                     return $q(function(resolve) {
+
                         var req = new(this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
                         req.open(method.toUpperCase(), url, !sync);
                         req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
