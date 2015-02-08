@@ -64,10 +64,27 @@ define([
                             return;
                         }
 
-                        logger.info('window_unload')._flush(true);
+                        logger.info('window_beforeunload')._flush(true);
 
                         if (previousBeforeUnloadHandler) {
                             return previousBeforeUnloadHandler.apply(this, arguments);
+                        }
+                    };
+
+                    var previousUnloadHandler = $window.onbeforeunload;
+
+                    $window.onunload = function (event) {
+
+                        if (logger.isDone) {
+                            return;
+                        }
+
+                        logger.done();
+
+                        logger.info('window_unload')._flush(true);
+
+                        if (previousUnloadHandler) {
+                            return previousUnloadHandler.apply(this, arguments);
                         }
                     };
 
