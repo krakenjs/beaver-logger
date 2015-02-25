@@ -130,7 +130,7 @@ define([
                 settings = settings || {};
 
                 //Print to console only in local and stage
-                if (window.meta.corp || deploy.isLocal() || deploy.isStage()) {
+                if (window.meta && window.meta.corp || deploy.isLocal() || deploy.isStage()) {
                     self.print(level, event, payload);
                 }
 
