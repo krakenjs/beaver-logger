@@ -171,7 +171,6 @@ define([
                 return self;
             },
 
-
             print: function (level, event, payload) {
                 var args = [event];
 
@@ -247,8 +246,7 @@ define([
             ajax: function (method, url, json, sync) {
 
                 return $q(function (resolve) {
-
-                    var req = new (this.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                    var req = new (window.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
                     req.open(method.toUpperCase(), url, !sync);
                     req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                     req.setRequestHeader('Content-type', 'application/json');
@@ -293,3 +291,5 @@ define([
     })
 
 });
+
+

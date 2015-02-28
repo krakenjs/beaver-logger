@@ -45,7 +45,7 @@ module.exports = function(grunt) {
             unit: {
                 configFile: 'test/karma.config.js',
                 singleRun: true,
-                browsers: ['Chrome'],
+                browsers: ['PhantomJS'],
                 src: ["test/spec/**/*.js"],
                 preprocessors: {
                     'dist/**/*.js': 'coverage'
