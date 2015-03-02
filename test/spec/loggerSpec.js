@@ -127,6 +127,85 @@ define([
         });
 
 
+        it('should call flush for error type', function(done){
+
+            $logger.flush = sinon.spy();
+
+            $logger.log($logLevel.ERROR, 'Test');
+
+            assert($logger.flush.called, 'Expect the flush to be called');
+
+            done();
+        });
+
+        it('should print the log to console for local mode', function(done){
+
+            $logger.flush = sinon.spy();
+            $logger.print = sinon.spy();
+
+            $logger.log($logLevel.INFO, 'Test');
+
+            assert($logger.print.called, 'Expect the print to be called');
+
+            done();
+        });
+
+        it('should print the log to console for corp ip', function(done){
+
+            $logger.flush = sinon.spy();
+            $logger.print = sinon.spy();
+
+            window.meta = {
+                corp: true
+            };
+
+            $logger.log($logLevel.INFO, 'Test');
+
+            assert($logger.print.called, 'Expect the print to be called');
+
+            done();
+        });
+
+        it('should combine events based on debounce factor', function(done){
+
+            var events = [];
+
+            var stub = sinon.stub($logger, 'enqueue', function(level, event, payload){
+
+                events.push({
+                    name: event,
+                    payload: payload
+                })
+            });
+
+            $logger.debug('window_error', {}, {
+                debounceFactor: "type1",
+                debounceInterval: 1000
+            });
+
+            $logger.debug('window_error', {}, {
+                debounceFactor: "type1",
+                debounceInterval: 1000
+            });
+
+            $logger.debug('window_error', {}, {
+                debounceFactor: "type1",
+                debounceInterval: 1000
+            });
+
+            $logger.debug('some_event', {}, {
+                debounceFactor: "type2",
+                debounceInterval: 1000
+            });
+
+            $timeout.flush();
+
+            assert(events.length === 2, 'Expect two events to be logged');
+            assert(events[0].payload.count === 3, 'Expect the count for the first event to be three')
+            done();
+        });
+
+
         it('should post data on flush', function(done) {
             angular.forEach(expectedData, function(data){
                 $logger.log($logLevel.INFO, data.eventName);
@@ -145,6 +224,8 @@ define([
 
             return promise;
         });
+
+
 
         it('should NOT make any requests if there is no data', function(done) {
 
