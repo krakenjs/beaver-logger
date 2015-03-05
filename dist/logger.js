@@ -131,16 +131,16 @@ define([
                 payload = payload   || {};
                 settings = settings || {};
 
-                if (window.meta && window.meta.requestTime) {
-                    payload.elapsed = Date.now() - window.meta.requestTime;
-                }
-
                 if (settings.unique) {
                     var hash = event + ':' + JSON.stringify(payload);
                     if (~uniqueEvents.indexOf(hash)) {
                         return self;
                     }
                     uniqueEvents.push(hash);
+                }
+
+                if (window.meta && window.meta.requestTime) {
+                    payload.elapsed = Date.now() - window.meta.requestTime;
                 }
 
                 //Print to console only in local and stage
