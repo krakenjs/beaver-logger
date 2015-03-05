@@ -42,6 +42,8 @@ define([
             }
         };
 
+        var uniqueEvents = [];
+
         angular.extend(logger, {
 
             autoLog: [$logLevel.WARNING, $logLevel.ERROR],
@@ -126,8 +128,16 @@ define([
 
                 var self = this;
 
-                payload = payload || {};
+                payload = payload   || {};
                 settings = settings || {};
+
+                if (settings.unique) {
+                    var hash = event + ':' + JSON.stringify(payload);
+                    if (~uniqueEvents.indexOf(hash)) {
+                        return self;
+                    }
+                    uniqueEvents.push(hash);
+                }
 
                 //Print to console only in local and stage
                 if (window.meta && window.meta.corp || deploy.isLocal() || deploy.isStage()) {
