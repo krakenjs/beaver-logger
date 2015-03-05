@@ -131,6 +131,10 @@ define([
                 payload = payload   || {};
                 settings = settings || {};
 
+                if (window.meta && window.meta.requestTime) {
+                    payload.elapsed = Date.now() - window.meta.requestTime;
+                }
+
                 if (settings.unique) {
                     var hash = event + ':' + JSON.stringify(payload);
                     if (~uniqueEvents.indexOf(hash)) {
