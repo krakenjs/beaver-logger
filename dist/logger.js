@@ -23,7 +23,7 @@ define([
         angular.forEach($logLevel, function (level) {
             logger[level] = function (event, payload, settings) {
                 return this.log(level, event, payload, settings);
-            }
+            };
         });
 
         var hostname = $window.location && $window.location.hostname || '';
@@ -260,7 +260,8 @@ define([
             ajax: function (method, url, json, sync) {
 
                 return $q(function (resolve) {
-                    var req = new (window.XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+                    var XRequest = window.XMLHttpRequest || ActiveXObject;
+                    var req = new XRequest('MSXML2.XMLHTTP.3.0');
                     req.open(method.toUpperCase(), url, !sync);
                     req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                     req.setRequestHeader('Content-type', 'application/json');
@@ -302,7 +303,7 @@ define([
 
     }).factory('$logger', function ($Logger) {
         return new $Logger();
-    })
+    });
 
 });
 

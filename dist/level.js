@@ -11,7 +11,7 @@ define(['angular'], function (angular) {
                 ERROR: 'error',
                 WARN:  'warn',
                 ALERT: 'alert'
-            }
+            };
         })
 
         .factory('$consoleLogLevel', function () {

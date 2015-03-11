@@ -1,11 +1,23 @@
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
+
+    var coverageDirectory = 'coverage';
+
+    function isFusion() {
+        return process.env.FUSION_BUILD_GENERATED !== undefined;
+    }
 
     var appConfig = {
         dist: 'dist',
         bower_root: 'components'
     };
+
+    var srcFiles = ['*.js', 'dist/**/*.js'];
+    var testFiles = ['test/**/*.js'];
+    var allFiles = [];
+    Array.prototype.push.apply(allFiles, srcFiles);
+    Array.prototype.push.apply(allFiles, testFiles);
 
     // Project configuration.
     grunt.initConfig({
@@ -17,8 +29,8 @@ module.exports = function(grunt) {
             gruntfile: {
                 src: 'Gruntfile.js'
             },
-            app: {
-                src: ['app/**/*.js']
+            lib: {
+                src: allFiles
             }
         },
         watch: {
@@ -64,11 +76,55 @@ module.exports = function(grunt) {
                     production: true
                 }
             }
+        },
+        plato: {
+            fusion: {
+                options: {
+                    jshint: false,
+                    exclude: /Gruntfile.js/,
+                    complexity: {
+                        logicalor: false,
+                        switchcase: false,
+                        forin: true,
+                        trycatch: true
+                    }
+                },
+                files: {
+                    'plato-reports': srcFiles
+                }
+            }
+        },
+        codecoverage: {
+            all: {
+                src: testFiles,
+                options: {
+                    globals: ['chai'],
+                    timeout: 1000000,
+                    ignoreLeaks: false,
+                    ui: 'bdd',
+                    reporter: 'dot',
+                    covDir: coverageDirectory,
+                    reportType: 'lcov',
+                    printType: 'both',
+                    excludes: ['**/public/**', '**/.build/**', 'Gruntfile.js']
+                }
+            }
+        },
+        checkcoverage: {
+            options: {
+                statements: 90,
+                functions: 90,
+                branches: 90,
+                lines: 95,
+                includePattern: coverageDirectory + '/coverage.json'
+            }
         }
     });
 
+    require('load-grunt-tasks')(grunt);
     // These plugins provide necessary tasks.
-    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-ci-suite');
+    grunt.loadNpmTasks('grunt-plato');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-karma');
@@ -76,6 +132,7 @@ module.exports = function(grunt) {
 
     // Default task.
     grunt.registerTask('default', ['jshint', 'copy']);
-    grunt.registerTask('test', ['bower-install-simple', 'karma']);
+    grunt.registerTask('test', ['jshint', 'plato', 'bower-install-simple', 'karma']);
+    grunt.registerTask('lint', ['jshint']);
 
 };
