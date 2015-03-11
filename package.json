@@ -4,7 +4,9 @@
   "description": "A component for frontend logging",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "mkdir -p logs && grunt test",
+    "cover": "mkdir -p logs && grunt cover",
+    "lint": "grunt lint"
   },
   "repository": {
     "type": "git",
