@@ -1,3 +1,5 @@
+/* global describe: false, it: false, before: false, after: false, beforeEach: false, sinon: false, assert: false */
+
 window.config = {
     urls: {
         baseUrl: '/webapps/test'
@@ -40,7 +42,7 @@ define([
                     requests.push(json);
                     this.readyState = 4;
                     this.onreadystatechange();
-                }
+                };
             };
         }
 
@@ -175,7 +177,7 @@ define([
                 events.push({
                     name: event,
                     payload: payload
-                })
+                });
             });
 
             $logger.debug('window_error', {}, {
@@ -201,7 +203,7 @@ define([
             $timeout.flush();
 
             assert(events.length === 2, 'Expect two events to be logged');
-            assert(events[0].payload.count === 3, 'Expect the count for the first event to be three')
+            assert(events[0].payload.count === 3, 'Expect the count for the first event to be three');
             done();
         });
 

@@ -2,3 +2,4 @@ components
 node_modules
 .idea/*
 coverage/
+plato-reports
