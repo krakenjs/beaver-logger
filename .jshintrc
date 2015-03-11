@@ -156,7 +156,7 @@
     // Global symbols
     "globals": {
         "requirejs": false,
-        "ActiveXObjct": false,
+        "ActiveXObject": false,
         "describe"   : false,
         "it"         : false,
         "before"     : false,
