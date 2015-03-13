@@ -134,5 +134,5 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['jshint', 'copy']);
     grunt.registerTask('test', ['jshint', 'plato', 'bower-install-simple', 'karma']);
     grunt.registerTask('lint', ['jshint']);
-
+    grunt.registerTask('ci', ['test']);
 };
