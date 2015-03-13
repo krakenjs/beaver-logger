@@ -10,13 +10,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.paypal.com:Checkout-R/xo-beaver-component.git"
+    "url": "git@github.paypal.com:xo-component/xo-beaver.git"
   },
   "keywords": [
     "logging"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "PayPal",
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-bower-install-simple": "^1.0.3",
@@ -40,5 +40,8 @@
     "mocha-jenkins-reporter": "^0.1.5",
     "pre-commit": "^1.0.6",
     "xunit-file": "0.0.6"
-  }
+  },
+  "pre-commit": [
+    "lint"
+  ]
 }
