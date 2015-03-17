@@ -163,6 +163,8 @@
         "beforeEach" : false,
         "after"      : false,
         "afterEach"  : false,
+        "assert"     : false,
+        "sinon"      : false,
         "inject": false
     }
 }
