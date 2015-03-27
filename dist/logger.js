@@ -140,7 +140,8 @@ define([
                 }
 
                 if (window.meta && window.meta.requestTime) {
-                    payload.elapsed = Date.now() - window.meta.requestTime;
+                    payload.elapsed = Date.now() - (window.performance ?
+                        window.performance.timing.connectStart : window.meta.requestTime);
                 }
 
                 //Print to console only in local and stage
