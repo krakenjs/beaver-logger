@@ -139,11 +139,11 @@ define([
                     uniqueEvents.push(hash);
                 }
 
-                if (window.performance) {
+                if (window.performance && window.performance.timing && window.performance.timing.connectStart) {
                     payload.elapsed = Date.now() - window.performance.timing.connectStart;
                 }
                 else if (window.meta && window.meta.requestTime) {
-                    payload.server_elapsed = Date.now() - window.performance.timing.connectStart;
+                    payload.server_elapsed = Date.now() - window.meta.requestTime;
                 }
 
                 //Print to console only in local and stage
