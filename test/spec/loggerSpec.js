@@ -17,51 +17,56 @@ define([
     var DEBOUNCE_INTERVAL = 10;
 
 
-    describe('Logger :: Tests', function () {
-        var $logger,
-            injector,
-            $logLevel,
-            $consoleLogLevel,
-            $window,
-            $rootScope,
-            $timeout,
-            $interval,
-            $q,
-            $log,
-            expectedData,
-            $scope,
-            requests = [];
+    var $logger,
+        injector,
+        $logLevel,
+        $consoleLogLevel,
+        $window,
+        $rootScope,
+        $timeout,
+        $interval,
+        $q,
+        $log,
+        expectedData,
+        $scope,
+        requests = [];
 
-        function setXMLHttpRequest(){
-            window.XMLHttpRequest = function(){
-                this.readyState = 0;
-                this.onreadystatechange = function(){};
-                this.open = sinon.spy();
-                this.setRequestHeader = sinon.spy();
-                this.send = function(json){
-                    requests.push(json);
-                    this.readyState = 4;
-                    this.onreadystatechange();
-                };
+    function setXMLHttpRequest(){
+        window.XMLHttpRequest = function(){
+            this.readyState = 0;
+            this.onreadystatechange = function(){};
+            this.open = sinon.spy();
+            this.setRequestHeader = sinon.spy();
+            this.send = function(json){
+                requests.push(json);
+                this.readyState = 4;
+                this.onreadystatechange();
             };
-        }
+        };
+    }
 
-        function setTestLocals($injector){
-            //Core angular services/factories
-            $rootScope = $injector.get('$rootScope');
-            $scope = $rootScope.$new();
-            $timeout = $injector.get('$timeout');
-            $interval = $injector.get('$interval');
-            $window = $injector.get('$window');
-            $q = $injector.get('$q');
-            $log = $injector.get('$log');
+    function setTestLocals($injector){
+        //Core angular services/factories
+        $rootScope = $injector.get('$rootScope');
+        $scope = $rootScope.$new();
+        $timeout = $injector.get('$timeout');
+        $interval = $injector.get('$interval');
+        $window = $injector.get('$window');
+        $q = $injector.get('$q');
+        $log = $injector.get('$log');
 
-            //our custom services
-            $logLevel = $injector.get('$logLevel');
-            $consoleLogLevel = $injector.get('$consoleLogLevel');
-            requests = [];
-            setXMLHttpRequest();
-        }
+        //our custom services
+        $logLevel = $injector.get('$logLevel');
+        $consoleLogLevel = $injector.get('$consoleLogLevel');
+        requests = [];
+        setXMLHttpRequest();
+    }
+
+
+    describe('Logger :: Tests', function () {
+
+        var previousBeforeUnloadHandler = window.onbeforeunload;
+        var previousUnloadHandler = window.onunload;
 
 
         beforeEach(module('beaver'));
@@ -84,6 +89,11 @@ define([
             ];
         }));
 
+
+        after(function(){
+            window.onbeforeunload = previousBeforeUnloadHandler;
+            window.onunload = previousUnloadHandler;
+        });
 
         it('should call flush for onbeforeunload', function(done) {
 
@@ -242,69 +252,53 @@ define([
             return promise;
         });
 
+    });
 
-        //
-        //it('should make two posts', function(done) {
-        //    buildHttpMock($httpBackend);
-        //    angular.forEach(expectedData, function(data){
-        //        $logger.log(data.level, data.eventName);
-        //    });
-        //
-        //    $interval.flush(INTERVAL);
-        //    $timeout.flush(10);
-        //    $httpBackend.flush();
-        //
-        //    angular.forEach(expectedData, function(data){
-        //        $logger.log(data.level, data.eventName);
-        //    });
-        //
-        //    $interval.flush(INTERVAL);
-        //    $timeout.flush(10);
-        //    $httpBackend.flush();
-        //
-        //    done();
-        //});
-        //
-        //
-        //it('should STOP accumulating logs after size limit of SIZE_LIMIT', function(done){
-        //    buildHttpMock($httpBackend);
-        //    for(var i =0; i< 200; i++){
-        //        $logger.log($logLevel.INFO, "test");
-        //    }
-        //    assert($logger.buffer.length === SIZE_LIMIT, "Expected the size of the buffer to be SIZE_LIMIT = 100")
-        //    done();
-        //});
-        //
-        //it('should post the log data on window.onbeforeunload', function (done) {
-        //    buildHttpMock($httpBackend);
-        //    $logger.log($logLevel.INFO, "test");
-        //    angular.element($window).triggerHandler('onbeforeunload');
-        //    $interval.flush(INTERVAL);
-        //    $timeout.flush(10);
-        //    $httpBackend.flush();
-        //    done();
-        //});
-        //
-        //it('should print the info logs to console', function (done) {
-        //    buildHttpMock($httpBackend);
-        //    $logger.print("somerandom", "INFO_LOG", {info: "test"});
-        //    assert($log.info.logs.length === 1, "Expect to print logs to console");
-        //    done();
-        //});
-        //
-        //it('should print the error logs to console', function (done) {
-        //    buildHttpMock($httpBackend);
-        //    $logger.print($consoleLogLevel.error, "ERROR_LOG" ,{error: "test"});
-        //    assert($log.error.logs.length === 1, "Expect to print logs to console");
-        //    done();
-        //});
-        //
-        //it('should print the warning logs to console', function (done) {
-        //    buildHttpMock($httpBackend);
-        //    $logger.print($consoleLogLevel.warn, "WARNING_LOG" ,{warning: "test"});
-        //    assert($log.warn.logs.length === 1, "Expect to print logs to console");
-        //    done();
-        //});
+
+
+    describe('Logger :: Tests for window unload', function () {
+        var previousBeforeUnloadHandler = window.onbeforeunload;
+        var previousUnloadHandler = window.onunload;
+        var onbeforeunloadSpy = sinon.spy();
+        var onunloadSpy = sinon.spy();
+
+        beforeEach(module('beaver'));
+
+        beforeEach(inject(function ($injector) {
+            window.onbeforeunload = onbeforeunloadSpy;
+            window.onunload = onunloadSpy;
+            setTestLocals($injector);
+            $logger    = $injector.get('$logger');
+            injector = $injector;
+
+            $logger.interval = INTERVAL;
+            $logger.sizeLimit = SIZE_LIMIT;
+            $logger.debounceInterval = DEBOUNCE_INTERVAL;
+
+            expectedData = [
+                {level: $logLevel.INFO,    eventName: "test"},
+                {level: $logLevel.DEBUG,   eventName: "test"},
+                {level: $logLevel.ALERT,   eventName: "test"}
+            ];
+
+        }));
+
+        after(function(){
+            window.onbeforeunload = previousBeforeUnloadHandler;
+            window.onunload = previousUnloadHandler;
+        });
+
+        it('should call previously set window.onbeforeunload', function(done) {
+            window.onbeforeunload();
+            assert(onbeforeunloadSpy.calledOnce, 'Should call previous onbeforeunload handler only once');
+            done();
+        });
+
+        it('should call previously set window.onunload', function(done) {
+            window.onunload();
+            assert(onunloadSpy.calledOnce, 'Should call previous onunload handler only once');
+            done();
+        });
 
     });
 
