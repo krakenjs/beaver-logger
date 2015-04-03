@@ -21,6 +21,11 @@ module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
+        clean: {
+            tmp: 'tmp',
+            build: '.build',
+            coverage: coverageDirectory
+        },
         path: appConfig,
         jshint: {
             options: {
@@ -52,7 +57,14 @@ module.exports = function (grunt) {
                 filter: ''
             }
         },
-
+        rename: {
+            coverageReport: {
+                files: [
+                    {src: [coverageDirectory + '/coverage*.json'],
+                        dest: coverageDirectory + '/coverage.json'},
+                ]
+            }
+        },
         karma: {
             unit: {
                 configFile: 'test/karma.config.js',
@@ -94,22 +106,6 @@ module.exports = function (grunt) {
                 }
             }
         },
-        codecoverage: {
-            all: {
-                src: testFiles,
-                options: {
-                    globals: ['chai'],
-                    timeout: 1000000,
-                    ignoreLeaks: false,
-                    ui: 'bdd',
-                    reporter: 'dot',
-                    covDir: coverageDirectory,
-                    reportType: 'lcov',
-                    printType: 'both',
-                    excludes: ['**/public/**', '**/.build/**', 'Gruntfile.js']
-                }
-            }
-        },
         checkcoverage: {
             options: {
                 statements: 90,
@@ -135,4 +131,5 @@ module.exports = function (grunt) {
     grunt.registerTask('test', ['jshint', 'plato', 'bower-install-simple', 'karma']);
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('ci', ['test']);
+    grunt.registerTask('coverage', ['clean:coverage', 'karma:unit', 'rename:coverageReport']);
 };
