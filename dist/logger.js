@@ -72,7 +72,7 @@ define([
                     }
                 };
 
-                var previousUnloadHandler = $window.onbeforeunload;
+                var previousUnloadHandler = $window.onunload;
 
                 $window.onunload = function (event) {
 
