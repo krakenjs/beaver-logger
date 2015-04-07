@@ -19,6 +19,7 @@ define([
                                     $consoleLogLevel) {
 
         var logger = {};
+        var HERMES_DEV_COOKIE = 'hermesdev';
 
         angular.forEach($logLevel, function (level) {
             logger[level] = function (event, payload, settings) {
@@ -27,20 +28,6 @@ define([
         });
 
         var hostname = $window.location && $window.location.hostname || '';
-
-        var deploy = {
-            isLocal: function () {
-                return hostname === 'localhost' || hostname === 'localhost.paypal.com';
-            },
-
-            isStage: function () {
-                return Boolean(hostname.match(/^.*\.qa\.paypal\.com$/));
-            },
-
-            isLive: function () {
-                return hostname === 'www.paypal.com';
-            }
-        };
 
         var uniqueEvents = [];
 
@@ -52,6 +39,20 @@ define([
             debounceInterval: 10,
             uri: '/api/log',
             debounceCache: {},
+
+            deploy : {
+                isLocal: function () {
+                    return hostname === 'localhost' || hostname === 'localhost.paypal.com';
+                },
+
+                isStage: function () {
+                    return Boolean(hostname.match(/^.*\.qa\.paypal\.com$/));
+                },
+
+                isLive: function () {
+                    return hostname === 'www.paypal.com';
+                }
+            },
 
             init: function () {
                 var logger = this;
@@ -91,6 +92,8 @@ define([
 
                 this.daemon();
             },
+
+
 
             done: function () {
                 this.isDone = true;
@@ -146,8 +149,24 @@ define([
                     payload.server_elapsed = Date.now() - window.meta.requestTime;
                 }
 
+                function shouldPrintLogsToConsole(){
+                    if(window.meta && window.meta.corp) {
+                        return true;
+                    }
+
+                    if(self.deploy.isLocal() || self.deploy.isStage()) {
+                        return true;
+                    }
+
+                    var cookies = window.cookies || {};
+                    if(cookies[HERMES_DEV_COOKIE] && cookies[HERMES_DEV_COOKIE] === '1') {
+                        return true;
+                    }
+
+                    return false;
+                }
                 //Print to console only in local and stage
-                if (window.meta && window.meta.corp || deploy.isLocal() || deploy.isStage()) {
+                if (shouldPrintLogsToConsole()) {
                     self.print(level, event, payload);
                 }
 
