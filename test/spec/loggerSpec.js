@@ -178,6 +178,61 @@ define([
             done();
         });
 
+        it('should print the log to console when hermesdev cookie is set', function(done){
+
+            $logger.flush = sinon.spy();
+            $logger.print = sinon.spy();
+
+            window.meta = {
+                corp: false
+            };
+
+            $logger.deploy.isLocal = function(){
+                return false;
+            };
+
+            $logger.deploy.isStage = function(){
+                return false;
+            };
+
+            window.cookies = window.cookies || [];
+            window.cookies['hermesdev'] = '1';
+
+            $logger.log($logLevel.INFO, 'Test');
+
+            assert($logger.print.called, 'Expect the print to be called');
+
+            done();
+        });
+
+        it('should NOT print the log to console when hermesdev cookie is not set', function(done){
+
+            $logger.flush = sinon.spy();
+            $logger.print = sinon.spy();
+
+            window.cookies = window.cookies || [];
+            window.cookies['hermesdev'] = '0';
+
+            window.meta = {
+                corp: false
+            };
+
+            $logger.deploy.isLocal = function(){
+                return false;
+            };
+
+            $logger.deploy.isStage = function(){
+                return false;
+            };
+
+
+            $logger.log($logLevel.INFO, 'Test');
+
+            assert(!$logger.print.called, 'Expect the print to be NOT called');
+
+            done();
+        });
+
         it('should combine events based on debounce factor', function(done){
 
             var events = [];
