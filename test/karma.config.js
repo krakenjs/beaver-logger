@@ -43,8 +43,10 @@ module.exports = function(config) {
 
     // optionally, configure the reporter
     coverageReporter: {
-      type : 'html',
-      dir : 'coverage/'
+        reporters: [ 
+          { type : 'text-summary', dir : 'coverage/'},
+          { type : 'html', dir : 'coverage/'},
+        ]
     },
 
     // web server port
