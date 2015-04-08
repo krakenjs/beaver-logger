@@ -145,7 +145,16 @@ define([
                 if (window.performance && window.performance.timing && window.performance.timing.connectStart) {
                     payload.elapsed = Date.now() - window.performance.timing.connectStart;
                 }
-                else if (window.meta && window.meta.requestTime) {
+
+                if (window.performance && window.performance.now) {
+                    payload.performance_elapsed = window.performance.now();
+                }
+
+                if (window.clientStartTime) {
+                    payload.client_elapsed = Date.now() - window.clientStartTime;
+                }
+
+                if (window.meta && window.meta.requestTime) {
                     payload.server_elapsed = Date.now() - window.meta.requestTime;
                 }
 
