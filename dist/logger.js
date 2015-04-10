@@ -142,12 +142,20 @@ define([
                     uniqueEvents.push(hash);
                 }
 
-                if (window.performance && window.performance.timing && window.performance.timing.connectStart) {
-                    payload.elapsed = Date.now() - window.performance.timing.connectStart;
-                }
+                if (window.performance) {
+                    var timing = window.performance.timing;
 
-                if (window.performance && window.performance.now) {
-                    payload.performance_elapsed = window.performance.now();
+                    if (timing && timing.connectStart) {
+                        payload.elapsed = Date.now() - timing.connectStart;
+                    }
+
+                    if (timing && timing.requestStart && timing.navigationStart && window.performance.now) {
+                        payload.req_elapsed = window.performance.now() - (timing.requestStart - timing.navigationStart);
+                    }
+
+                    if (window.performance.now) {
+                        payload.performance_elapsed = window.performance.now();
+                    }
                 }
 
                 if (window.clientStartTime) {
