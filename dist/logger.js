@@ -143,18 +143,19 @@ define([
                 }
 
                 if (window.performance) {
-                    var timing = window.performance.timing;
+                    var performance = window.performance;
+                    var timing      = window.performance.timing || {};
 
-                    if (timing && timing.connectStart) {
+                    if (timing.connectStart) {
                         payload.elapsed = Date.now() - timing.connectStart;
                     }
 
-                    if (timing && timing.requestStart && timing.navigationStart && window.performance.now) {
-                        payload.req_elapsed = window.performance.now() - (timing.requestStart - timing.navigationStart);
-                    }
+                    if (performance.now && Math.abs(performance.now() - Date.now()) > 1000) {
+                        payload.performance_elapsed = performance.now();
 
-                    if (window.performance.now) {
-                        payload.performance_elapsed = window.performance.now();
+                        if (timing.requestStart && timing.navigationStart) {
+                            payload.req_elapsed = performance.now() - (timing.requestStart - timing.navigationStart);
+                        }
                     }
                 }
 
