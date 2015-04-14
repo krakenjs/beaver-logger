@@ -150,6 +150,19 @@ define([
             done();
         });
 
+        it('should NOT print the log to console for local mode', function(done){
+
+            $logger.flush = sinon.spy();
+            $logger.print = sinon.spy();
+
+            $logger.log($logLevel.INFO, 'Test', {}, {noConsole: true});
+
+            assert(!$logger.print.called, 'Expect the print to be NOT called');
+
+            done();
+        });
+
+
         it('should print the log to console for local mode', function(done){
 
             $logger.flush = sinon.spy();
@@ -352,6 +365,87 @@ define([
         it('should call previously set window.onunload', function(done) {
             window.onunload();
             assert(onunloadSpy.calledOnce, 'Should call previous onunload handler only once');
+            done();
+        });
+
+    });
+
+    describe('Logger :: Tests for heartbeat', function () {
+
+        window.config = window.config || {};
+
+        var $interval;
+
+        beforeEach(module('beaver'));
+
+        beforeEach(inject(function ($injector) {
+            window.config.beaver = {
+                heartbeat: {
+                    "interval": 200,
+                    "idle_timeout": 60000
+                }
+            };
+
+            $logger = $injector.get('$logger');
+            $interval = $injector.get('$interval');
+        }));
+
+        it('should fire heartbeat if there is no log for a while', function(done) {
+            var origDateNow = Date.now;
+
+            var lastLogTime = Date.now();
+
+
+            Date.now = function(){
+                return lastLogTime + 300;
+            };
+
+            $logger.info = sinon.spy();
+
+            $interval.flush(200);
+
+            assert($logger.info.called, 'Expect heartbeat to be logged');
+            assert($logger.info.getCall(0).args[2].noConsole, 'Expect noConsole to be set');
+            assert($logger.info.getCall(0).args[2].heartbeat, 'Expect heartbeat flag to be set');
+
+            Date.now = origDateNow;
+            done();
+        });
+
+        it('should NOT fire heartbeat if a event is logged recently', function(done) {
+            var origDateNow = Date.now;
+            var lastLogTime = Date.now();
+
+
+            Date.now = function(){
+                return lastLogTime + 100;
+            };
+
+            $logger.info = sinon.spy();
+
+            $interval.flush(200);
+
+            assert(!$logger.info.called, 'Expect heartbeat to be NOT logged');
+            Date.now = origDateNow;
+            done();
+        });
+
+
+        it('should NOT fire heartbeat after idle timeout', function(done) {
+            var origDateNow = Date.now;
+            var lastLogTime = Date.now();
+
+
+            Date.now = function(){
+                return lastLogTime + 610000;
+            };
+
+            $logger.info = sinon.spy();
+
+            $interval.flush(200);
+
+            assert(!$logger.info.called, 'Expect heartbeat to be NOT logged');
+            Date.now = origDateNow;
             done();
         });
 

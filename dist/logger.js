@@ -39,6 +39,7 @@ define([
             debounceInterval: 10,
             uri: '/api/log',
             debounceCache: {},
+            lastLogTime: Date.now(),
 
             deploy : {
                 isLocal: function () {
@@ -90,10 +91,39 @@ define([
                     }
                 };
 
+                this.set_heartbeat();
                 this.daemon();
             },
 
 
+            set_heartbeat: function(){
+                var self = this;
+                var heartbeat = window.config && window.config.beaver && window.config.beaver.heartbeat;
+
+                if(heartbeat){
+                    var interv = heartbeat.interval || 200;
+
+                    $interval(function () {
+
+                        var timeSinceLastLog = Date.now() - self.lastLogTime;
+                        var idle_timeout = heartbeat.idle_timeout || 1000;
+
+                        if(timeSinceLastLog < interv){
+                            return;
+                        }
+
+                        if(timeSinceLastLog > idle_timeout){
+                            return;
+                        }
+
+                        self.info('heartbeat', {}, {
+                            noConsole : true,
+                            heartbeat: true
+                        });
+
+                    }, interv);
+                }
+            },
 
             done: function () {
                 this.isDone = true;
@@ -127,12 +157,16 @@ define([
                 return this;
             },
 
+            /* jslint maxcomplexity: false */
             log: function (level, event, payload, settings) {
 
                 var self = this;
-
                 payload = payload   || {};
                 settings = settings || {};
+
+                if(!settings.heartbeat){
+                    self.lastLogTime = Date.now();
+                }
 
                 if (settings.unique) {
                     var hash = event + ':' + JSON.stringify(payload);
@@ -158,6 +192,11 @@ define([
                 }
 
                 function shouldPrintLogsToConsole(){
+
+                    if(settings.noConsole){
+                        return false;
+                    }
+
                     if(window.meta && window.meta.corp) {
                         return true;
                     }
@@ -173,6 +212,7 @@ define([
 
                     return false;
                 }
+
                 //Print to console only in local and stage
                 if (shouldPrintLogsToConsole()) {
                     self.print(level, event, payload);
