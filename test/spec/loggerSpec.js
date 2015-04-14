@@ -150,6 +150,19 @@ define([
             done();
         });
 
+        it('should NOT print the log to console for local mode', function(done){
+
+            $logger.flush = sinon.spy();
+            $logger.print = sinon.spy();
+
+            $logger.log($logLevel.INFO, 'Test', {}, {noConsole: true});
+
+            assert(!$logger.print.called, 'Expect the print to be NOT called');
+
+            done();
+        });
+
+
         it('should print the log to console for local mode', function(done){
 
             $logger.flush = sinon.spy();
@@ -292,10 +305,7 @@ define([
             return promise;
         });
 
-
-
         it('should NOT make any requests if there is no data', function(done) {
-
             var promise = $logger.flush()
                 .then(function(){
                     assert(requests.length === 0, 'Assert a ajax request to be sent');
@@ -355,6 +365,82 @@ define([
             done();
         });
 
+    });
+
+    describe('Logger :: Tests for heartbeat', function () {
+
+        var $interval;
+
+        beforeEach(module('beaver'));
+
+        beforeEach(inject(function ($injector) {
+
+            $logger = $injector.get('$logger');
+            $interval = $injector.get('$interval');
+            $rootScope = $injector.get('$rootScope');
+
+        }));
+
+        it('should fire heartbeat if there is no log for a while', function(done) {
+            var origDateNow = Date.now;
+
+            var lastLogTime = Date.now();
+
+
+            Date.now = function(){
+                return lastLogTime + 300;
+            };
+
+            $logger.info = sinon.spy();
+
+            $rootScope.$emit('startLoad');
+            $interval.flush(200);
+            $rootScope.$emit('allLoaded');
+
+            assert($logger.info.called, 'Expect heartbeat to be logged');
+            assert($logger.info.getCall(0).args[2].noConsole, 'Expect noConsole to be set');
+            assert($logger.info.getCall(0).args[2].heartbeat, 'Expect heartbeat flag to be set');
+
+            Date.now = origDateNow;
+            done();
+        });
+
+        it('should NOT fire heartbeat if a event is logged recently', function(done) {
+            var origDateNow = Date.now;
+            var lastLogTime = Date.now();
+
+
+            Date.now = function(){
+                return lastLogTime + 100;
+            };
+
+            $logger.info = sinon.spy();
+            $rootScope.$emit('startLoad');
+            $interval.flush(200);
+            $rootScope.$emit('allLoaded');
+            assert(!$logger.info.called, 'Expect heartbeat to be NOT logged');
+            Date.now = origDateNow;
+            done();
+        });
+
+        it('should clear heartbeat beacon on allLoaded event', function(done) {
+            var origDateNow = Date.now;
+            var lastLogTime = Date.now();
+
+
+            Date.now = function(){
+                return lastLogTime + 300;
+            };
+
+            $logger.info = sinon.spy();
+            $rootScope.$emit('startLoad');
+            $rootScope.$emit('allLoaded');
+            $interval.flush(200);
+
+            assert(!$logger.info.called, 'Expect heartbeat to be NOT logged');
+            Date.now = origDateNow;
+            done();
+        });
     });
 
 });
