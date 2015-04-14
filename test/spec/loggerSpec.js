@@ -305,10 +305,7 @@ define([
             return promise;
         });
 
-
-
         it('should NOT make any requests if there is no data', function(done) {
-
             var promise = $logger.flush()
                 .then(function(){
                     assert(requests.length === 0, 'Assert a ajax request to be sent');
@@ -372,22 +369,16 @@ define([
 
     describe('Logger :: Tests for heartbeat', function () {
 
-        window.config = window.config || {};
-
         var $interval;
 
         beforeEach(module('beaver'));
 
         beforeEach(inject(function ($injector) {
-            window.config.beaver = {
-                heartbeat: {
-                    "interval": 200,
-                    "idle_timeout": 60000
-                }
-            };
 
             $logger = $injector.get('$logger');
             $interval = $injector.get('$interval');
+            $rootScope = $injector.get('$rootScope');
+
         }));
 
         it('should fire heartbeat if there is no log for a while', function(done) {
@@ -402,7 +393,9 @@ define([
 
             $logger.info = sinon.spy();
 
+            $rootScope.$emit('startLoad');
             $interval.flush(200);
+            $rootScope.$emit('allLoaded');
 
             assert($logger.info.called, 'Expect heartbeat to be logged');
             assert($logger.info.getCall(0).args[2].noConsole, 'Expect noConsole to be set');
@@ -422,33 +415,32 @@ define([
             };
 
             $logger.info = sinon.spy();
-
+            $rootScope.$emit('startLoad');
             $interval.flush(200);
-
+            $rootScope.$emit('allLoaded');
             assert(!$logger.info.called, 'Expect heartbeat to be NOT logged');
             Date.now = origDateNow;
             done();
         });
 
-
-        it('should NOT fire heartbeat after idle timeout', function(done) {
+        it('should clear heartbeat beacon on allLoaded event', function(done) {
             var origDateNow = Date.now;
             var lastLogTime = Date.now();
 
 
             Date.now = function(){
-                return lastLogTime + 610000;
+                return lastLogTime + 300;
             };
 
             $logger.info = sinon.spy();
-
+            $rootScope.$emit('startLoad');
+            $rootScope.$emit('allLoaded');
             $interval.flush(200);
 
             assert(!$logger.info.called, 'Expect heartbeat to be NOT logged');
             Date.now = origDateNow;
             done();
         });
-
     });
 
 });

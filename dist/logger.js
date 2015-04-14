@@ -98,31 +98,26 @@ define([
 
             set_heartbeat: function(){
                 var self = this;
-                var heartbeat = window.config && window.config.beaver && window.config.beaver.heartbeat;
 
-                if(heartbeat){
-                    var interv = heartbeat.interval || 200;
+                var myInterval;
 
-                    $interval(function () {
+                $rootScope.$on('startLoad', function(){
+                   myInterval =  $interval(function () {
+                       var timeSinceLastLog = Date.now() - self.lastLogTime;
+                       if(timeSinceLastLog < 200){
+                           return;
+                       }
+                       self.info('heartbeat', {}, {
+                           noConsole : true,
+                           heartbeat: true
+                       });
 
-                        var timeSinceLastLog = Date.now() - self.lastLogTime;
-                        var idle_timeout = heartbeat.idle_timeout || 1000;
+                   }, 200);
+                });
 
-                        if(timeSinceLastLog < interv){
-                            return;
-                        }
-
-                        if(timeSinceLastLog > idle_timeout){
-                            return;
-                        }
-
-                        self.info('heartbeat', {}, {
-                            noConsole : true,
-                            heartbeat: true
-                        });
-
-                    }, interv);
-                }
+                $rootScope.$on('allLoaded', function() {
+                    $interval.cancel(myInterval);
+                });
             },
 
             done: function () {
