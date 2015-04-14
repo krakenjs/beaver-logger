@@ -146,25 +146,15 @@ define([
                     var performance = window.performance;
                     var timing      = window.performance.timing || {};
 
-                    if (timing.connectStart) {
-                        payload.elapsed = Date.now() - timing.connectStart;
-                    }
-
                     if (performance.now && Math.abs(performance.now() - Date.now()) > 1000) {
-                        payload.performance_elapsed = performance.now();
+                        if (window.clientStartTime) {
+                            payload.client_elapsed = performance.now() - window.clientStartTime;
+                        }
 
                         if (timing.requestStart && timing.navigationStart) {
                             payload.req_elapsed = performance.now() - (timing.requestStart - timing.navigationStart);
                         }
                     }
-                }
-
-                if (window.clientStartTime) {
-                    payload.client_elapsed = Date.now() - window.clientStartTime;
-                }
-
-                if (window.meta && window.meta.requestTime) {
-                    payload.server_elapsed = Date.now() - window.meta.requestTime;
                 }
 
                 function shouldPrintLogsToConsole(){
