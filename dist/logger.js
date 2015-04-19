@@ -133,15 +133,6 @@ define([
                     payload: payload || {}
                 };
 
-                try {
-                    JSON.stringify(data);
-                }
-                catch (e) {
-                    return this.error('log_serialize_failed', {
-                        event: event.toString()
-                    });
-                }
-
                 this.buffer.push(data);
 
                 //If the log level is classified as autolog, then flush the data
