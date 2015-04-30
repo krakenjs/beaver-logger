@@ -162,6 +162,8 @@ define([
                     uniqueEvents.push(hash);
                 }
 
+                payload.pageID = window.meta && window.meta.pageID;
+
                 if (window.performance) {
                     var performance = window.performance;
                     var timing      = window.performance.timing || {};
