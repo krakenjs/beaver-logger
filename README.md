@@ -29,3 +29,6 @@ module as angular dependency then, you can access these.
 
 It makes a POST on the following api end point for now: `{baseUrl}/api/log`
 
+
+## Test
+ `npm install && grunt test`
