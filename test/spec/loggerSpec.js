@@ -386,7 +386,6 @@ define([
 
             var lastLogTime = Date.now();
 
-
             Date.now = function(){
                 return lastLogTime + 300;
             };
@@ -443,4 +442,102 @@ define([
         });
     });
 
+    describe('Logger :: Tests for howbusy', function () {
+
+        //var $interval;
+        var origDateNow, lastLogTime;
+
+        beforeEach(module('beaver'));
+
+        beforeEach(inject(function ($injector) {
+
+            $logger = $injector.get('$logger');
+            $interval = $injector.get('$interval');
+            $rootScope = $injector.get('$rootScope');
+
+            $logger.print = sinon.spy();
+
+            origDateNow = Date.now;
+            lastLogTime = Date.now();
+
+        }));
+
+        afterEach(function(){
+            Date.now = origDateNow;
+        });
+
+        it('should log howbusy even no need to log heartbeat before allLoaded', function(done) {
+            Date.now = function(){
+                return lastLogTime + 100;
+            };
+
+            $rootScope.$emit('startLoad');
+            $interval.flush(200);
+            $logger.info('test_log', {
+                key: "value"
+            });
+            $rootScope.$emit('allLoaded');
+
+            var payload = $logger.print.getCall(0).args[2];
+            assert.equal(payload.key, 'value', 'Expect the original payload');
+            assert.isDefined(payload.lastSampledTime, 'Expect lastSampledTime exists in payload');
+            assert(payload.lastLag >= 0, 'Expect lag is not negative');
+
+            done();
+        });
+
+        it('should log howbusy sequence while loading', function(done) {
+
+            Date.now = function(){
+                return lastLogTime + 300;
+            };
+
+            $rootScope.$emit('startLoad');
+            $interval.flush(200);
+            $logger.info('test_log1', {
+                key1: "value1"
+            });
+
+            Date.now = function(){
+                return lastLogTime + 700;
+            };
+            $interval.flush(200);
+            $logger.info('test_log2', {
+                key2: "value2"
+            });
+
+            var payload1 = $logger.print.getCall(0).args[2];
+            assert.equal(payload1.key1, 'value1', 'Expect the original payload1');
+            assert(payload1.lastLag >= 100, 'Expect lag is larger than 300-200');
+            assert.equal(payload1.lastLag, payload1.maxLag, 'Expect max is updated');
+
+            var payload2 = $logger.print.getCall(1).args[2];
+            assert.equal(payload2.key2, 'value2', 'Expect the original payload2');
+            assert(payload2.lastLag >= 200, 'Expect lag is larger than 700-300-200');
+            assert.equal(payload2.lastLag, payload2.maxLag, 'Expect max is updated');
+
+            done();
+        });
+
+        it('should no longer log howbusy after allLoaded event', function(done) {
+            Date.now = function(){
+                return lastLogTime + 300;
+            };
+
+            $rootScope.$emit('startLoad');
+            $rootScope.$emit('allLoaded');
+            $interval.flush(200);
+            $logger.info('test_log', {
+                key: "value"
+            });
+
+            var payload = $logger.print.getCall(0).args[2];
+            assert.equal(payload.key, 'value', 'Expect the original payload');
+            ['lastSampledTime', 'lastLag', 'maxLag', 'dampendedLag'].forEach(function (e) {
+                assert.isUndefined(payload[e], 'Expect ' + e + ' does NOT exist in payload');
+            });
+
+            done();
+        });
+    });
 });
