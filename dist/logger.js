@@ -40,6 +40,12 @@ define([
             uri: '/api/log',
             debounceCache: {},
             lastLogTime: Date.now(),
+            howBusy:{
+                lastSampledTime: Date.now(),
+                lastLag: 0,
+                maxLag: 0,
+                dampendedLag: 0
+            },
 
             deploy : {
                 isLocal: function () {
@@ -99,24 +105,42 @@ define([
             set_heartbeat: function(){
                 var self = this;
 
-                var myInterval;
+                var heartbeat, interval = 200;
 
                 $rootScope.$on('startLoad', function(){
-                   myInterval =  $interval(function () {
-                       var timeSinceLastLog = Date.now() - self.lastLogTime;
-                       if(timeSinceLastLog < 200){
-                           return;
-                       }
-                       self.info('heartbeat', {}, {
-                           noConsole : true,
-                           heartbeat: true
-                       });
 
-                   }, 200);
+                    heartbeat =  $interval(function () {
+
+                        var now = Date.now();
+
+                        var howBusy = self.howBusy;
+                        if (howBusy) {
+                            howBusy.lastLag = now - howBusy.lastSampledTime - interval;
+                            if (howBusy.lastLag < 0) {
+                                howBusy.lastLag = 0;
+                            }
+                            howBusy.maxLag = (howBusy.lastLag > howBusy.maxLag) ?
+                                howBusy.lastLag : howBusy.maxLag;
+                            howBusy.dampendedLag = (howBusy.lastLag + howBusy.dampendedLag * 2) / 3;
+                            howBusy.lastSampledTime = now;
+                        }
+
+                        var timeSinceLastLog = now - self.lastLogTime;
+                        if (timeSinceLastLog < interval) {
+                            return;
+                        }
+
+                        self.info('heartbeat', {}, {
+                            noConsole : true,
+                            heartbeat: true
+                        });
+
+                    }, interval);
                 });
 
                 $rootScope.$on('allLoaded', function() {
-                    $interval.cancel(myInterval);
+                    $interval.cancel(heartbeat);
+                    self.howBusy = undefined;
                 });
             },
 
@@ -177,6 +201,10 @@ define([
                             payload.req_elapsed = performance.now() - (timing.requestStart - timing.navigationStart);
                         }
                     }
+                }
+
+                if(self.howBusy){
+                    angular.extend(payload, self.howBusy);
                 }
 
                 function shouldPrintLogsToConsole(){
