@@ -40,6 +40,9 @@ define([
             uri: '/api/log',
             debounceCache: {},
             lastLogTime: Date.now(),
+            lastFlushTime:  Date.now(),
+            contHeartBeatCount: 0,
+            contHeartBeatCountThreshold: 100,
             howBusy:{
                 lastSampledTime: Date.now(),
                 lastLag: 0,
@@ -105,43 +108,90 @@ define([
             set_heartbeat: function(){
                 var self = this;
 
-                var heartbeat, interval = 200;
 
-                $rootScope.$on('startLoad', function(){
+                setHeartBeat();
+                setLoadingHeartBeat();
+
+                //Sets a interval for logging heatbeats
+                function setHeartBeat(){
+                    var heartbeat, interval = 5 * 1000;
 
                     heartbeat =  $interval(function () {
 
-                        var now = Date.now();
-
-                        var howBusy = self.howBusy;
-                        if (howBusy) {
-                            howBusy.lastLag = now - howBusy.lastSampledTime - interval;
-                            if (howBusy.lastLag < 0) {
-                                howBusy.lastLag = 0;
-                            }
-                            howBusy.maxLag = (howBusy.lastLag > howBusy.maxLag) ?
-                                howBusy.lastLag : howBusy.maxLag;
-                            howBusy.dampendedLag = (howBusy.lastLag + howBusy.dampendedLag * 2) / 3;
-                            howBusy.lastSampledTime = now;
-                        }
-
-                        var timeSinceLastLog = now - self.lastLogTime;
-                        if (timeSinceLastLog < interval) {
+                        //If we have max number of continuous heartbeats logged, then do nothing.
+                        if(self.contHeartBeatCount >= self.contHeartBeatCountThreshold){
                             return;
                         }
 
-                        self.info('heartbeat', {}, {
-                            noConsole : true,
-                            heartbeat: true
-                        });
+                        //Update the continuous heartbeat count
+                        self.contHeartBeatCount += 1;
+
+                        //Log a heartbeat event
+                        self.info('heartbeat',
+                            //payload
+                            {
+                                'sequenceNum': self.contHeartBeatCount
+                            },
+                            //settings/options
+                            {
+                                noConsole : true,
+                                heartbeat: true
+                            }
+                        );
+
+                        var now = Date.now();
+                        var timeSinceLastFlush = now - self.lastFlushTime;
+
+                        //If there is no flush in last minute then flush the logs, to make sure we capture heartbeats
+                        if (timeSinceLastFlush >= 60 * 1000) {
+                            self.flush();
+                        }
 
                     }, interval);
-                });
 
-                $rootScope.$on('allLoaded', function() {
-                    $interval.cancel(heartbeat);
-                    self.howBusy = undefined;
-                });
+                }
+
+                //Sets a interval for loading spinner heart beats
+                function setLoadingHeartBeat(){
+                    var loadingHeartbeat, interval = 200;
+
+                    $rootScope.$on('startLoad', function(){
+
+                        loadingHeartbeat =  $interval(function () {
+
+                            var now = Date.now();
+
+                            var howBusy = self.howBusy;
+                            if (howBusy) {
+                                howBusy.lastLag = now - howBusy.lastSampledTime - interval;
+                                if (howBusy.lastLag < 0) {
+                                    howBusy.lastLag = 0;
+                                }
+                                howBusy.maxLag = (howBusy.lastLag > howBusy.maxLag) ?
+                                                 howBusy.lastLag : howBusy.maxLag;
+                                howBusy.dampendedLag = (howBusy.lastLag + howBusy.dampendedLag * 2) / 3;
+                                howBusy.lastSampledTime = now;
+                            }
+
+                            var timeSinceLastLog = now - self.lastLogTime;
+                            if (timeSinceLastLog < interval) {
+                                return;
+                            }
+
+                            self.info('loading_heartbeat', {}, {
+                                noConsole : true,
+                                heartbeat: true
+                            });
+
+                        }, interval);
+                    });
+
+                    $rootScope.$on('allLoaded', function() {
+                        $interval.cancel(loadingHeartbeat);
+                        self.howBusy = undefined;
+                    });
+                }
+
             },
 
             done: function () {
@@ -177,8 +227,12 @@ define([
                 }
                 settings = settings || {};
 
+                //If the event is NOT a heartbeat then
+                // 1. update lastLogTime to current time
+                // 2. Reset the counter for continuous heartbeat events
                 if(!settings.heartbeat){
                     self.lastLogTime = Date.now();
+                    self.contHeartBeatCount = 0;
                 }
 
                 if (settings.unique) {
@@ -333,6 +387,8 @@ define([
                     meta = $injector.get('$metaBuilder').build();
                 }
                 catch (err) {}
+
+                logger.lastFlushTime = Date.now();
 
                 var req = this.ajax('post', $window.config.urls.baseUrl + this.uri, {
                     data: {
