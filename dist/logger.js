@@ -171,7 +171,10 @@ define([
             log: function (level, event, payload, settings) {
 
                 var self = this;
-                payload = payload   || {};
+
+                if (angular.isArray(payload) || !angular.isObject(payload)) {
+                    payload = {payload: payload};
+                }
                 settings = settings || {};
 
                 if(!settings.heartbeat){

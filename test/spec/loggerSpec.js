@@ -150,6 +150,20 @@ define([
             done();
         });
 
+        it('should convert non-object payload to object', function(done){
+
+            $logger.print = sinon.spy();
+
+            var i = 0;
+            var expected_payload = ['abc', undefined, null, '', []];
+            ["abc", undefined, null, '', []].forEach(function(e){
+                $logger.log($logLevel.INFO, 'test', e);
+                assert.deepEqual(expected_payload[i++], $logger.print.getCall(i-1).args[2].payload);
+            });
+
+            done();
+        });
+
         it('should NOT print the log to console for local mode', function(done){
 
             $logger.flush = sinon.spy();
