@@ -381,7 +381,8 @@ define([
 
     });
 
-    describe('Logger :: Tests for heartbeat', function () {
+
+    describe('Logger :: Tests for loading_heartbeat', function () {
 
         var $interval;
 
@@ -416,6 +417,7 @@ define([
 
             Date.now = origDateNow;
             done();
+
         });
 
         it('should NOT fire heartbeat if a event is logged recently', function(done) {
@@ -554,4 +556,101 @@ define([
             done();
         });
     });
+
+
+    /**
+     * -----------------------------------------------------------------------------------------------------------------
+     *
+     *  Tests for Heartbeats
+     *
+     * -----------------------------------------------------------------------------------------------------------------
+     */
+
+    describe('Logger :: Tests for heartbeat', function () {
+
+        var $interval;
+
+        beforeEach(module('beaver'));
+
+        beforeEach(inject(function ($injector) {
+
+            $logger = $injector.get('$logger');
+            $interval = $injector.get('$interval');
+            $rootScope = $injector.get('$rootScope');
+
+        }));
+
+        it('should NOT fire heartbeat if threshold is reached', function(done) {
+
+            $logger.contHeartBeatCount = $logger.contHeartBeatCountThreshold = 100;
+
+            $logger.info = sinon.spy();
+            $logger.flush = sinon.spy();
+
+            $interval.flush(5*1000);
+
+            assert(!$logger.info.called, 'Expect heartbeat to be NOT sent');
+            assert(!$logger.flush.called, 'flush should not be called');
+
+            done();
+
+        });
+
+        it('should fire heartbeat if threshold is NOT reached', function(done) {
+
+            $logger.contHeartBeatCount = 10;
+            $logger.contHeartBeatCountThreshold = 100;
+
+            $logger.info = sinon.spy();
+
+            $interval.flush(5*1000);
+
+            assert($logger.info.called, 'Expect heartbeat to be sent');
+            assert($logger.contHeartBeatCount === 11, 'Expect the contHeartBeatCount to be incremented');
+
+            var payload = $logger.info.getCall(0).args[1];
+            assert(payload.sequenceNum === 11, 'Expect to send the correct sequence number for heartbeat');
+            var options = $logger.info.getCall(0).args[2];
+            assert(options.noConsole, 'Expect to set noConsole in options');
+            assert(options.heartbeat, 'Expect to set heartbeat in options');
+
+            done();
+
+        });
+
+        it('should fire heartbeat and call flush', function(done) {
+
+
+            $logger.info = sinon.spy();
+            $logger.flush = sinon.spy();
+
+            $logger.lastFlushTime = Date.now() - (70 * 1000);
+
+            $interval.flush(5*1000);
+
+            assert($logger.info.called, 'Expect heartbeat to be sent');
+            assert($logger.flush.called, 'Expect flush to be called');
+
+            done();
+
+        });
+
+        it('should fire heartbeat but NOT call flush', function(done) {
+
+
+            $logger.info = sinon.spy();
+            $logger.flush = sinon.spy();
+
+            $logger.lastFlushTime = Date.now() - (10 * 1000);
+
+            $interval.flush(5*1000);
+
+            assert($logger.info.called, 'Expect heartbeat to be sent');
+            assert(!$logger.flush.called, 'Expect flush to be NOT called');
+
+            done();
+
+        });
+    });
+
 });
