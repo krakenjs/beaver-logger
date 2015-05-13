@@ -193,11 +193,11 @@ define([
                     var timing      = window.performance.timing || {};
 
                     if (performance.now && Math.abs(performance.now() - Date.now()) > 1000) {
-                        if (window.clientStartTime) {
+                        if (window.clientStartTime && payload.client_elapsed === undefined) {
                             payload.client_elapsed = performance.now() - window.clientStartTime;
                         }
 
-                        if (timing.requestStart && timing.navigationStart) {
+                        if (timing.requestStart && timing.navigationStart && payload.req_elapsed === undefined) {
                             payload.req_elapsed = performance.now() - (timing.requestStart - timing.navigationStart);
                         }
                     }
