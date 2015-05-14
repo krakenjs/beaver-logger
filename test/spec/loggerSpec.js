@@ -535,7 +535,7 @@ define([
             done();
         });
 
-        it('should no longer log howbusy after allLoaded event', function(done) {
+        it('should still log howbusy after allLoaded event', function(done) {
             Date.now = function(){
                 return lastLogTime + 300;
             };
@@ -550,7 +550,7 @@ define([
             var payload = $logger.print.getCall(0).args[2];
             assert.equal(payload.key, 'value', 'Expect the original payload');
             ['lastSampledTime', 'lastLag', 'maxLag', 'dampendedLag'].forEach(function (e) {
-                assert.isUndefined(payload[e], 'Expect ' + e + ' does NOT exist in payload');
+                assert.isDefined(payload[e], 'Expect ' + e + ' still exist in payload');
             });
 
             done();

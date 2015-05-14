@@ -188,7 +188,6 @@ define([
 
                     $rootScope.$on('allLoaded', function() {
                         $interval.cancel(loadingHeartbeat);
-                        self.howBusy = undefined;
                     });
                 }
 
