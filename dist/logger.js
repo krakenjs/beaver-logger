@@ -253,8 +253,8 @@ define([
                             payload.client_elapsed = performance.now() - window.clientStartTime;
                         }
 
-                        if (timing.requestStart && timing.navigationStart && payload.req_elapsed === undefined) {
-                            payload.req_elapsed = performance.now() - (timing.requestStart - timing.navigationStart);
+                        if (timing.connectEnd && timing.navigationStart && payload.req_elapsed === undefined) {
+                            payload.req_elapsed = performance.now() - (timing.connectEnd - timing.navigationStart);
                         }
                     }
                 }
