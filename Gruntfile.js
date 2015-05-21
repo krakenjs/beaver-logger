@@ -29,7 +29,8 @@ module.exports = function (grunt) {
         path: appConfig,
         jshint: {
             options: {
-                jshintrc: '.jshintrc'
+                jshintrc: '.jshintrc',
+                reporter: isFusion() ? 'checkstyle-file' : 'jshint'
             },
             gruntfile: {
                 src: 'Gruntfile.js'
