@@ -38,7 +38,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', "coverage"],
+    reporters: ['progress', "coverage", 'junit'],
 
 
     // optionally, configure the reporter
@@ -47,6 +47,11 @@ module.exports = function(config) {
           { type : 'text-summary', dir : 'coverage/'},
           { type : 'html', dir : 'coverage/'},
         ]
+    },
+
+    junitReporter: {
+      outputFile: 'xunit.xml',
+      suite: ''
     },
 
     // web server port
