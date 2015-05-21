@@ -221,7 +221,7 @@ define([
 
                 var self = this;
 
-                if (angular.isArray(payload) || !angular.isObject(payload)) {
+                if (payload && (angular.isArray(payload) || !angular.isObject(payload))) {
                     payload = {payload: payload};
                 }
                 settings = settings || {};
