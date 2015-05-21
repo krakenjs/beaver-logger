@@ -2,6 +2,10 @@
 // Generated on Sun Nov 09 2014 13:19:03 GMT-0800 (PST)
 
 module.exports = function(config) {
+  function coverageSubDir(browser) {
+    return ((browser.toLowerCase().indexOf('phantom')>=0) && '.') || browser;
+  }
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -43,9 +47,10 @@ module.exports = function(config) {
 
     // optionally, configure the reporter
     coverageReporter: {
+        dir: 'coverage',
         reporters: [ 
-          { type : 'text-summary', dir : 'coverage/'},
-          { type : 'html', dir : 'coverage/'},
+          { type : 'lcov', subdir: coverageSubDir },
+          { type : 'json', subdir: coverageSubDir, file: 'coverage.json' }
         ]
     },
 
