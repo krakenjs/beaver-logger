@@ -3,7 +3,8 @@
 
 module.exports = function(config) {
   function coverageSubDir(browser) {
-    return ((browser.toLowerCase().indexOf('phantom')>=0) && '.') || browser;
+    var defaultBrowser = process.env.KARMA_DEFAULT_BROWSER || 'phantom';
+    return ((browser.toLowerCase().indexOf(defaultBrowser)>=0) && '.') || browser;
   }
 
   config.set({
