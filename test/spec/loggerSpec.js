@@ -155,10 +155,18 @@ define([
             $logger.print = sinon.spy();
 
             var i = 0;
-            var expected_payload = ['abc', undefined, null, '', []];
-            ["abc", undefined, null, '', []].forEach(function(e){
+            ["abc", true, 10, undefined, null, '', []].forEach(function(e){
+
                 $logger.log($logLevel.INFO, 'test', e);
-                assert.deepEqual(expected_payload[i++], $logger.print.getCall(i-1).args[2].payload);
+
+                var expected = e || {};
+
+                if(angular.isArray(expected) || !angular.isObject(expected)){
+                    assert.deepEqual(expected, $logger.print.getCall(i++).args[2].payload);
+                }
+                else{
+                    assert.deepEqual(undefined, $logger.print.getCall(i++).args[2].payload);
+                }
             });
 
             done();
