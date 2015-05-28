@@ -125,6 +125,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-bower-install-simple');
 
     // Default task.
+    grunt.registerTask('cover', ['coverage']);
     grunt.registerTask('default', ['jshint', 'copy']);
     grunt.registerTask('test', ['jshint', 'plato', 'bower-install-simple', 'karma']);
     grunt.registerTask('lint', ['jshint']);
