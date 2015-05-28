@@ -76,6 +76,11 @@ module.exports = function (grunt) {
                 color: true,
                 directory: "<%= path.bower_root %>"
             },
+            "dev": {
+                options: {
+                    production: false
+                }
+            },
             "prod": {
                 options: {
                     production: true
