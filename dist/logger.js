@@ -202,7 +202,7 @@ define([
                 var data = {
                     level: level,
                     event: event,
-                    timestamp: new Date(),
+                    timestamp: Date.now(),
                     payload: payload || {}
                 };
 
