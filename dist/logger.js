@@ -216,6 +216,32 @@ define([
                 return this;
             },
 
+            addPerformanceData: function(payload) {
+
+                if (!window.performance || !window.performance.now) {
+                    return;
+                }
+
+                var performance = window.performance;
+                var timing      = window.performance.timing || {};
+
+                if (Math.abs(performance.now() - Date.now()) < 1000) {
+                    return;
+                }
+
+                if (window.clientStartTime && payload.client_elapsed === undefined) {
+                    payload.client_elapsed = performance.now() - window.clientStartTime;
+                }
+
+                if (timing.connectEnd && timing.navigationStart && payload.req_elapsed === undefined) {
+                    var req_elapsed = performance.now() - (timing.connectEnd - timing.navigationStart);
+
+                    if (req_elapsed > 0) {
+                        payload.req_elapsed = req_elapsed;
+                    }
+                }
+            },
+
             /* jslint maxcomplexity: false */
             log: function (level, event, payload, settings) {
 
@@ -246,20 +272,7 @@ define([
 
                 payload.pageID = window.meta && window.meta.pageID;
 
-                if (window.performance) {
-                    var performance = window.performance;
-                    var timing      = window.performance.timing || {};
-
-                    if (performance.now && Math.abs(performance.now() - Date.now()) > 1000) {
-                        if (window.clientStartTime && payload.client_elapsed === undefined) {
-                            payload.client_elapsed = performance.now() - window.clientStartTime;
-                        }
-
-                        if (timing.connectEnd && timing.navigationStart && payload.req_elapsed === undefined) {
-                            payload.req_elapsed = performance.now() - (timing.connectEnd - timing.navigationStart);
-                        }
-                    }
-                }
+                this.addPerformanceData(payload);
 
                 if(self.howBusy){
                     angular.extend(payload, self.howBusy);
