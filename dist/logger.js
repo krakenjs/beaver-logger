@@ -218,26 +218,16 @@ define([
 
             addPerformanceData: function(payload) {
 
-                if (!window.performance || !window.performance.now) {
-                    return;
-                }
+                if (window.enablePerformance) {
+                    var performance = window.performance;
+                    var timing      = window.performance.timing || {};
 
-                var performance = window.performance;
-                var timing      = window.performance.timing || {};
+                    if (window.clientStartTime) {
+                        payload.client_elapsed = performance.now() - window.clientStartTime;
+                    }
 
-                if (Math.abs(performance.now() - Date.now()) < 1000) {
-                    return;
-                }
-
-                if (window.clientStartTime && payload.client_elapsed === undefined) {
-                    payload.client_elapsed = performance.now() - window.clientStartTime;
-                }
-
-                if (timing.connectEnd && timing.navigationStart && payload.req_elapsed === undefined) {
-                    var req_elapsed = performance.now() - (timing.connectEnd - timing.navigationStart);
-
-                    if (req_elapsed > 0) {
-                        payload.req_elapsed = req_elapsed;
+                    if (timing.connectEnd && timing.navigationStart) {
+                        payload.req_elapsed = performance.now() - (timing.connectEnd - timing.navigationStart);
                     }
                 }
             },
