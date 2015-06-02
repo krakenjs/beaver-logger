@@ -5,7 +5,7 @@ module.exports = function (grunt) {
     var coverageDirectory = 'coverage';
 
     function isFusion() {
-        return process.env.FUSION_BUILD_GENERATED !== undefined;
+        return process.env.FUSION_BUILD_GENERATED !== undefined || process.env.BUILD_ID !== undefined;
     }
 
     var appConfig = {
