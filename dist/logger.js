@@ -419,7 +419,7 @@ define([
                             resolve();
                         }
                     };
-                    req.send(JSON.stringify(json));
+                    req.send(JSON.stringify(json).replace(/&/g, '%26'));
                 });
             },
 
