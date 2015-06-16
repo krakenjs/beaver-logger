@@ -76,7 +76,7 @@ define([
                         return;
                     }
 
-                    logger.info('window_beforeunload')._flush(true);
+                    logger.info('window_beforeunload');
 
                     if (previousBeforeUnloadHandler) {
                         return previousBeforeUnloadHandler.apply(this, arguments);
