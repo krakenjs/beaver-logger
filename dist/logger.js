@@ -296,7 +296,10 @@ define([
                     self.print(level, event, payload);
                 }
 
-                if (this.isDone || this.buffer.length >= this.sizeLimit) {
+                if (this.buffer.length >= this.sizeLimit) {
+                    if (Math.random() < 0.01) {
+                        return self.enqueue('warn', 'logger_max_buffer_length', {});
+                    }
                     return self;
                 }
 
@@ -349,6 +352,15 @@ define([
 
             flush: function (immediate) {
                 var logger = this;
+
+                if (this.isDone) {
+                    if (Math.random() < 0.01) {
+                        this.enqueue('warn', 'logger_is_done', {});
+                    }
+                    else {
+                        return $q.when();
+                    }
+                }
 
                 if (immediate) {
                     return $q.when(this._flush());
