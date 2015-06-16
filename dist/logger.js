@@ -221,13 +221,14 @@ define([
                 if (window.enablePerformance) {
                     var performance = window.performance;
                     var timing      = window.performance.timing || {};
+                    var now         = performance.now();
 
                     if (window.clientStartTime && payload.client_elapsed === undefined) {
-                        payload.client_elapsed = performance.now() - window.clientStartTime;
+                        payload.client_elapsed = parseInt(now - window.clientStartTime);
                     }
 
                     if (timing.connectEnd && timing.navigationStart  && payload.req_elapsed === undefined) {
-                        payload.req_elapsed = performance.now() - (timing.connectEnd - timing.navigationStart);
+                        payload.req_elapsed = parseInt(now - (timing.connectEnd - timing.navigationStart));
                     }
                 }
             },
