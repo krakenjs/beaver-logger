@@ -465,6 +465,11 @@ define([
 
     }).factory('$logger', function ($Logger) {
         return new $Logger();
+
+    }).run(function($logger) {
+        angular.forEach(window.beaconQueue, function(payload) {
+            $logger.log(payload.level, payload.event, payload);
+        });
     });
 
 });
