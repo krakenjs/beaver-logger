@@ -354,7 +354,7 @@ define([
                 var logger = this;
 
                 if (this.isDone) {
-                    if (Math.random() < 0.01) {
+                    if (Math.random() < 0.01 && this.buffer.length) {
                         this.enqueue('warn', 'logger_is_done', {});
                     }
                     else {
