@@ -34,21 +34,12 @@ define([
         angular.extend(logger, {
 
             autoLog: [$logLevel.WARNING, $logLevel.ERROR],
-            interval: 5 * 60 * 1000, //5 minutes
-            sizeLimit: 100,
+            flushInterval: 10 * 60 * 1000,
+            heartbeatInterval: 5000,
+            sizeLimit: 150,
             debounceInterval: 10,
             uri: '/api/log',
-            debounceCache: {},
-            lastLogTime: Date.now(),
-            lastFlushTime:  Date.now(),
-            contHeartBeatCount: 0,
-            contHeartBeatCountThreshold: 100,
-            howBusy:{
-                lastSampledTime: Date.now(),
-                lastLag: 0,
-                maxLag: 0,
-                dampendedLag: 0
-            },
+            hearbeatMaxThreshold: 50,
 
             deploy : {
                 isLocal: function () {
@@ -100,120 +91,67 @@ define([
                     }
                 };
 
-                this.set_heartbeat();
+                this.heartbeat();
                 this.daemon();
             },
 
 
-            set_heartbeat: function(){
+            heartbeat: function(){
                 var self = this;
 
+                function timestamp() {
+                    var perf = window.performance;
 
-                setHeartBeat();
-                setLoadingHeartBeat();
-
-                //Sets a interval for logging heatbeats
-                function setHeartBeat(){
-                    var heartbeat, interval = 5 * 1000;
-
-                    heartbeat =  $interval(function () {
-
-                        //If we have max number of continuous heartbeats logged, then do nothing.
-                        if(self.contHeartBeatCount >= self.contHeartBeatCountThreshold){
-                            return;
-                        }
-
-                        //Update the continuous heartbeat count
-                        self.contHeartBeatCount += 1;
-
-                        //Log a heartbeat event
-                        self.info('heartbeat',
-                            //payload
-                            {
-                                'sequenceNum': self.contHeartBeatCount
-                            },
-                            //settings/options
-                            {
-                                noConsole : true,
-                                heartbeat: true
-                            }
-                        );
-
-                        var now = Date.now();
-                        var timeSinceLastFlush = now - self.lastFlushTime;
-
-                        //If there is no flush in last minute then flush the logs, to make sure we capture heartbeats
-                        if (timeSinceLastFlush >= 60 * 1000) {
-                            self.flush();
-                        }
-
-                    }, interval);
-
+                    return window.enablePerformance ?
+                        parseInt(perf.now() - (perf.timing.connectEnd - perf.timing.navigationStart)) :
+                        Date.now();
                 }
 
-                //Sets a interval for loading spinner heart beats
-                function setLoadingHeartBeat(){
-                    var loadingHeartbeat, interval = 200;
+                var howBusy = {
+                    lastSampledTime: timestamp(),
+                    lastLag: 0,
+                    maxLag: 0,
+                    dampendedLag: 0
+                };
 
-                    $rootScope.$on('startLoad', function(){
+                var count = 0;
 
-                        loadingHeartbeat =  $interval(function () {
+                $interval(function () {
 
-                            var now = Date.now();
+                    if (!self.buffer.length || self.buffer[self.buffer.length-1].event !== 'heartbeat') {
+                        count = 0;
+                    }
 
-                            var howBusy = self.howBusy;
-                            if (howBusy) {
-                                howBusy.lastLag = now - howBusy.lastSampledTime - interval;
-                                if (howBusy.lastLag < 0) {
-                                    howBusy.lastLag = 0;
-                                }
-                                howBusy.maxLag = (howBusy.lastLag > howBusy.maxLag) ?
-                                                 howBusy.lastLag : howBusy.maxLag;
-                                howBusy.dampendedLag = (howBusy.lastLag + howBusy.dampendedLag * 2) / 3;
-                                howBusy.lastSampledTime = now;
-                            }
+                    if(!self.buffer.length || count > self.hearbeatMaxThreshold) {
+                        return;
+                    }
 
-                            var timeSinceLastLog = now - self.lastLogTime;
-                            if (timeSinceLastLog < interval) {
-                                return;
-                            }
+                    count += 1;
 
-                            self.info('loading_heartbeat', {}, {
-                                noConsole : true,
-                                heartbeat: true
-                            });
+                    var payload = {
+                        count: count
+                    };
 
-                        }, interval);
-                    });
+                    var now  = timestamp();
 
-                    $rootScope.$on('allLoaded', function() {
-                        $interval.cancel(loadingHeartbeat);
-                    });
-                }
+                    howBusy.lastLag         = now - howBusy.lastSampledTime - self.heartbeatInterval;
+                    howBusy.maxLag          = (howBusy.lastLag > howBusy.maxLag) ? howBusy.lastLag : howBusy.maxLag;
+                    howBusy.dampendedLag    = (howBusy.lastLag + howBusy.dampendedLag * 2) / 3;
+                    howBusy.lastSampledTime = now;
 
+                    payload.lastLag          = howBusy.lastLag.toFixed(4);
+                    payload.maxLag           = howBusy.maxLag.toFixed(4);
+                    payload.dampendedLag     = howBusy.dampendedLag.toFixed(4);
+                    payload.lastSampledTime  = howBusy.lastSampledTime.toFixed(4);
+                    payload.approximate      = window.enablePerformance ? 0 : 1;
+
+                    self.info('heartbeat', payload, {noConsole: true});
+
+                }, this.heartbeatInterval);
             },
 
             done: function () {
                 this.isDone = true;
-            },
-
-            enqueue: function (level, event, payload) {
-
-                var data = {
-                    level: level,
-                    event: event,
-                    timestamp: Date.now(),
-                    payload: payload || {}
-                };
-
-                this.buffer.push(data);
-
-                //If the log level is classified as autolog, then flush the data
-                if (~this.autoLog.indexOf(level)) {
-                    this.flush();
-                }
-
-                return this;
             },
 
             addPerformanceData: function(payload) {
@@ -245,14 +183,6 @@ define([
                 }
                 settings = settings || {};
 
-                //If the event is NOT a heartbeat then
-                // 1. update lastLogTime to current time
-                // 2. Reset the counter for continuous heartbeat events
-                if(!settings.heartbeat){
-                    self.lastLogTime = Date.now();
-                    self.contHeartBeatCount = 0;
-                }
-
                 if (settings.unique) {
                     var hash = event + ':' + JSON.stringify(payload);
                     if (~uniqueEvents.indexOf(hash)) {
@@ -265,78 +195,65 @@ define([
 
                 this.addPerformanceData(payload);
 
-                if(self.howBusy){
-                    angular.extend(payload, self.howBusy);
-                }
-
-                function shouldPrintLogsToConsole(){
-
-                    if(settings.noConsole){
-                        return false;
-                    }
-
-                    if(window.meta && window.meta.corp) {
-                        return true;
-                    }
-
-                    if(self.deploy.isLocal() || self.deploy.isStage()) {
-                        return true;
-                    }
-
-                    var cookies = window.cookies || {};
-                    if(cookies[HERMES_DEV_COOKIE] && cookies[HERMES_DEV_COOKIE] === '1') {
-                        return true;
-                    }
-
-                    return false;
-                }
-
-                //Print to console only in local and stage
-                if (shouldPrintLogsToConsole()) {
-                    self.print(level, event, payload);
-                }
+                self.print(level, event, payload, settings);
 
                 if (this.buffer.length >= this.sizeLimit) {
-                    if (Math.random() < 0.01) {
+                    if (this.buffer.length === this.sizeLimit && Math.random() < 0.01) {
                         return self.enqueue('warn', 'logger_max_buffer_length', {});
                     }
                     return self;
                 }
 
-                if (!settings.debounceFactor) {
-                    return self.enqueue(level, event, payload);
-                }
-
-                var eventName = event + '_' + settings.debounceFactor;
-
-                // First check the debounceCache to see if we have same event+message
-                var debouncedEvent = self.debounceCache[eventName];
-
-                if (debouncedEvent) {
-                    debouncedEvent.payload.count += 1;
-                }
-
-                // If not already present create an entry for this event+message in debounce cache.
-                else {
-                    payload.count = 1;
-
-                    debouncedEvent = self.debounceCache[eventName] = {
-                        level: level,
-                        event: event,
-                        payload: payload
-                    };
-
-                    //Add to the log buffer after a interval specified by settings
-                    $timeout(function () {
-                        self.enqueue(debouncedEvent.level, debouncedEvent.event, debouncedEvent.payload);
-                        delete self.debounceCache[eventName];
-                    }, settings.debounceInterval || 1000);
-                }
-
-                return self;
+                return self.enqueue(level, event, payload, settings);
             },
 
-            print: function (level, event, payload) {
+            enqueue: function (level, event, payload) {
+
+                var data = {
+                    level: level,
+                    event: event,
+                    timestamp: Date.now(),
+                    payload: payload || {}
+                };
+
+                this.buffer.push(data);
+
+                //If the log level is classified as autolog, then flush the data
+                if (~this.autoLog.indexOf(level)) {
+                    this.flush();
+                }
+
+                return this;
+            },
+
+            shouldPrintLogsToConsole: function(settings) {
+
+                if (settings.noConsole){
+                    return false;
+                }
+
+                if (window.meta && window.meta.corp) {
+                    return true;
+                }
+
+                if (this.deploy.isLocal() || this.deploy.isStage()) {
+                    return true;
+                }
+
+                var cookies = window.cookies || {};
+                if (cookies[HERMES_DEV_COOKIE] && cookies[HERMES_DEV_COOKIE] === '1') {
+                    return true;
+                }
+
+                return false;
+            },
+
+            print: function (level, event, payload, settings) {
+
+                if (!this.shouldPrintLogsToConsole(settings)) {
+                    return;
+                }
+
                 var args = [event];
 
                 if (payload) {
@@ -405,8 +322,6 @@ define([
                 }
                 catch (err) {}
 
-                logger.lastFlushTime = Date.now();
-
                 var req = this.ajax('post', $window.config.urls.baseUrl + this.uri, {
                     data: {
                         events: logger.buffer
@@ -443,7 +358,7 @@ define([
 
                 this.timer = $interval(function () {
                     logger.flush();
-                }, this.interval);
+                }, this.flushInterval);
             },
 
             stop: function () {
