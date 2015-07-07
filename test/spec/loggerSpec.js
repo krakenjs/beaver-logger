@@ -252,19 +252,19 @@ define([
             var events = [];
 
             $logger.debug('window_error', {}, {
-                dedupe: true
+                unique: true
             });
 
             $logger.debug('window_error', {}, {
-                dedupe: true
+                unique: true
             });
 
             $logger.debug('window_error', {}, {
-                dedupe: true
+                unique: true
             });
 
             $logger.debug('some_event', {}, {
-                dedupe: true
+                unique: true
             });
 
             assert.equal($logger.buffer.length, 2, 'Expect two events to be logged');

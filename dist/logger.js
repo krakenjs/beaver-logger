@@ -36,7 +36,7 @@ define([
             autoLog: [$logLevel.WARNING, $logLevel.ERROR],
             flushInterval: 10 * 60 * 1000,
             heartbeatInterval: 5000,
-            sizeLimit: 150,
+            sizeLimit: 300,
             debounceInterval: 10,
             uri: '/api/log',
             hearbeatMaxThreshold: 50,
