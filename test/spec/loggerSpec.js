@@ -16,6 +16,16 @@ define([
     var SIZE_LIMIT = 100;
     var DEBOUNCE_INTERVAL = 10;
 
+    window.enablePerformance = true;
+
+    window.performance = {
+        now: Date.now,
+        timing: {
+            connectEnd: 0,
+            requestStart: 0
+        }
+    };
+
 
     var $logger,
         injector,

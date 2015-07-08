@@ -99,12 +99,13 @@ define([
             heartbeat: function(){
                 var self = this;
 
+                if (!window.enablePerformance) {
+                    return;
+                }
+
                 function timestamp() {
                     var perf = window.performance;
-
-                    return window.enablePerformance ?
-                        parseInt(perf.now() - (perf.timing.connectEnd - perf.timing.navigationStart)) :
-                        Date.now();
+                    return parseInt(perf.now() - (perf.timing.connectEnd - perf.timing.navigationStart));
                 }
 
                 var howBusy = {
@@ -143,7 +144,10 @@ define([
                     payload.maxLag           = howBusy.maxLag.toFixed(4);
                     payload.dampendedLag     = howBusy.dampendedLag.toFixed(4);
                     payload.lastSampledTime  = howBusy.lastSampledTime.toFixed(4);
-                    payload.approximate      = window.enablePerformance ? 0 : 1;
+
+                    if (howBusy.lastLag > 5000) {
+                        self.info('toobusy', {}, {noConsole: true, unique: true});
+                    }
 
                     self.info('heartbeat', payload, {noConsole: true});
 
