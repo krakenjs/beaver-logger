@@ -208,6 +208,10 @@ define([
                     return self;
                 }
 
+                if (this.isDone && event !== 'logger_is_done') {
+                    this.log('info', 'logger_is_done', {}, {unique: true});
+                }
+
                 return self.enqueue(level, event, payload, settings);
             },
 
@@ -279,10 +283,6 @@ define([
 
                 if (!this.buffer.length) {
                     return $q.when();
-                }
-
-                if (this.isDone) {
-                    this.enqueue('info', 'logger_is_done');
                 }
 
                 if (immediate) {
