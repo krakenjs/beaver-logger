@@ -202,8 +202,8 @@ define([
                 self.print(level, event, payload, settings);
 
                 if (this.buffer.length >= this.sizeLimit) {
-                    if (this.buffer.length === this.sizeLimit && Math.random() < 0.01) {
-                        return self.enqueue('warn', 'logger_max_buffer_length', {});
+                    if (this.buffer.length === this.sizeLimit) {
+                        return self.enqueue('info', 'logger_max_buffer_length');
                     }
                     return self;
                 }
@@ -211,13 +211,16 @@ define([
                 return self.enqueue(level, event, payload, settings);
             },
 
-            enqueue: function (level, event, payload) {
+            enqueue: function (level, event, payload, settings) {
+
+                payload  = payload  || {};
+                settings = settings || {};
 
                 var data = {
                     level: level,
                     event: event,
                     timestamp: Date.now(),
-                    payload: payload || {}
+                    payload: payload
                 };
 
                 this.buffer.push(data);
@@ -274,13 +277,12 @@ define([
             flush: function (immediate) {
                 var logger = this;
 
+                if (!this.buffer.length) {
+                    return $q.when();
+                }
+
                 if (this.isDone) {
-                    if (Math.random() < 0.01 && this.buffer.length) {
-                        this.enqueue('warn', 'logger_is_done', {});
-                    }
-                    else {
-                        return $q.when();
-                    }
+                    this.enqueue('info', 'logger_is_done');
                 }
 
                 if (immediate) {
