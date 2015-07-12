@@ -63,6 +63,10 @@ define([
 
                 $window.onbeforeunload = function (event) {
 
+                    if (logger.isDone) {
+                        return;
+                    }
+
                     logger.info('window_beforeunload');
 
                     if (previousBeforeUnloadHandler) {
@@ -73,6 +77,10 @@ define([
                 var previousUnloadHandler = $window.onunload;
 
                 $window.onunload = function (event) {
+
+                    if (logger.isDone) {
+                        return;
+                    }
 
                     logger.info('window_unload')._flush(true);
 
@@ -147,7 +155,7 @@ define([
             },
 
             done: function () {
-
+                this.isDone = true;
             },
 
             addPerformanceData: function(payload) {
@@ -198,6 +206,10 @@ define([
                         return self.enqueue('info', 'logger_max_buffer_length');
                     }
                     return self;
+                }
+
+                if (this.isDone && event !== 'logger_is_done') {
+                    this.log('info', 'logger_is_done', {}, {unique: true});
                 }
 
                 return self.enqueue(level, event, payload, settings);
