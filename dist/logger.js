@@ -208,10 +208,6 @@ define([
                     return self;
                 }
 
-                if (this.isDone && event !== 'logger_is_done') {
-                    this.log('info', 'logger_is_done', {}, {unique: true});
-                }
-
                 return self.enqueue(level, event, payload, settings);
             },
 
