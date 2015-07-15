@@ -27,27 +27,15 @@ module.exports = function (grunt) {
             coverage: coverageDirectory
         },
         path: appConfig,
-        jshint: {
+        eslint: {
             options: {
-                jshintrc: '.jshintrc',
-                reporter: isFusion() ? 'checkstyle-file' : 'jshint'
+                config: '.eslintrc',
+                format: isFusion() ? 'checkstyle' : 'stylish',
+                outputFile: isFusion() ? 'checkstyle.xml' : ''
             },
-            gruntfile: {
-                src: 'Gruntfile.js'
-            },
-            lib: {
-                src: allFiles
-            }
-        },
-        watch: {
-            gruntfile: {
-                files: '<%= jshint.gruntfile.src %>',
-                tasks: ['jshint:gruntfile']
-            },
-            lib: {
-                files: '<%= jshint.lib.src %>',
-                tasks: ['jshint:lib', 'nodeunit']
-            }
+            module: [
+                'dist/**/*.js'
+            ]
         },
         copy: {
             dist: {
@@ -119,16 +107,15 @@ module.exports = function (grunt) {
     // These plugins provide necessary tasks.
     grunt.loadNpmTasks('grunt-ci-suite');
     grunt.loadNpmTasks('grunt-plato');
-    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-bower-install-simple');
 
     // Default task.
     grunt.registerTask('cover', ['coverage']);
-    grunt.registerTask('default', ['jshint', 'copy']);
-    grunt.registerTask('test', ['jshint', 'plato', 'bower-install-simple', 'karma']);
-    grunt.registerTask('lint', ['jshint']);
+    grunt.registerTask('default', ['lint', 'copy']);
+    grunt.registerTask('test', ['lint', 'plato', 'bower-install-simple', 'karma']);
+    grunt.registerTask('lint', ['eslint']);
     grunt.registerTask('ci', ['test']);
     grunt.registerTask('coverage', ['clean:coverage', 'karma:unit']);
 };

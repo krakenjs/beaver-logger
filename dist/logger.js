@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 define([
     'angular',
@@ -41,7 +41,7 @@ define([
             uri: '/api/log',
             hearbeatMaxThreshold: 50,
 
-            deploy : {
+            deploy: {
                 isLocal: function () {
                     return hostname === 'localhost' || hostname === 'localhost.paypal.com';
                 },
@@ -56,18 +56,18 @@ define([
             },
 
             init: function () {
-                var logger = this;
+                var self = this;
                 this.buffer = [];
 
                 var previousBeforeUnloadHandler = $window.onbeforeunload;
 
                 $window.onbeforeunload = function (event) {
 
-                    if (logger.isDone) {
+                    if (self.isDone) {
                         return;
                     }
 
-                    logger.info('window_beforeunload');
+                    self.info('window_beforeunload');
 
                     if (previousBeforeUnloadHandler) {
                         return previousBeforeUnloadHandler.apply(this, arguments);
@@ -78,13 +78,13 @@ define([
 
                 $window.onunload = function (event) {
 
-                    if (logger.isDone) {
+                    if (self.isDone) {
                         return;
                     }
 
-                    logger.info('window_unload')._flush(true);
+                    self.info('window_unload')._flush(true);
 
-                    logger.done();
+                    self.done();
 
                     if (previousUnloadHandler) {
                         return previousUnloadHandler.apply(this, arguments);
@@ -96,7 +96,7 @@ define([
             },
 
 
-            heartbeat: function(){
+            heartbeat: function() {
                 var self = this;
 
                 if (!window.enablePerformance) {
@@ -105,7 +105,7 @@ define([
 
                 function timestamp() {
                     var perf = window.performance;
-                    return parseInt(perf.now() - (perf.timing.connectEnd - perf.timing.navigationStart));
+                    return parseInt(perf.now() - (perf.timing.connectEnd - perf.timing.navigationStart), 10);
                 }
 
                 var howBusy = {
@@ -119,11 +119,11 @@ define([
 
                 $interval(function () {
 
-                    if (!self.buffer.length || self.buffer[self.buffer.length-1].event !== 'heartbeat') {
+                    if (!self.buffer.length || self.buffer[self.buffer.length - 1].event !== 'heartbeat') {
                         count = 0;
                     }
 
-                    if(!self.buffer.length || count > self.hearbeatMaxThreshold) {
+                    if (!self.buffer.length || count > self.hearbeatMaxThreshold) {
                         return;
                     }
 
@@ -133,23 +133,28 @@ define([
                         count: count
                     };
 
-                    var now  = timestamp();
+                    var now = timestamp();
 
-                    howBusy.lastLag         = now - howBusy.lastSampledTime - self.heartbeatInterval;
-                    howBusy.maxLag          = (howBusy.lastLag > howBusy.maxLag) ? howBusy.lastLag : howBusy.maxLag;
-                    howBusy.dampendedLag    = (howBusy.lastLag + howBusy.dampendedLag * 2) / 3;
+                    howBusy.lastLag = now - howBusy.lastSampledTime - self.heartbeatInterval;
+                    howBusy.maxLag = (howBusy.lastLag > howBusy.maxLag) ? howBusy.lastLag : howBusy.maxLag;
+                    howBusy.dampendedLag = (howBusy.lastLag + howBusy.dampendedLag * 2) / 3;
                     howBusy.lastSampledTime = now;
 
-                    payload.lastLag          = howBusy.lastLag.toFixed(4);
-                    payload.maxLag           = howBusy.maxLag.toFixed(4);
-                    payload.dampendedLag     = howBusy.dampendedLag.toFixed(4);
-                    payload.lastSampledTime  = howBusy.lastSampledTime.toFixed(4);
+                    payload.lastLag = howBusy.lastLag.toFixed(4);
+                    payload.maxLag = howBusy.maxLag.toFixed(4);
+                    payload.dampendedLag = howBusy.dampendedLag.toFixed(4);
+                    payload.lastSampledTime = howBusy.lastSampledTime.toFixed(4);
 
                     if (howBusy.lastLag > 5000) {
-                        self.info('toobusy', {}, {noConsole: true, unique: true});
+                        self.info('toobusy', {}, {
+                            noConsole: true,
+                            unique: true
+                        });
                     }
 
-                    self.info('heartbeat', payload, {noConsole: true});
+                    self.info('heartbeat', payload, {
+                        noConsole: true
+                    });
 
                 }, this.heartbeatInterval);
             },
@@ -162,15 +167,15 @@ define([
 
                 if (window.enablePerformance) {
                     var performance = window.performance;
-                    var timing      = window.performance.timing || {};
-                    var now         = performance.now();
+                    var timing = window.performance.timing || {};
+                    var now = performance.now();
 
-                    if (window.clientStartTime && payload.client_elapsed === undefined) {
-                        payload.client_elapsed = parseInt(now - window.clientStartTime);
+                    if (window.clientStartTime && angular.isUndefined(payload.client_elapsed)) {
+                        payload.client_elapsed = parseInt(now - window.clientStartTime, 10);
                     }
 
-                    if (timing.connectEnd && timing.navigationStart  && payload.req_elapsed === undefined) {
-                        payload.req_elapsed = parseInt(now - (timing.connectEnd - timing.navigationStart));
+                    if (timing.connectEnd && timing.navigationStart && angular.isUndefined(payload.req_elapsed)) {
+                        payload.req_elapsed = parseInt(now - (timing.connectEnd - timing.navigationStart), 10);
                     }
                 }
             },
@@ -183,13 +188,15 @@ define([
                 payload = payload || {};
 
                 if (angular.isArray(payload) || !angular.isObject(payload)) {
-                    payload = {payload: payload};
+                    payload = {
+                        payload: payload
+                    };
                 }
                 settings = settings || {};
 
                 if (settings.unique) {
-                    var hash = event + ':' + JSON.stringify(payload);
-                    if (~uniqueEvents.indexOf(hash)) {
+                    var hash = event + ':' + angular.toJson(payload);
+                    if (uniqueEvents.indexOf(hash) > -1) {
                         return self;
                     }
                     uniqueEvents.push(hash);
@@ -213,7 +220,7 @@ define([
 
             enqueue: function (level, event, payload, settings) {
 
-                payload  = payload  || {};
+                payload = payload || {};
                 settings = settings || {};
 
                 var data = {
@@ -225,8 +232,8 @@ define([
 
                 this.buffer.push(data);
 
-                //If the log level is classified as autolog, then flush the data
-                if (~this.autoLog.indexOf(level)) {
+                // If the log level is classified as autolog, then flush the data
+                if (this.autoLog.indexOf(level) > -1) {
                     this.flush();
                 }
 
@@ -235,7 +242,7 @@ define([
 
             shouldPrintLogsToConsole: function(settings) {
 
-                if (settings.noConsole){
+                if (settings.noConsole) {
                     return false;
                 }
 
@@ -275,7 +282,7 @@ define([
             },
 
             flush: function (immediate) {
-                var logger = this;
+                var self = this;
 
                 if (!this.buffer.length) {
                     return $q.when();
@@ -285,53 +292,54 @@ define([
                     return $q.when(this._flush());
                 }
 
-                if (logger.debouncer_timeout) {
-                    $timeout.cancel(logger.debouncer_timeout);
+                if (self.debouncer_timeout) {
+                    $timeout.cancel(self.debouncer_timeout);
                 }
 
-                logger.debouncer_timeout = $timeout(function () {
+                self.debouncer_timeout = $timeout(function () {
 
-                    var resolver = logger.debouncer_resolver;
+                    var resolver = self.debouncer_resolver;
 
-                    delete logger.debouncer_promise;
-                    delete logger.debouncer_resolver;
-                    delete logger.debouncer_timeout;
+                    delete self.debouncer_promise;
+                    delete self.debouncer_resolver;
+                    delete self.debouncer_timeout;
 
-                    logger._flush().then(function () {
+                    self._flush().then(function () {
                         resolver();
                     });
 
                 }, this.debounceInterval);
 
-                return logger.debouncer_promise = logger.debouncer_promise || $q(function (resolver) {
-                    logger.debouncer_resolver = resolver;
+                self.debouncer_promise = self.debouncer_promise || $q(function (resolver) {
+                    self.debouncer_resolver = resolver;
                 });
+
+                return self.debouncer_promise;
             },
 
             _flush: function (sync) {
-                var logger = this;
+                var self = this;
 
-                if (!logger.buffer.length) {
+                if (!self.buffer.length) {
                     return $q.when();
                 }
-
-                var buffer = logger.buffer;
 
                 var meta = {};
 
                 try {
                     meta = $injector.get('$metaBuilder').build();
+                } catch (err) {
+                    // @TODO - Log error
                 }
-                catch (err) {}
 
                 var req = this.ajax('post', $window.config.urls.baseUrl + this.uri, {
                     data: {
-                        events: logger.buffer
+                        events: self.buffer
                     },
                     meta: meta
                 }, sync);
 
-                logger.buffer = [];
+                self.buffer = [];
 
                 return req;
             },
@@ -339,7 +347,7 @@ define([
             ajax: function (method, url, json, sync) {
 
                 return $q(function (resolve) {
-                    var XRequest = window.XMLHttpRequest || ActiveXObject;
+                    var XRequest = window.XMLHttpRequest || ActiveXObject; // eslint-disable-line no-undef, block-scoped-var
                     var req = new XRequest('MSXML2.XMLHTTP.3.0');
                     req.open(method.toUpperCase(), url, !sync);
                     req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -349,17 +357,17 @@ define([
                             resolve();
                         }
                     };
-                    req.send(JSON.stringify(json).replace(/&/g, '%26'));
+                    req.send(JSON.stringify(json).replace(/&/g, '%26')); // eslint-disable-line angular/ng_json_functions
                 });
             },
 
             daemon: function () {
                 this.stop();
 
-                var logger = this;
+                var self = this;
 
                 this.timer = $interval(function () {
-                    logger.flush();
+                    self.flush();
                 }, this.flushInterval);
             },
 
