@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 define(['angular'], function (angular) {
     return angular.module('beaver.level', [])
@@ -6,10 +6,10 @@ define(['angular'], function (angular) {
         .factory('$logLevel', function () {
 
             return {
-                INFO:  'info',
+                INFO: 'info',
                 DEBUG: 'debug',
                 ERROR: 'error',
-                WARN:  'warn',
+                WARN: 'warn',
                 ALERT: 'alert'
             };
         })
@@ -17,10 +17,10 @@ define(['angular'], function (angular) {
         .factory('$consoleLogLevel', function () {
 
             return {
-                info:  'info',
+                info: 'info',
                 debug: 'debug',
                 error: 'error',
-                warn:  'warn',
+                warn: 'warn',
                 alert: 'info'
             };
         });
