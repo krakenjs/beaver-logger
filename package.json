@@ -44,7 +44,7 @@
     "load-grunt-tasks": "^3.1.0",
     "mocha": "^2.2.1",
     "mocha-jenkins-reporter": "^0.1.5",
-    "pre-commit": "^1.0.6",
+    "pre-commit": "^1.0.10",
     "xunit-file": "0.0.6"
   },
   "pre-commit": [
