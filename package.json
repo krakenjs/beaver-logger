@@ -19,8 +19,8 @@
   "license": "PayPal",
   "devDependencies": {
     "chai": "^2.1.2",
-    "eslint": "^0.17.1",
-    "eslint-config-xo": "^1.1.1",
+    "eslint": "^0.24.1",
+    "eslint-config-xo": "^2.0.0",
     "eslint-plugin-angular": "0.0.15",
     "eslint-plugin-consumerweb": "^1.0.0",
     "grunt": "^0.4.5",
