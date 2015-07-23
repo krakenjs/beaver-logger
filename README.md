@@ -1,5 +1,7 @@
-xo-beaver-component
+xo-beaver
 ===================
+[![Dependency Status](http://daviddm-5042.ccg21.dev.paypalcorp.com:1337/xo-component/xo-beaver.svg)](http://daviddm-5042.ccg21.dev.paypalcorp.com:1337/xo-component/xo-beaver)
+[![devDependency Status](http://daviddm-5042.ccg21.dev.paypalcorp.com:1337/xo-component/xo-beaver/dev-status.svg)](http://daviddm-5042.ccg21.dev.paypalcorp.com:1337/xo-component/xo-beaver#info=devDependencies)
 
 A ui logging component for Hermes
 
