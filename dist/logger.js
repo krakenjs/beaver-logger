@@ -145,7 +145,7 @@ define([
                     payload.dampendedLag = howBusy.dampendedLag.toFixed(4);
                     payload.lastSampledTime = howBusy.lastSampledTime.toFixed(4);
 
-                    if (howBusy.lastLag > 5000) {
+                    if (howBusy.lastLag > 10000) {
                         self.info('toobusy', {}, {
                             noConsole: true,
                             unique: true
