@@ -136,7 +136,7 @@ define([
                     var now = timestamp();
 
                     howBusy.lastLag = now - howBusy.lastSampledTime - self.heartbeatInterval;
-                    howBusy.maxLag = (howBusy.lastLag > howBusy.maxLag) ? howBusy.lastLag : howBusy.maxLag;
+                    howBusy.maxLag = howBusy.lastLag > howBusy.maxLag ? howBusy.lastLag : howBusy.maxLag;
                     howBusy.dampendedLag = (howBusy.lastLag + howBusy.dampendedLag * 2) / 3;
                     howBusy.lastSampledTime = now;
 
