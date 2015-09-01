@@ -75,30 +75,14 @@ module.exports = function (grunt) {
                 }
             }
         },
-        plato: {
-            fusion: {
+        browserify: {
+            dist: {
                 options: {
-                    jshint: false,
-                    exclude: /Gruntfile.js/,
-                    complexity: {
-                        logicalor: false,
-                        switchcase: false,
-                        forin: true,
-                        trycatch: true
-                    }
+                    transform: [['babelify', { "stage": 0 }]]
                 },
                 files: {
-                    'plato-reports': srcFiles
+                    'dist/beaver-logger.js': 'src/index.js'
                 }
-            }
-        },
-        checkcoverage: {
-            options: {
-                statements: 90,
-                functions: 90,
-                branches: 90,
-                lines: 95,
-                includePattern: coverageDirectory + '/coverage.json'
             }
         }
     });
