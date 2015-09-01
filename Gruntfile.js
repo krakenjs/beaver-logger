@@ -22,7 +22,7 @@ module.exports = function (grunt) {
                 options: {
                     transform: [
 						['babelify', { "stage": 0 }],
-						['uglifyify', { "stage": 1 }]
+						['uglifyify', { "stage": 1, global: true }]
 					]
                 },
                 files: {
