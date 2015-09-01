@@ -64,8 +64,6 @@ export function log(level, event, payload) {
             enqueue(level, event, payload);
         }
     });
-
-    return module;
 }
 
 export function debug(event, payload) {
@@ -155,7 +153,7 @@ export var flush = promiseDebounce(function() {
 function ajax(method, url, data) {
 
     return new Promise(function (resolve) {
-        var XRequest = window.XMLHttpRequest || ActiveXObject;
+        var XRequest = window.XMLHttpRequest || window.ActiveXObject;
         var req = new XRequest('MSXML2.XMLHTTP.3.0');
         req.open(method.toUpperCase(), url, true);
         req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -170,7 +168,7 @@ function ajax(method, url, data) {
 }
 
 (window.beaconQueue || []).forEach(function(payload) {
-    $logger.log(payload.level, payload.event, payload);
+    log(payload.level, payload.event, payload);
 });
 
 
@@ -178,4 +176,4 @@ var payloadBuilders = [];
 
 export function addPayloadBuilder(builder) {
     payloadBuilders.push(builder);
-};
+}

@@ -1,20 +1,24 @@
 
 import * as logger from './logger';
-import Promise from 'promise';
 import {windowReady} from './util';
 
-var enablePerformance =
-    window.performance &&
-    performance.now &&
-    performance.timing &&
-    performance.timing.connectEnd &&
-    performance.timing.navigationStart &&
-    (Math.abs(performance.now() - Date.now()) > 1000) &&
-    (performance.now() - (performance.timing.connectEnd - performance.timing.navigationStart)) > 0;
+export function init() {
+
+    var enablePerformance =
+        window.performance &&
+        performance.now &&
+        performance.timing &&
+        performance.timing.connectEnd &&
+        performance.timing.navigationStart &&
+        (Math.abs(performance.now() - Date.now()) > 1000) &&
+        (performance.now() - (performance.timing.connectEnd - performance.timing.navigationStart)) > 0;
 
 
-if (enablePerformance) {
-    window.clientStartTime = window.clientStartTime || parseInt(window.performance.now());
+    if (!enablePerformance) {
+        return logger.info('no_performance_data');
+    }
+
+    window.clientStartTime = window.clientStartTime || parseInt(window.performance.now(), 10);
 
     function timestamp() {
         var perf = window.performance;
@@ -72,11 +76,11 @@ if (enablePerformance) {
     }, logger.config.heartbeatInterval);
 
 
-    logger.addPayloadBuilder(function() {
+    logger.addPayloadBuilder(function () {
 
         var performance = window.performance;
-        var timing      = performance.timing || {};
-        var now         = performance.now();
+        var timing = performance.timing || {};
+        var now = performance.now();
 
         var payload = {};
 
@@ -91,58 +95,53 @@ if (enablePerformance) {
         return payload;
     });
 
-    if (logger.config.log_performance) {
-        windowReady.then(function() {
+    windowReady.then(function () {
 
-            var keys = [
-                'connectEnd', 'connectStart', 'domComplete', 'domContentLoadedEventEnd',
-                'domContentLoadedEventStart', 'domInteractive', 'domLoading', 'domainLookupEnd',
-                'domainLookupStart', 'fetchStart', 'loadEventEnd', 'loadEventStart', 'navigationStart',
-                'redirectEnd', 'redirectStart', 'requestStart', 'responseEnd', 'responseStart',
-                'secureConnectionStart', 'unloadEventEnd', 'unloadEventStart'
-            ];
+        var keys = [
+            'connectEnd', 'connectStart', 'domComplete', 'domContentLoadedEventEnd',
+            'domContentLoadedEventStart', 'domInteractive', 'domLoading', 'domainLookupEnd',
+            'domainLookupStart', 'fetchStart', 'loadEventEnd', 'loadEventStart', 'navigationStart',
+            'redirectEnd', 'redirectStart', 'requestStart', 'responseEnd', 'responseStart',
+            'secureConnectionStart', 'unloadEventEnd', 'unloadEventStart'
+        ];
 
-            var timing = {};
+        var timing = {};
 
-            keys.forEach(function(key) {
-                timing[key] = parseInt(window.performance.timing[key], 10) || 0;
-            });
-
-            var offset = timing.connectEnd - timing.navigationStart;
-
-            if (timing.connectEnd) {
-                Object.keys(timing).forEach(function(name) {
-                    var time = timing[name];
-                    if (time) {
-                        logger.info('timing_' + name, {
-                            client_elapsed: time - timing.connectEnd - (window.clientStartTime - offset),
-                            req_elapsed: time - timing.connectEnd
-                        });
-                    }
-                });
-            }
-
-            logger.info('timing', timing);
-            logger.info('memory', window.performance.memory);
-            logger.info('navigation', window.performance.navigation);
-
-            if (window.performance.getEntries) {
-                angular.forEach(window.performance.getEntries(), function(resource) {
-                    if (['link', 'script', 'img', 'css'].indexOf(resource.initiatorType) > -1) {
-                        logger.info(resource.initiatorType, resource);
-                    }
-                });
-            }
-
-            if (timing.connectEnd && timing.navigationStart) {
-                logger.info('js_init', {
-                    client_elapsed: 0,
-                    req_elapsed: window.clientStartTime - offset
-                });
-            }
+        keys.forEach(function (key) {
+            timing[key] = parseInt(window.performance.timing[key], 10) || 0;
         });
-    }
-}
-else {
-    logger.info('no_performance_data');
+
+        var offset = timing.connectEnd - timing.navigationStart;
+
+        if (timing.connectEnd) {
+            Object.keys(timing).forEach(function (name) {
+                var time = timing[name];
+                if (time) {
+                    logger.info('timing_' + name, {
+                        client_elapsed: time - timing.connectEnd - (window.clientStartTime - offset),
+                        req_elapsed: time - timing.connectEnd
+                    });
+                }
+            });
+        }
+
+        logger.info('timing', timing);
+        logger.info('memory', window.performance.memory);
+        logger.info('navigation', window.performance.navigation);
+
+        if (window.performance.getEntries) {
+            window.performance.getEntries().forEach(function (resource) {
+                if (['link', 'script', 'img', 'css'].indexOf(resource.initiatorType) > -1) {
+                    logger.info(resource.initiatorType, resource);
+                }
+            });
+        }
+
+        if (timing.connectEnd && timing.navigationStart) {
+            logger.info('js_init', {
+                client_elapsed: 0,
+                req_elapsed: window.clientStartTime - offset
+            });
+        }
+    });
 }

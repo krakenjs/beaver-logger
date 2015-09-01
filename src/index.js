@@ -1,4 +1,10 @@
+'use strict';
+
 import * as logger from './logger';
 import * as performance from './performance';
 
-window['$logger'] = logger;
+if (logger.config.log_performance) {
+    performance.init();
+}
+
+window.$logger = logger;

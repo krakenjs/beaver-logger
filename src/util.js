@@ -13,7 +13,7 @@ export function extend(dest, src) {
     }
 
     return dest;
-};
+}
 
 export function promiseDebounce(method, interval) {
 
@@ -44,7 +44,7 @@ export function promiseDebounce(method, interval) {
         });
 
         return debounce.promise;
-    }
+    };
 }
 
 export var windowReady = new Promise(function(resolve) {
