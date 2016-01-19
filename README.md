@@ -1,36 +1,19 @@
-xo-beaver
-===================
-[![Dependency Status](http://daviddm-5042.ccg21.dev.paypalcorp.com:1337/xo-component/xo-beaver.svg)](http://daviddm-5042.ccg21.dev.paypalcorp.com:1337/xo-component/xo-beaver)
-[![devDependency Status](http://daviddm-5042.ccg21.dev.paypalcorp.com:1337/xo-component/xo-beaver/dev-status.svg)](http://daviddm-5042.ccg21.dev.paypalcorp.com:1337/xo-component/xo-beaver#info=devDependencies)
+beaver-client
+=============
 
-A ui logging component for Hermes
+Front-end log buffer, which periodically (or on demand) flushes logs to the server side.
 
 Overview
 ---------------------
 
-This module was written to support logging from browser for checkout angular app.
+### `$logger.info(<event>, <payload>)`;
 
-## Current support:
+Queues a log. Options are `debug`, `info`, `warn`, `error`.
 
-1. Registers these objects `$Logger`, `$logLevel`, `$LoggerApi` under `beaver` module. So if you add `beaver`
-module as angular dependency then, you can access these.
+For example:
 
-2. `$logger` provides interface:
+`$logger.error('something_went_wrong', { error: err.toString() })`
 
-    $logger.error('event_name', {
-        payload_prop: 'payload value'
-    })
+### `$logger.flush()`;
 
-
-## Log Flushing:
-
-`$logger.flush()` flushes data to api server
-
-    1. Every 10sec.
-    2. window.onbeforeunload
-
-It makes a POST on the following api end point for now: `{baseUrl}/api/log`
-
-
-## Test
- `npm install && grunt test`
+Flushes the logs to the server side. Best done on page transitions, but will happen automatically after a delay.
