@@ -7,4 +7,3 @@ plato-reports
 *.log
 checkstyle.xml
 xunit.xml
-dist

@@ -2,5 +2,9 @@
 
 <script>
 
+    window.addEventListener('load', function() {
+        $logger.info('my_event');
+        $logger.flush();
+    });
 
 </script>
