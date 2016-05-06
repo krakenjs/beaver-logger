@@ -841,6 +841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.startTransition = startTransition;
 	exports.endTransition = endTransition;
+	exports.transition = transition;
 
 	var _performance = __webpack_require__(8);
 
@@ -886,6 +887,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    startTime = currentTime;
 	    currentState = toState;
 	    pageID = (0, _util.uniqueID)();
+	}
+
+	function transition(toState) {
+	    startTransition();
+	    endTransition(toState);
 	}
 
 	(0, _builders.addPayloadBuilder)(function () {
