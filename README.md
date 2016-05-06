@@ -3,6 +3,8 @@ Sloth Logger
 
 Front-end log buffer, which periodically (or on demand) flushes logs to the server side.
 
+![Flow](/flow.png?raw=true)
+
 Overview
 ---------
 
