@@ -1,10 +1,45 @@
-<script src="dist/beaver-logger.js"></script>
+<script src="dist/sloth-logger.js"></script>
 
 <script>
 
+    $logger.addMetaBuilder(function() {
+        return {
+            token: 'EC-XXXXXX'
+        }
+    });
+
+    $logger.addPayloadBuilder(function() {
+        return {
+            extraTS: Date.now()
+        }
+    });
+
     window.addEventListener('load', function() {
         $logger.info('my_event');
-        $logger.flush();
     });
+
+    $logger.endTransition('login');
+
+    $logger.track({
+
+        foo: 'bar',
+        boo: 'baz'
+    })
+
+    // User enters data on page
+    setTimeout(function() {
+
+        // User does something to trigger a page transition
+        $logger.startTransition();
+
+        // We make some ajax calls and show a loading spinner
+        setTimeout(function() {
+
+            // We land on the review page
+            $logger.endTransition('review');
+
+        }, 1000);
+
+    }, 1000);
 
 </script>
