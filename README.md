@@ -7,6 +7,7 @@ Overview
 ---------
 
 
+## Basic logging
 
 ### `$logger.info(<event>, <payload>);`
 
@@ -15,6 +16,13 @@ Queues a log. Options are `debug`, `info`, `warn`, `error`.
 For example:
 
 `$logger.error('something_went_wrong', { error: err.toString() })`
+
+### `$logger.track(<payload>);`
+
+Call this to attach general tracking information to the current page. This is useful if the data is not associated with a specific event, and will be sent to the server the next time the logs are flushed.
+
+
+## Transitions
 
 ### `$logger.startTransition();`
 
@@ -28,9 +36,15 @@ Call this when you transition to the next page. Sloth-logger will automatically 
 
 This is a short-hand for `logger.startTransition(); $logger.endTransition(<nextStateName>);` when there is no loading time, and the transition from one state to another is instant. The logs will be auto-flushed after this call.
 
-### `$logger.track(<payload>);`
 
-Call this to attach general tracking information to the current page. This is useful if the data is not associated with a specific event, and will be sent to the server the next time the logs are flushed.
+## Initialization and configuration
+
+### `$logger.init(<config>);`
+
+Set the logger up with your configuration options. This is optional. Configuration options are listed below.
+
+
+## Advanced
 
 ### `$logger.addMetaBuilder(<function>);`
 
@@ -39,10 +53,6 @@ Attach a method which is called and will attach general information to the loggi
 ### `$logger.addPayloadBuilder(<function>);`
 
 Attach a method which is called and will attach values to **each individual log's payload** whenever the logs are flushed
-
-### `$logger.init(<config>);`
-
-Set the logger up with your configuration options. This is optional. Configuration options are listed below.
 
 ### `$logger.flush();`
 
