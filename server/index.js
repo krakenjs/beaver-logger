@@ -100,7 +100,7 @@ var handleRequest = module.exports.handleRequest = function handleRequest(req, l
     }
 }
 
-var expressEndpoint = module.exports.expressEndpoint = function expressEndpoint(options) {
+module.exports.expressEndpoint = function expressEndpoint(options) {
 
     options = options || {};
 
