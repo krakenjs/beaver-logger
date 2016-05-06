@@ -41,6 +41,11 @@ export function endTransition(toState) {
     pageID = uniqueID();
 }
 
+export function transition(toState) {
+    startTransition();
+    endTransition(toState);
+}
+
 addPayloadBuilder(() => {
     return {
         pageID
