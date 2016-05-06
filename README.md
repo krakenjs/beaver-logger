@@ -46,7 +46,7 @@ Set the logger up with your configuration options. This is optional. Configurati
 
 ### `$logger.flush();`
 
-Flushes the logs to the server side. Best done on page transitions, but will happen automatically after a delay. Recommended that you use the transition methods rather than manually calling this
+Flushes the logs to the server side. Recommended you don't call this manually, as it will happen automatically on page transitions, or after a configured interval.
 
 
 Installing
