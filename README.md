@@ -71,7 +71,7 @@ Installing
 - Include in your project
 
 ```html
-<script src="/js/post-robot.min.js"></script>
+<script src="/js/sloth-logger.min.js"></script>
 ```
 
 or
