@@ -10,11 +10,6 @@ Front-end logger, which will:
 
 This is a great tool to use if you want to do logging on the client side in the same way you do on the server, without worrying about sending off a million beacons. You can quickly get an idea of what's going on on your client, including error cases, page transitions, or anything else you care to log!
 
-Data Flow
----------
-
-![Flow](/flow.png?raw=true)
-
 Overview
 ---------
 
@@ -196,3 +191,9 @@ module.exports = {
     }
 }
 ```
+
+
+Data Flow
+---------
+
+![Flow](/flow.png?raw=true)
