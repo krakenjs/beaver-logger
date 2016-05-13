@@ -1,7 +1,17 @@
 Sloth Logger
 ------------
 
-Front-end log buffer, which periodically (or on demand) flushes logs to the server side.
+Front-end logger, which will:
+
+- Buffer your front-end logs and periodically send them to the server side
+- Allow you to log page transitions and gather performance stats
+- Automatically log window performance stats, where available, and watch for event loop delays
+- Automatically flush logs for any errors or warnings
+
+This is a great tool to use if you want to do logging on the client side in the same way you do on the server, without worrying about sending off a million beacons. You can quickly get an idea of what's going on on your client, including error cases, page transitions, or anything else you care to log!
+
+Data Flow
+---------
 
 ![Flow](/flow.png?raw=true)
 
