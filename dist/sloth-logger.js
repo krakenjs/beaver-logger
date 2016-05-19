@@ -162,6 +162,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var async = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
 
 
+	    if (!_config.config.uri) {
+	        return;
+	    }
+
 	    var hasBuffer = buffer.length;
 	    var hasTracking = Object.keys(tracking).length;
 
@@ -470,6 +474,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var queueIndex = -1;
 
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -587,7 +594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	var config = exports.config = {
 
-	    uri: '/api/log',
+	    uri: '',
 
 	    initial_state_name: 'init',
 
