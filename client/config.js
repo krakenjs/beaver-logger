@@ -1,7 +1,7 @@
 
 export let config = {
 
-    uri: '/api/log',
+    uri: '',
     
     initial_state_name: 'init',
 

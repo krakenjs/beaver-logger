@@ -29,6 +29,10 @@ export function print(level, event, payload) {
 
 export function immediateFlush(async=true) {
 
+    if (!config.uri) {
+        return;
+    }
+
     let hasBuffer = buffer.length;
     let hasTracking = Object.keys(tracking).length;
 
