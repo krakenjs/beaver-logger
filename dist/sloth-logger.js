@@ -324,6 +324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.windowReady = undefined;
 	exports.extend = extend;
+	exports.isSameDomain = isSameDomain;
 	exports.ajax = ajax;
 	exports.promiseDebounce = promiseDebounce;
 	exports.safeInterval = safeInterval;
@@ -348,12 +349,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return dest;
 	}
 
+	function isSameDomain(url) {
+	    var match = url.match(/https?:\/\/[^/]+/);
+
+	    if (!match) {
+	        return true;
+	    }
+
+	    return match[0] === window.location.protocol + '//' + window.location.host;
+	}
+
 	function ajax(method, url, data) {
 	    var async = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
 
 
 	    return new _es6PromiseMin.Promise(function (resolve) {
 	        var XRequest = window.XMLHttpRequest || window.ActiveXObject;
+
+	        if (window.XDomainRequest && !isSameDomain(url)) {
+	            XRequest = window.XDomainRequest;
+	        }
+
 	        var req = new XRequest('MSXML2.XMLHTTP.3.0');
 	        req.open(method.toUpperCase(), url, async);
 	        req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
