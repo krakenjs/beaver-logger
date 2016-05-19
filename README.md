@@ -151,7 +151,10 @@ myapp.use(slothLogger.expressEndpoint({
     uri: '/api/log',
     
     // Custom logger (optional, by default logs to console)
-    logger: myLogger
+    logger: myLogger,
+
+    // Enable cross-origin requests to your logging endpoint
+    enableCors: false
 }))
 ```
 

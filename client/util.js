@@ -16,10 +16,25 @@ export function extend(dest, src, over=true) {
     return dest;
 }
 
+export function isSameDomain(url) {
+    let match = url.match(/https?:\/\/[^/]+/);
+
+    if (!match) {
+        return true;
+    }
+
+    return match[0] === `${window.location.protocol}//${window.location.host}`;
+}
+
 export function ajax(method, url, data, async=true) {
 
     return new Promise(resolve => {
         let XRequest = window.XMLHttpRequest || window.ActiveXObject;
+
+        if (window.XDomainRequest && !isSameDomain(url)) {
+            XRequest = window.XDomainRequest;
+        }
+
         let req = new XRequest('MSXML2.XMLHTTP.3.0');
         req.open(method.toUpperCase(), url, async);
         req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');

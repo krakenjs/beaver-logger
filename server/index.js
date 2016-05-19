@@ -1,5 +1,6 @@
 
 var util = require('./util');
+var url = require('url');
 
 var defaultLogger = {
 
@@ -110,6 +111,15 @@ module.exports.expressEndpoint = function expressEndpoint(options) {
     var app = require('express')();
 
     app.all(options.uri, function(req, res, next) {
+
+        if (options.enableCors) {
+            if (req.get('origin')) {
+                var parsedUrl = url.parse(req.get('origin')) || {};
+                res.header('Access-Control-Allow-Origin', parsedUrl.protocol + '//' + parsedUrl.host);
+            } else {
+                res.header('Access-Control-Allow-Origin', '*');
+            }
+        }
 
         try {
             handleRequest(req, options.logger);
