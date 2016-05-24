@@ -4,14 +4,26 @@
   "description": "Client side logger.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp lint"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.paypal.com:nfra/sloth-logger.git"
+    "url": "git://github.com/krakenjs/sloth-logger.git"
   },
-  "author": "",
-  "license": "MIT",
+  "keywords": [
+    "logging",
+    "logger",
+    "log",
+    "krakenjs",
+    "kraken"
+  ],
+  "licenses": [
+    {
+      "type": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ],
+  "readmeFilename": "README.md",
   "devDependencies": {
     "babel-core": "^6.7.7",
     "babel-eslint": "^6.0.4",
