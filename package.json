@@ -2,7 +2,7 @@
   "name": "sloth-logger",
   "version": "1.0.5",
   "description": "Client side logger.",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
     "test": "gulp lint"
   },
