@@ -1,4 +1,4 @@
-# Contributing to sloth-logger
+# Contributing to beaver-logger
 
 We are always looking for ways to make our modules better. Adding features and fixing bugs allows everyone who depends
 on this code to create better, more stable applications.
@@ -9,13 +9,13 @@ your changes into our code. Ideas and other comments are also welcome.
 1. Create your own [fork](https://help.github.com/articles/fork-a-repo) of this [repository](../../fork).
 ```bash
 # Clone it
-$ git clone git@github.com:me/sloth-logger.git
+$ git clone git@github.com:me/beaver-logger.git
 
 # Change directory
-$ cd sloth-logger
+$ cd beaver-logger
 
 # Add the upstream repo
-$ git remote add upstream git://github.com/krakenjs/sloth-logger.git
+$ git remote add upstream git://github.com/krakenjs/beaver-logger.git
 
 # Get the latest upstream changes
 $ git pull upstream

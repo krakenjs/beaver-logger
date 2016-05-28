@@ -41,10 +41,10 @@ export function init(conf) {
         setInterval(flush, config.flushInterval);
     }
 
-    if (window.slothLogQueue) {
-        window.slothLogQueue.forEach(payload => {
+    if (window.beaverLogQueue) {
+        window.beaverLogQueue.forEach(payload => {
             log(payload.level, payload.event, payload);
         });
-        delete window.slothLogQueue;
+        delete window.beaverLogQueue;
     }
 }

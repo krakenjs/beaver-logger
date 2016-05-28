@@ -690,11 +690,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        setInterval(_logger.flush, _config.config.flushInterval);
 	    }
 
-	    if (window.slothLogQueue) {
-	        window.slothLogQueue.forEach(function (payload) {
+	    if (window.beaverLogQueue) {
+	        window.beaverLogQueue.forEach(function (payload) {
 	            (0, _logger.log)(payload.level, payload.event, payload);
 	        });
-	        delete window.slothLogQueue;
+	        delete window.beaverLogQueue;
 	    }
 	}
 

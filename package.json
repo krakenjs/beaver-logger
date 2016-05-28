@@ -1,5 +1,5 @@
 {
-  "name": "sloth-logger",
+  "name": "beaver-logger",
   "version": "1.0.5",
   "description": "Client side logger.",
   "main": "server/index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/krakenjs/sloth-logger.git"
+    "url": "git://github.com/krakenjs/beaver-logger.git"
   },
   "keywords": [
     "logging",

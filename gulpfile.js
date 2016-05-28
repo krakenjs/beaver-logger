@@ -6,7 +6,7 @@ var gulpWebpack = require('gulp-webpack');
 
 gulp.task('build', ['webpack', 'webpack-min']);
 
-var FILE_NAME = 'sloth-logger';
+var FILE_NAME = 'beaver-logger';
 var MODULE_NAME = '$logger';
 
 var WEBPACK_CONFIG = {
