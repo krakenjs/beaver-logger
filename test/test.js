@@ -8,16 +8,6 @@ $logger.init({
    uri: '/test/api/log'
 });
 
-var logEndpoint = $mockEndpoint.register({
-    method: 'GET',
-    uri: '/test/api/log',
-    data: function() {
-        return {
-            name: 'Zippy the Pinhead'
-        };
-    }
-}).listen();
-
 describe('xcomponent tests', function() {
 
     it('should assert log something and flush it to the buffer', function() {
