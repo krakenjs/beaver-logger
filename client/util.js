@@ -63,19 +63,22 @@ export function promiseDebounce(method, interval) {
         debounce.timeout = setTimeout(() => {
 
             let resolver = debounce.resolver;
+            let rejector = debounce.rejector;
 
             delete debounce.promise;
             delete debounce.resolver;
+            delete debounce.rejector;
             delete debounce.timeout;
             
             return Promise.resolve().then(() => {
                 return method.apply(null, args);
-            }).then(resolver);
+            }).then(resolver, rejector);
 
         }, interval);
 
-        debounce.promise = debounce.promise || new Promise(resolver => {
+        debounce.promise = debounce.promise || new Promise((resolver, rejector) => {
             debounce.resolver = resolver;
+            debounce.rejector = rejector;
         });
 
         return debounce.promise;
