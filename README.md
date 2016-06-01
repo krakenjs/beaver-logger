@@ -69,7 +69,7 @@ Flushes the logs to the server side. Recommended you don't call this manually, a
 Installing
 ----------
 
-- Install via npm or bowser
+- Install via npm or bower
 
 `npm install --save beaver-logger` or `bower install --save beaver-logger`
 
