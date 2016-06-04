@@ -10,7 +10,7 @@ $logger.init({
 
 describe('xcomponent tests', function() {
 
-    it('should assert log something and flush it to the buffer', function() {
+    it('should log something and flush it to the buffer', function() {
 
         $logger.info('hello_world', {
             foo: 'bar'

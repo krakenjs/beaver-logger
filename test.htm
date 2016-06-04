@@ -1,6 +1,10 @@
-<script src="dist/sloth-logger.js"></script>
+<script src="dist/beaver-logger.js"></script>
 
 <script>
+
+    $logger.init({
+        uri: '/api/test'
+    });
 
     $logger.addMetaBuilder(function() {
         return {
@@ -11,6 +15,12 @@
     $logger.addPayloadBuilder(function() {
         return {
             extraTS: Date.now()
+        }
+    });
+
+    $logger.addHeaderBuilder(function() {
+        return {
+            'x-csrf-token': '323432ln23'
         }
     });
 

@@ -26,7 +26,7 @@ export function isSameDomain(url) {
     return match[0] === `${window.location.protocol}//${window.location.host}`;
 }
 
-export function ajax(method, url, data, async=true) {
+export function ajax(method, url, headers={}, data={}, async=true) {
 
     return new Promise(resolve => {
         let XRequest = window.XMLHttpRequest || window.ActiveXObject;
@@ -37,8 +37,16 @@ export function ajax(method, url, data, async=true) {
 
         let req = new XRequest('MSXML2.XMLHTTP.3.0');
         req.open(method.toUpperCase(), url, async);
+
         req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         req.setRequestHeader('Content-type', 'application/json');
+
+        for (let headerName in headers) {
+            if (headers.hasOwnProperty(headerName)) {
+                req.setRequestHeader(headerName, headers[headerName]);
+            }
+        }
+
         req.onreadystatechange = () => {
             if (req.readyState > 3) {
                 resolve();

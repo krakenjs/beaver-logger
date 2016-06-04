@@ -57,9 +57,49 @@ Set the logger up with your configuration options. This is optional. Configurati
 
 Attach a method which is called and will attach general information to the logging payload whenever the logs are flushed
 
+```javascript
+$logger.addMetaBuilder(function() {
+    return {
+        current_page: getMyCurrentPage()
+    };
+});
+```
+
 ### `$logger.addPayloadBuilder(<function>);`
 
 Attach a method which is called and will attach values to **each individual log's payload** whenever the logs are flushed
+
+```javascript
+$logger.addPayloadBuilder(function() {
+    return {
+        performance_ts: window.performance.now()
+    };
+});
+```
+
+### `$logger.addTrackingBuilder(<function>);`
+
+Attach a method which is called and will attach values to **each individual log's tracking** whenever the logs are flushed
+
+```javascript
+$logger.addTrackingBuilder(function() {
+    return {
+        pageLoadTime: getPageLoadTime()
+    };
+});
+```
+
+### `$logger.addHeaderBuilder(<function>);`
+
+Attach a method which is called and will attach values to **each individual log requests' headers** whenever the logs are flushed
+
+```javascript
+$logger.addHeaderBuilder(function() {
+    return {
+        'x-csrf-token': getCSRFToken()
+    };
+});
+```
 
 ### `$logger.flush();`
 

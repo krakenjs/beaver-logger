@@ -1,6 +1,6 @@
 
 import { extend, promiseDebounce, ajax } from './util';
-import { payloadBuilders, metaBuilders } from './builders';
+import { payloadBuilders, metaBuilders, trackingBuilders, headerBuilders } from './builders';
 import { config } from './config';
 import { init } from './init';
 
@@ -54,9 +54,27 @@ export function immediateFlush(async=true) {
         }
     }
 
+    for (let builder of trackingBuilders) {
+        try {
+            extend(tracking, builder(), false);
+        } catch (err) {
+            console.error('Error in custom tracking builder:', err.stack || err.toString());
+        }
+    }
+
+    let headers = {};
+
+    for (let builder of headerBuilders) {
+        try {
+            extend(headers, builder(), false);
+        } catch (err) {
+            console.error('Error in custom header builder:', err.stack || err.toString());
+        }
+    }
+
     let events = buffer;
 
-    let req = ajax('post', config.uri, {
+    let req = ajax('post', config.uri, headers, {
         events,
         meta,
         tracking
