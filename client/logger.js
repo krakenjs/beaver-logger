@@ -2,7 +2,6 @@
 import { extend, promiseDebounce, ajax } from './util';
 import { payloadBuilders, metaBuilders, trackingBuilders, headerBuilders } from './builders';
 import { config } from './config';
-import { init } from './init';
 
 export let buffer = [];
 export let tracking = {};
@@ -104,8 +103,6 @@ function enqueue(level, event, payload) {
 
 
 export function log(level, event, payload) {
-
-    init();
 
     payload = payload || {};
 
