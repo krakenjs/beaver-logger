@@ -134,8 +134,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _config = __webpack_require__(6);
 
-	var _init = __webpack_require__(7);
-
 	var buffer = exports.buffer = [];
 	var tracking = exports.tracking = {};
 
@@ -298,8 +296,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function log(level, event, payload) {
-
-	    (0, _init.init)();
 
 	    payload = payload || {};
 
@@ -961,7 +957,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _config = __webpack_require__(6);
 
+	var windowID = (0, _util.uniqueID)();
 	var pageID = (0, _util.uniqueID)();
+
 	var currentState = _config.config.initial_state_name;
 	var startTime = void 0;
 
@@ -1004,6 +1002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	(0, _builders.addPayloadBuilder)(function () {
 	    return {
+	        windowID: windowID,
 	        pageID: pageID
 	    };
 	});
