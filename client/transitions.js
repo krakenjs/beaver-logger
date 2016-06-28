@@ -5,7 +5,9 @@ import { addMetaBuilder, addPayloadBuilder } from './builders';
 import { uniqueID } from './util';
 import { config } from './config';
 
+let windowID = uniqueID();
 let pageID = uniqueID();
+
 let currentState = config.initial_state_name;
 let startTime;
 
@@ -48,6 +50,7 @@ export function transition(toState) {
 
 addPayloadBuilder(() => {
     return {
+        windowID,
         pageID
     }
 });
