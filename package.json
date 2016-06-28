@@ -1,6 +1,6 @@
 {
   "name": "beaver-logger",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Client side logger.",
   "main": "server/index.js",
   "scripts": {
