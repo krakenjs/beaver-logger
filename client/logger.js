@@ -23,7 +23,18 @@ export function print(level, event, payload) {
         args.push('\n\n', payload.error || payload.warning);
     }
 
-    (window.console[level] || window.console.log).apply(window.console, args);
+    if (window.console) {
+
+        if (window.console[level] && window.console[level].apply) {
+            window.console[level].apply(window.console, args);
+        } else if (window.console[level]) {
+            window.console[level](event, payload, payload.error || payload.warning);
+        } else if (window.console.log && window.console.log.apply) {
+            window.console.log.apply(window.console, args);
+        } else if (window.console.log) {
+            window.console.log(event, payload, payload.error || payload.warning);
+        }
+    }
 }
 
 export function immediateFlush(async=true) {
