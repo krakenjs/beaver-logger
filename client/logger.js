@@ -6,6 +6,11 @@ import { config } from './config';
 export let buffer = [];
 export let tracking = {};
 
+if (Function.prototype.bind && window.console && typeof console.log === 'object') {
+    [ 'log', 'info', 'warn', 'error' ].forEach(function(method) {
+        console[method] = this.bind(console[method], console);
+    }, Function.prototype.call);
+}
 
 export function print(level, event, payload) {
 
@@ -27,12 +32,8 @@ export function print(level, event, payload) {
 
         if (window.console[level] && window.console[level].apply) {
             window.console[level].apply(window.console, args);
-        } else if (window.console[level]) {
-            window.console[level](event, payload, payload.error || payload.warning);
         } else if (window.console.log && window.console.log.apply) {
             window.console.log.apply(window.console, args);
-        } else if (window.console.log) {
-            window.console.log(event, payload, payload.error || payload.warning);
         }
     }
 }
