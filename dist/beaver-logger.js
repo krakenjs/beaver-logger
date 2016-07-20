@@ -119,6 +119,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	exports.flush = exports.tracking = exports.buffer = undefined;
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 	exports.print = print;
 	exports.immediateFlush = immediateFlush;
 	exports.log = log;
@@ -136,6 +139,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var buffer = exports.buffer = [];
 	var tracking = exports.tracking = {};
+
+	if (Function.prototype.bind && window.console && _typeof(console.log) === 'object') {
+	    ['log', 'info', 'warn', 'error'].forEach(function (method) {
+	        console[method] = this.bind(console[method], console);
+	    }, Function.prototype.call);
+	}
 
 	function print(level, event, payload) {
 
@@ -157,12 +166,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (window.console[level] && window.console[level].apply) {
 	            window.console[level].apply(window.console, args);
-	        } else if (window.console[level]) {
-	            window.console[level](event, payload, payload.error || payload.warning);
 	        } else if (window.console.log && window.console.log.apply) {
 	            window.console.log.apply(window.console, args);
-	        } else if (window.console.log) {
-	            window.console.log(event, payload, payload.error || payload.warning);
 	        }
 	    }
 	}
