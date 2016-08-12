@@ -82,12 +82,14 @@ var handleRequest = module.exports.handleRequest = function handleRequest(req, l
     } else {
 
         var event = query.event;
-        var level = query.level;
+        var level = query.level || 'info';
+        var state = query.state;
 
         var payload = util.extend({}, query);
 
         delete payload.event;
         delete payload.level;
+        delete payload.state;
 
         return log(req, logger, {
             events: [
@@ -96,7 +98,10 @@ var handleRequest = module.exports.handleRequest = function handleRequest(req, l
                     event: event,
                     payload: payload
                 }
-            ]
+            ],
+            meta: {
+                state: state
+            }
         });
     }
 }
