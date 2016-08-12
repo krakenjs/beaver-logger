@@ -1,7 +1,7 @@
 {
   "name": "beaver-logger",
   "main": "index.js",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "authors": [
     "Daniel Brain <dbrain@paypal.com>"
   ],
