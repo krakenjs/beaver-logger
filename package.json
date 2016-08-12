@@ -2,7 +2,7 @@
   "name": "beaver-logger",
   "version": "1.0.10",
   "description": "Client side logger.",
-  "main": "server/index.js",
+  "main": "dist/beaver-logger.js",
   "scripts": {
     "test": "gulp lint"
   },
