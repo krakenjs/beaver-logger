@@ -124,6 +124,12 @@ module.exports.expressEndpoint = function expressEndpoint(options) {
             } else {
                 res.header('Access-Control-Allow-Origin', '*');
             }
+
+            res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+        }
+
+        if (req.method.toLowerCase === 'options') {
+            return res.status(200).send();
         }
 
         try {
