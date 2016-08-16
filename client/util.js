@@ -16,6 +16,10 @@ export function extend(dest, src, over=true) {
     return dest;
 }
 
+export function isSameProtocol(url) {
+    return window.location.protocol === url.split('/')[0];
+}
+
 export function isSameDomain(url) {
     let match = url.match(/https?:\/\/[^/]+/);
 
@@ -32,6 +36,11 @@ export function ajax(method, url, headers={}, data={}, async=true) {
         let XRequest = window.XMLHttpRequest || window.ActiveXObject;
 
         if (window.XDomainRequest && !isSameDomain(url)) {
+
+            if (!isSameProtocol(url)) {
+                return resolve();
+            }
+
             XRequest = window.XDomainRequest;
         }
 
