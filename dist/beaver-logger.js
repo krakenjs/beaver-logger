@@ -396,6 +396,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.windowReady = undefined;
 	exports.extend = extend;
+	exports.isSameProtocol = isSameProtocol;
 	exports.isSameDomain = isSameDomain;
 	exports.ajax = ajax;
 	exports.promiseDebounce = promiseDebounce;
@@ -421,6 +422,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return dest;
 	}
 
+	function isSameProtocol(url) {
+	    return window.location.protocol === url.split('/')[0];
+	}
+
 	function isSameDomain(url) {
 	    var match = url.match(/https?:\/\/[^/]+/);
 
@@ -441,6 +446,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var XRequest = window.XMLHttpRequest || window.ActiveXObject;
 
 	        if (window.XDomainRequest && !isSameDomain(url)) {
+
+	            if (!isSameProtocol(url)) {
+	                return resolve();
+	            }
+
 	            XRequest = window.XDomainRequest;
 	        }
 
