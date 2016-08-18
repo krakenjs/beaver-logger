@@ -138,7 +138,9 @@ export function log(level, event, payload) {
         }
     }
 
-    print(level, event, payload);
+    if (!config.silent) {
+        print(level, event, payload);
+    }
 
     if (buffer.length === config.sizeLimit) {
         enqueue('info', 'logger_max_buffer_length');

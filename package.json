@@ -4,7 +4,7 @@
   "description": "Client side logger.",
   "main": "dist/beaver-logger.js",
   "scripts": {
-    "test": "gulp lint"
+    "test": "gulp lint && karma start"
   },
   "repository": {
     "type": "git",

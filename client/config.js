@@ -10,6 +10,10 @@ export let config = {
 
     sizeLimit: 300,
 
+    // Supress `console.log`s when `true`
+    // Recommended for production usage
+    silent: false,
+
     heartbeat: true,
     heartbeatConsoleLog: true,
     heartbeatInterval:    5000,
