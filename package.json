@@ -4,6 +4,7 @@
   "description": "Client side logger.",
   "main": "dist/beaver-logger.js",
   "scripts": {
+    "prepublish": "sh publish.sh",
     "test": "gulp lint && karma start"
   },
   "repository": {
