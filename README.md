@@ -150,6 +150,11 @@ $logger.init({
     sizeLimit: 300,
 
 
+    // Supress `console.log`s when `true`
+    // Recommended for production usage
+    silent: false,
+
+
     // Enable or disable heartbeats, which run on an interval and monitor for event loop delays
     heartbeat: true,
 
