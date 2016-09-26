@@ -37,29 +37,31 @@ var log = module.exports.log = function log(req, logger, logs) {
     var meta = logs.meta || {};
     var tracking = logs.tracking || {};
 
-    events.forEach(function(event) {
+    if (Array.isArray(events)) {
+        events.forEach(function(event) {
 
-        if (!event.event) {
-            return;
-        }
+            if (!event.event) {
+                return;
+            }
 
-        event.level = event.level || 'info';
-        event.payload = event.payload || {};
+            event.level = event.level || 'info';
+            event.payload = event.payload || {};
 
-        var _log = logger instanceof Function ? logger : logger.log;
+            var _log = logger instanceof Function ? logger : logger.log;
 
-        if (_log instanceof Function) {
-            return _log(req, event.level, event.event, event.payload);
-        }
+            if (_log instanceof Function) {
+                return _log(req, event.level, event.event, event.payload);
+            }
 
-        var _logLevel = logger[event.level];
+            var _logLevel = logger[event.level];
 
-        if (_logLevel instanceof Function) {
-            return _logLevel(req, event.event, event.payload);
-        }
+            if (_logLevel instanceof Function) {
+                return _logLevel(req, event.event, event.payload);
+            }
 
-        defaultLogger.log(req, event.level, event.event, event.payload);
-    });
+            defaultLogger.log(req, event.level, event.event, event.payload);
+        });
+    }
 
     if (logger.meta) {
         logger.meta(req, meta);
