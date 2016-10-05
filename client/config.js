@@ -2,6 +2,7 @@
 export let config = {
 
     uri: '',
+    prefix: '',
     
     initial_state_name: 'init',
 

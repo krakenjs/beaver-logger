@@ -116,6 +116,10 @@ function enqueue(level, event, payload) {
 
 export function log(level, event, payload) {
 
+    if (config.prefix) {
+        event = `${config.prefix}_${event}`;
+    }
+
     payload = payload || {};
 
     if (typeof payload === 'string') {
@@ -148,6 +152,31 @@ export function log(level, event, payload) {
     else if (buffer.length < config.sizeLimit) {
         enqueue(level, event, payload);
     }
+}
+
+export function prefix(name) {
+
+    return {
+        debug(event, payload) {
+            return log('debug', `${name}_${event}`, payload);
+        },
+
+        info(event, payload) {
+            return log('info', `${name}_${event}`, payload);
+        },
+
+        warn(event, payload) {
+            return log('warn', `${name}_${event}`, payload);
+        },
+
+        error(event, payload) {
+            return log('error', `${name}_${event}`, payload);
+        },
+
+        flush() {
+            return flush();
+        }
+    };
 }
 
 export function debug(event, payload) {
