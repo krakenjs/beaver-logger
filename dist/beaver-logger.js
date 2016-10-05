@@ -125,6 +125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.print = print;
 	exports.immediateFlush = immediateFlush;
 	exports.log = log;
+	exports.prefix = prefix;
 	exports.debug = debug;
 	exports.info = info;
 	exports.warn = warn;
@@ -296,8 +297,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return req;
 	}
 
-	var flush = exports.flush = (0, _util.promiseDebounce)(immediateFlush, _config.config.debounceInterval);
+	var _flush = (0, _util.promiseDebounce)(immediateFlush, _config.config.debounceInterval);
 
+	exports.flush = _flush;
 	function enqueue(level, event, payload) {
 
 	    buffer.push({
@@ -307,11 +309,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 
 	    if (_config.config.autoLog.indexOf(level) > -1) {
-	        flush();
+	        _flush();
 	    }
 	}
 
 	function log(level, event, payload) {
+
+	    if (_config.config.prefix) {
+	        event = _config.config.prefix + '_' + event;
+	    }
 
 	    payload = payload || {};
 
@@ -365,6 +371,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else if (buffer.length < _config.config.sizeLimit) {
 	        enqueue(level, event, payload);
 	    }
+	}
+
+	function prefix(name) {
+
+	    return {
+	        debug: function debug(event, payload) {
+	            return log('debug', name + '_' + event, payload);
+	        },
+	        info: function info(event, payload) {
+	            return log('info', name + '_' + event, payload);
+	        },
+	        warn: function warn(event, payload) {
+	            return log('warn', name + '_' + event, payload);
+	        },
+	        error: function error(event, payload) {
+	            return log('error', name + '_' + event, payload);
+	        },
+	        flush: function flush() {
+	            return _flush();
+	        }
+	    };
 	}
 
 	function debug(event, payload) {
@@ -806,6 +833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var config = exports.config = {
 
 	    uri: '',
+	    prefix: '',
 
 	    initial_state_name: 'init',
 
