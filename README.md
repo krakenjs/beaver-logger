@@ -158,7 +158,7 @@ $logger.init({
     heartbeatInterval: 5000,
 
     // Maximum number of sequential heartbeat logs
-    hearbeatMaxThreshold: 50,
+    heartbeatMaxThreshold: 50,
 
     // Monitors for event loop delays and triggers a toobusy event
     heartbeatTooBusy: false,

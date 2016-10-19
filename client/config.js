@@ -19,7 +19,7 @@ export let config = {
     heartbeatConsoleLog: true,
     heartbeatInterval:    5000,
     heartbeatTooBusy: false,
-    hearbeatMaxThreshold: 50,
+    heartbeatMaxThreshold: 50,
     heartbeatTooBusyThreshold: 10000,
 
     autoLog: ['warn', 'error'],
