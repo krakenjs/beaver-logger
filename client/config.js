@@ -3,7 +3,7 @@ export let config = {
 
     uri: '',
     prefix: '',
-    
+
     initial_state_name: 'init',
 
     flushInterval:    10 * 60 * 1000,
@@ -18,6 +18,7 @@ export let config = {
     heartbeat: true,
     heartbeatConsoleLog: true,
     heartbeatInterval:    5000,
+    heartbeatTooBusy: false,
     hearbeatMaxThreshold: 50,
     heartbeatTooBusyThreshold: 10000,
 

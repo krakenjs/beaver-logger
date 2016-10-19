@@ -1,6 +1,6 @@
 
 import { config } from './config';
-import { info, buffer } from './logger';
+import { info } from './logger';
 import { addPayloadBuilder } from './builders'
 import { windowReady, safeInterval } from './util';
 
@@ -27,11 +27,11 @@ function timer(startTime) {
 
     return {
         startTime,
-        
+
         elapsed() {
             return parseInt(now() - startTime, 10);
         },
-        
+
         reset() {
             startTime = now();
         }
@@ -55,34 +55,31 @@ export function initHeartBeat() {
 
     safeInterval(() => {
 
-        if (!buffer.length || buffer[buffer.length - 1].event !== 'heartbeat') {
-            heartbeatCount = 0;
-        }
-
-        if (!buffer.length || heartbeatCount > config.hearbeatMaxThreshold) {
+        if (heartbeatCount > config.hearbeatMaxThreshold) {
             return;
         }
 
         heartbeatCount += 1;
-        
+
         let elapsed = heartBeatTimer.elapsed();
         let lag = elapsed - config.heartbeatInterval;
 
-        if (lag >= config.heartbeatTooBusyThreshold) {
-            info('toobusy', {
-                count: heartbeatCount,
-                elapsed,
-                lag
-            }, {
-                noConsole: !config.heartbeatConsoleLog
-            });
+        let heartbeatPayload = {
+            count: heartbeatCount,
+            elapsed
+        };
+
+        if (config.heartbeatTooBusy) {
+            heartbeatPayload.lag = lag;
+
+            if (lag >= config.heartbeatTooBusyThreshold) {
+                info('toobusy', heartbeatPayload, {
+                    noConsole: !config.heartbeatConsoleLog
+                });
+            }
         }
 
-        info('heartbeat', {
-            count: heartbeatCount,
-            elapsed,
-            lag
-        }, {
+        info('heartbeat', heartbeatPayload, {
             noConsole: !config.heartbeatConsoleLog
         });
 
