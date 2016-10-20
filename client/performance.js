@@ -55,7 +55,7 @@ export function initHeartBeat() {
 
     safeInterval(() => {
 
-        if (heartbeatCount > config.heartbeatMaxThreshold) {
+        if (config.heartbeatMaxThreshold && (heartbeatCount > config.heartbeatMaxThreshold)) {
             return;
         }
 
