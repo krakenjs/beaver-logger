@@ -63,7 +63,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _logger = __webpack_require__(1);
 
 	Object.keys(_logger).forEach(function (key) {
-	  if (key === "default") return;
+	  if (key === "default" || key === "__esModule") return;
 	  Object.defineProperty(exports, key, {
 	    enumerable: true,
 	    get: function get() {
@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _init = __webpack_require__(7);
 
 	Object.keys(_init).forEach(function (key) {
-	  if (key === "default") return;
+	  if (key === "default" || key === "__esModule") return;
 	  Object.defineProperty(exports, key, {
 	    enumerable: true,
 	    get: function get() {
@@ -87,7 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _transitions = __webpack_require__(9);
 
 	Object.keys(_transitions).forEach(function (key) {
-	  if (key === "default") return;
+	  if (key === "default" || key === "__esModule") return;
 	  Object.defineProperty(exports, key, {
 	    enumerable: true,
 	    get: function get() {
@@ -99,7 +99,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _builders = __webpack_require__(5);
 
 	Object.keys(_builders).forEach(function (key) {
-	  if (key === "default") return;
+	  if (key === "default" || key === "__esModule") return;
 	  Object.defineProperty(exports, key, {
 	    enumerable: true,
 	    get: function get() {
@@ -606,7 +606,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-
 	var process = module.exports = {};
 
 	// cached from whatever global is present so that test runners that stub it
@@ -617,22 +616,84 @@ return /******/ (function(modules) { // webpackBootstrap
 	var cachedSetTimeout;
 	var cachedClearTimeout;
 
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
 	(function () {
-	  try {
-	    cachedSetTimeout = setTimeout;
-	  } catch (e) {
-	    cachedSetTimeout = function () {
-	      throw new Error('setTimeout is not defined');
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
 	    }
-	  }
-	  try {
-	    cachedClearTimeout = clearTimeout;
-	  } catch (e) {
-	    cachedClearTimeout = function () {
-	      throw new Error('clearTimeout is not defined');
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
 	    }
-	  }
 	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+
+
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+
+
+
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
@@ -657,7 +718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = cachedSetTimeout(cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 
 	    var len = queue.length;
@@ -674,7 +735,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    cachedClearTimeout(timeout);
+	    runClearTimeout(timeout);
 	}
 
 	process.nextTick = function (fun) {
@@ -686,7 +747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        cachedSetTimeout(drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 
@@ -788,7 +849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    heartbeat: true,
 	    heartbeatConsoleLog: true,
 	    heartbeatInterval: 5000,
-	    hearbeatMaxThreshold: 50,
+	    heartbeatTooBusy: false,
 	    heartbeatTooBusyThreshold: 10000,
 
 	    autoLog: ['warn', 'error'],
@@ -929,11 +990,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    (0, _util.safeInterval)(function () {
 
-	        if (!_logger.buffer.length || _logger.buffer[_logger.buffer.length - 1].event !== 'heartbeat') {
-	            heartbeatCount = 0;
-	        }
-
-	        if (!_logger.buffer.length || heartbeatCount > _config.config.hearbeatMaxThreshold) {
+	        if (_config.config.heartbeatMaxThreshold && heartbeatCount > _config.config.heartbeatMaxThreshold) {
 	            return;
 	        }
 
@@ -942,21 +999,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var elapsed = heartBeatTimer.elapsed();
 	        var lag = elapsed - _config.config.heartbeatInterval;
 
-	        if (lag >= _config.config.heartbeatTooBusyThreshold) {
-	            (0, _logger.info)('toobusy', {
-	                count: heartbeatCount,
-	                elapsed: elapsed,
-	                lag: lag
-	            }, {
-	                noConsole: !_config.config.heartbeatConsoleLog
-	            });
+	        var heartbeatPayload = {
+	            count: heartbeatCount,
+	            elapsed: elapsed
+	        };
+
+	        if (_config.config.heartbeatTooBusy) {
+	            heartbeatPayload.lag = lag;
+
+	            if (lag >= _config.config.heartbeatTooBusyThreshold) {
+	                (0, _logger.info)('toobusy', heartbeatPayload, {
+	                    noConsole: !_config.config.heartbeatConsoleLog
+	                });
+	            }
 	        }
 
-	        (0, _logger.info)('heartbeat', {
-	            count: heartbeatCount,
-	            elapsed: elapsed,
-	            lag: lag
-	        }, {
+	        (0, _logger.info)('heartbeat', heartbeatPayload, {
 	            noConsole: !_config.config.heartbeatConsoleLog
 	        });
 	    }, _config.config.heartbeatInterval);
