@@ -30,7 +30,7 @@
     "babel-loader": "^6.2.4",
     "babel-plugin-add-module-exports": "^0.1.4",
     "babel-plugin-syntax-object-rest-spread": "^6.5.0",
-    "babel-plugin-transform-es2015-for-of": "^6.8.0",
+    "babel-plugin-transform-es2015-for-of": "^6.18.0",
     "babel-plugin-transform-es3-member-expression-literals": "^6.5.0",
     "babel-plugin-transform-es3-property-literals": "^6.5.0",
     "babel-plugin-transform-object-rest-spread": "^6.6.5",
