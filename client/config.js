@@ -21,9 +21,13 @@ export let config = {
     heartbeatTooBusy: false,
     heartbeatTooBusyThreshold: 10000,
 
+    logLevel: 'debug',
+
     autoLog: ['warn', 'error'],
 
     logUnload:      true,
     logUnloadSync:  false,
     logPerformance: true
 };
+
+export let logLevels = [ 'error', 'warn', 'info', 'debug' ];

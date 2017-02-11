@@ -1,7 +1,7 @@
 
 import { extend, promiseDebounce, ajax } from './util';
 import { payloadBuilders, metaBuilders, trackingBuilders, headerBuilders } from './builders';
-import { config } from './config';
+import { config, logLevels } from './config';
 
 export let buffer = [];
 export let tracking = {};
@@ -12,9 +12,23 @@ if (Function.prototype.bind && window.console && typeof console.log === 'object'
     }, Function.prototype.call);
 }
 
+let loaded = false;
+
+setTimeout(() => {
+    loaded = true;
+}, 1);
+
 export function print(level, event, payload) {
 
+    if (!loaded) {
+        return setTimeout(() => print(level, event, payload), 1);
+    }
+
     if (!window.console || !window.console.log) {
+        return;
+    }
+
+    if (logLevels.indexOf(level) > logLevels.indexOf(config.logLevel)) {
         return;
     }
 
