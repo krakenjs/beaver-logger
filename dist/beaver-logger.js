@@ -107,6 +107,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	});
+
+	var _config = __webpack_require__(6);
+
+	Object.keys(_config).forEach(function (key) {
+	  if (key === "default") return;
+	  Object.defineProperty(exports, key, {
+	    enumerable: true,
+	    get: function get() {
+	      return _config[key];
+	    }
+	  });
+	});
 	exports['default'] = module.exports;
 
 /***/ },
@@ -147,9 +159,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, Function.prototype.call);
 	}
 
+	var loaded = false;
+
+	setTimeout(function () {
+	    loaded = true;
+	}, 1);
+
 	function print(level, event, payload) {
 
+	    if (!loaded) {
+	        return setTimeout(function () {
+	            return print(level, event, payload);
+	        }, 1);
+	    }
+
 	    if (!window.console || !window.console.log) {
+	        return;
+	    }
+
+	    if (_config.logLevels.indexOf(level) > _config.logLevels.indexOf(_config.config.logLevel)) {
 	        return;
 	    }
 
@@ -759,12 +787,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    heartbeatTooBusy: false,
 	    heartbeatTooBusyThreshold: 10000,
 
+	    logLevel: 'debug',
+
 	    autoLog: ['warn', 'error'],
 
 	    logUnload: true,
 	    logUnloadSync: false,
 	    logPerformance: true
 	};
+
+	var logLevels = exports.logLevels = ['error', 'warn', 'info', 'debug'];
 
 /***/ },
 /* 7 */
