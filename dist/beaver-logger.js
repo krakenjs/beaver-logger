@@ -177,7 +177,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	    }
 
-	    if (_config.logLevels.indexOf(level) > _config.logLevels.indexOf(_config.config.logLevel)) {
+	    var logLevel = window.LOG_LEVEL || _config.config.logLevel;
+
+	    if (_config.logLevels.indexOf(level) > _config.logLevels.indexOf(logLevel)) {
 	        return;
 	    }
 
