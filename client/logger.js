@@ -28,7 +28,9 @@ export function print(level, event, payload) {
         return;
     }
 
-    if (logLevels.indexOf(level) > logLevels.indexOf(config.logLevel)) {
+    let logLevel = window.LOG_LEVEL || config.logLevel;
+
+    if (logLevels.indexOf(level) > logLevels.indexOf(logLevel)) {
         return;
     }
 
