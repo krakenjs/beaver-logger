@@ -44,13 +44,14 @@ export function print(level, event, payload) {
         args.push('\n\n', payload.error || payload.warning);
     }
 
-    if (window.console) {
-
+    try {
         if (window.console[level] && window.console[level].apply) {
             window.console[level].apply(window.console, args);
         } else if (window.console.log && window.console.log.apply) {
             window.console.log.apply(window.console, args);
         }
+    } catch (err) {
+        // pass
     }
 }
 
