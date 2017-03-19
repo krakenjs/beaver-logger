@@ -1,0 +1,12 @@
+
+<script src="../dist/beaver-logger.js"></script>
+
+<script>
+    $logger.init({
+        uri: 'https://www.some-logging-endpoint.com/log'
+    });
+
+    $logger.info('hello_world');
+
+    $logger.flush();
+</script>
