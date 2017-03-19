@@ -72,7 +72,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _init = __webpack_require__(7);
+	var _init = __webpack_require__(6);
 
 	Object.keys(_init).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -84,7 +84,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _transitions = __webpack_require__(9);
+	var _transitions = __webpack_require__(8);
 
 	Object.keys(_transitions).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -96,7 +96,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _builders = __webpack_require__(5);
+	var _builders = __webpack_require__(4);
 
 	Object.keys(_builders).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -108,7 +108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _config = __webpack_require__(6);
+	var _config = __webpack_require__(5);
 
 	Object.keys(_config).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -146,9 +146,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _util = __webpack_require__(2);
 
-	var _builders = __webpack_require__(5);
+	var _builders = __webpack_require__(4);
 
-	var _config = __webpack_require__(6);
+	var _config = __webpack_require__(5);
 
 	var buffer = exports.buffer = [];
 	var tracking = exports.tracking = {};
@@ -431,7 +431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.safeInterval = safeInterval;
 	exports.uniqueID = uniqueID;
 
-	var _es6PromiseMin = __webpack_require__(3);
+	var _promise = __webpack_require__(3);
 
 	function extend(dest, src) {
 	    var over = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
@@ -470,7 +470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var async = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
 
-	    return new _es6PromiseMin.Promise(function (resolve) {
+	    return new _promise.SyncPromise(function (resolve) {
 	        var XRequest = window.XMLHttpRequest || window.ActiveXObject;
 
 	        if (window.XDomainRequest && !isSameDomain(url)) {
@@ -525,12 +525,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            delete debounce.rejector;
 	            delete debounce.timeout;
 
-	            return _es6PromiseMin.Promise.resolve().then(function () {
+	            return _promise.SyncPromise.resolve().then(function () {
 	                return method.apply(null, args);
 	            }).then(resolver, rejector);
 	        }, interval);
 
-	        debounce.promise = debounce.promise || new _es6PromiseMin.Promise(function (resolver, rejector) {
+	        debounce.promise = debounce.promise || new _promise.SyncPromise(function (resolver, rejector) {
 	            debounce.resolver = resolver;
 	            debounce.rejector = rejector;
 	        });
@@ -539,7 +539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 
-	var windowReady = exports.windowReady = new _es6PromiseMin.Promise(function (resolve) {
+	var windowReady = exports.windowReady = new _promise.SyncPromise(function (resolve) {
 	    if (document.readyState === 'complete') {
 	        resolve();
 	    }
@@ -577,217 +577,410 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process, global) {/*!
-	 * @overview es6-promise - a tiny implementation of Promises/A+.
-	 * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
-	 * @license   Licensed under MIT license
-	 *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
-	 * @version   2.0.1
-	 */
+	'use strict';
 
-	(function(){function r(a,b){n[l]=a;n[l+1]=b;l+=2;2===l&&A()}function s(a){return"function"===typeof a}function F(){return function(){process.nextTick(t)}}function G(){var a=0,b=new B(t),c=document.createTextNode("");b.observe(c,{characterData:!0});return function(){c.data=a=++a%2}}function H(){var a=new MessageChannel;a.port1.onmessage=t;return function(){a.port2.postMessage(0)}}function I(){return function(){setTimeout(t,1)}}function t(){for(var a=0;a<l;a+=2)(0,n[a])(n[a+1]),n[a]=void 0,n[a+1]=void 0;
-	l=0}function p(){}function J(a,b,c,d){try{a.call(b,c,d)}catch(e){return e}}function K(a,b,c){r(function(a){var e=!1,f=J(c,b,function(c){e||(e=!0,b!==c?q(a,c):m(a,c))},function(b){e||(e=!0,g(a,b))});!e&&f&&(e=!0,g(a,f))},a)}function L(a,b){1===b.a?m(a,b.b):2===a.a?g(a,b.b):u(b,void 0,function(b){q(a,b)},function(b){g(a,b)})}function q(a,b){if(a===b)g(a,new TypeError("You cannot resolve a promise with itself"));else if("function"===typeof b||"object"===typeof b&&null!==b)if(b.constructor===a.constructor)L(a,
-	b);else{var c;try{c=b.then}catch(d){v.error=d,c=v}c===v?g(a,v.error):void 0===c?m(a,b):s(c)?K(a,b,c):m(a,b)}else m(a,b)}function M(a){a.f&&a.f(a.b);x(a)}function m(a,b){void 0===a.a&&(a.b=b,a.a=1,0!==a.e.length&&r(x,a))}function g(a,b){void 0===a.a&&(a.a=2,a.b=b,r(M,a))}function u(a,b,c,d){var e=a.e,f=e.length;a.f=null;e[f]=b;e[f+1]=c;e[f+2]=d;0===f&&a.a&&r(x,a)}function x(a){var b=a.e,c=a.a;if(0!==b.length){for(var d,e,f=a.b,g=0;g<b.length;g+=3)d=b[g],e=b[g+c],d?C(c,d,e,f):e(f);a.e.length=0}}function D(){this.error=
-	null}function C(a,b,c,d){var e=s(c),f,k,h,l;if(e){try{f=c(d)}catch(n){y.error=n,f=y}f===y?(l=!0,k=f.error,f=null):h=!0;if(b===f){g(b,new TypeError("A promises callback cannot return that same promise."));return}}else f=d,h=!0;void 0===b.a&&(e&&h?q(b,f):l?g(b,k):1===a?m(b,f):2===a&&g(b,f))}function N(a,b){try{b(function(b){q(a,b)},function(b){g(a,b)})}catch(c){g(a,c)}}function k(a,b,c,d){this.n=a;this.c=new a(p,d);this.i=c;this.o(b)?(this.m=b,this.d=this.length=b.length,this.l(),0===this.length?m(this.c,
-	this.b):(this.length=this.length||0,this.k(),0===this.d&&m(this.c,this.b))):g(this.c,this.p())}function h(a){O++;this.b=this.a=void 0;this.e=[];if(p!==a){if(!s(a))throw new TypeError("You must pass a resolver function as the first argument to the promise constructor");if(!(this instanceof h))throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");N(this,a)}}var E=Array.isArray?Array.isArray:function(a){return"[object Array]"===
-	Object.prototype.toString.call(a)},l=0,w="undefined"!==typeof window?window:{},B=w.MutationObserver||w.WebKitMutationObserver,w="undefined"!==typeof Uint8ClampedArray&&"undefined"!==typeof importScripts&&"undefined"!==typeof MessageChannel,n=Array(1E3),A;A="undefined"!==typeof process&&"[object process]"==={}.toString.call(process)?F():B?G():w?H():I();var v=new D,y=new D;k.prototype.o=function(a){return E(a)};k.prototype.p=function(){return Error("Array Methods must be provided an Array")};k.prototype.l=
-	function(){this.b=Array(this.length)};k.prototype.k=function(){for(var a=this.length,b=this.c,c=this.m,d=0;void 0===b.a&&d<a;d++)this.j(c[d],d)};k.prototype.j=function(a,b){var c=this.n;"object"===typeof a&&null!==a?a.constructor===c&&void 0!==a.a?(a.f=null,this.g(a.a,b,a.b)):this.q(c.resolve(a),b):(this.d--,this.b[b]=this.h(a))};k.prototype.g=function(a,b,c){var d=this.c;void 0===d.a&&(this.d--,this.i&&2===a?g(d,c):this.b[b]=this.h(c));0===this.d&&m(d,this.b)};k.prototype.h=function(a){return a};
-	k.prototype.q=function(a,b){var c=this;u(a,void 0,function(a){c.g(1,b,a)},function(a){c.g(2,b,a)})};var O=0;h.all=function(a,b){return(new k(this,a,!0,b)).c};h.race=function(a,b){function c(a){q(e,a)}function d(a){g(e,a)}var e=new this(p,b);if(!E(a))return (g(e,new TypeError("You must pass an array to race.")), e);for(var f=a.length,h=0;void 0===e.a&&h<f;h++)u(this.resolve(a[h]),void 0,c,d);return e};h.resolve=function(a,b){if(a&&"object"===typeof a&&a.constructor===this)return a;var c=new this(p,b);
-	q(c,a);return c};h.reject=function(a,b){var c=new this(p,b);g(c,a);return c};h.prototype={constructor:h,then:function(a,b){var c=this.a;if(1===c&&!a||2===c&&!b)return this;var d=new this.constructor(p),e=this.b;if(c){var f=arguments[c-1];r(function(){C(c,d,f,e)})}else u(this,d,a,b);return d},"catch":function(a){return this.then(null,a)}};var z={Promise:h,polyfill:function(){var a;a="undefined"!==typeof global?global:"undefined"!==typeof window&&window.document?window:self;"Promise"in a&&"resolve"in
-	a.Promise&&"reject"in a.Promise&&"all"in a.Promise&&"race"in a.Promise&&function(){var b;new a.Promise(function(a){b=a});return s(b)}()||(a.Promise=h)}}; true?!(__WEBPACK_AMD_DEFINE_RESULT__ = function(){return z}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):"undefined"!==typeof module&&module.exports?module.exports=z:"undefined"!==typeof this&&(this.ES6Promise=z)}).call(this);
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.patchPromise = patchPromise;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), (function() { return this; }())))
+	function trycatch(method, successHandler, errorHandler) {
+
+	    var isCalled = false;
+	    var isSuccess = false;
+	    var isError = false;
+	    var err = void 0,
+	        res = void 0;
+
+	    function flush() {
+	        if (isCalled) {
+	            if (isError) {
+	                return errorHandler(err);
+	            } else if (isSuccess) {
+	                return successHandler(res);
+	            }
+	        }
+	    }
+
+	    try {
+	        method(function (result) {
+	            res = result;
+	            isSuccess = true;
+	            flush();
+	        }, function (error) {
+	            err = error;
+	            isError = true;
+	            flush();
+	        });
+	    } catch (error) {
+	        return errorHandler(error);
+	    }
+
+	    isCalled = true;
+	    flush();
+	}
+
+	var possiblyUnhandledPromiseHandlers = [];
+	var possiblyUnhandledPromises = [];
+	var possiblyUnhandledPromiseTimeout = void 0;
+
+	function addPossiblyUnhandledPromise(promise) {
+	    possiblyUnhandledPromises.push(promise);
+	    possiblyUnhandledPromiseTimeout = possiblyUnhandledPromiseTimeout || setTimeout(flushPossiblyUnhandledPromises, 1);
+	}
+
+	function flushPossiblyUnhandledPromises() {
+
+	    possiblyUnhandledPromiseTimeout = null;
+	    var promises = possiblyUnhandledPromises;
+	    possiblyUnhandledPromises = [];
+
+	    var _loop = function _loop(i) {
+	        var promise = promises[i];
+
+	        if (promise.silentReject) {
+	            return 'continue';
+	        }
+
+	        promise.handlers.push({
+	            onError: function onError(err) {
+	                if (promise.silentReject) {
+	                    return;
+	                }
+
+	                dispatchError(err);
+	            }
+	        });
+
+	        promise.dispatch();
+	    };
+
+	    for (var i = 0; i < promises.length; i++) {
+	        var _ret = _loop(i);
+
+	        if (_ret === 'continue') continue;
+	    }
+	}
+
+	var dispatchedErrors = [];
+
+	function dispatchError(err) {
+
+	    if (dispatchedErrors.indexOf(err) !== -1) {
+	        return;
+	    }
+
+	    dispatchedErrors.push(err);
+
+	    setTimeout(function () {
+	        throw err;
+	    }, 1);
+
+	    for (var j = 0; j < possiblyUnhandledPromiseHandlers.length; j++) {
+	        possiblyUnhandledPromiseHandlers[j](err);
+	    }
+	}
+
+	var toString = {}.toString;
+
+	function isPromise(item) {
+	    try {
+	        if (!item) {
+	            return false;
+	        }
+
+	        if (window.Window && item instanceof window.Window) {
+	            return false;
+	        }
+
+	        if (window.constructor && item instanceof window.constructor) {
+	            return false;
+	        }
+
+	        if (toString) {
+	            var name = toString.call(item);
+
+	            if (name === '[object Window]' || name === '[object global]' || name === '[object DOMWindow]') {
+	                return false;
+	            }
+	        }
+
+	        if (item && item.then instanceof Function) {
+	            return true;
+	        }
+	    } catch (err) {
+	        return false;
+	    }
+
+	    return false;
+	}
+
+	var SyncPromise = exports.SyncPromise = function SyncPromise(handler) {
+
+	    this.resolved = false;
+	    this.rejected = false;
+
+	    this.silentReject = false;
+
+	    this.handlers = [];
+
+	    addPossiblyUnhandledPromise(this);
+
+	    if (!handler) {
+	        return;
+	    }
+
+	    var self = this;
+
+	    trycatch(handler, function (res) {
+	        return self.resolve(res);
+	    }, function (err) {
+	        return self.reject(err);
+	    });
+	};
+
+	SyncPromise.resolve = function SyncPromiseResolve(value) {
+
+	    if (isPromise(value)) {
+	        return value;
+	    }
+
+	    return new SyncPromise().resolve(value);
+	};
+
+	SyncPromise.reject = function SyncPromiseResolve(error) {
+	    return new SyncPromise().reject(error);
+	};
+
+	SyncPromise.prototype.resolve = function (result) {
+	    if (this.resolved || this.rejected) {
+	        return this;
+	    }
+
+	    if (isPromise(result)) {
+	        throw new Error('Can not resolve promise with another promise');
+	    }
+
+	    this.resolved = true;
+	    this.value = result;
+	    this.dispatch();
+
+	    return this;
+	};
+
+	SyncPromise.prototype.reject = function (error) {
+	    if (this.resolved || this.rejected) {
+	        return this;
+	    }
+
+	    if (isPromise(error)) {
+	        throw new Error('Can not reject promise with another promise');
+	    }
+
+	    this.rejected = true;
+	    this.value = error;
+	    this.dispatch();
+
+	    return this;
+	};
+
+	SyncPromise.prototype.asyncReject = function (error) {
+	    this.silentReject = true;
+	    this.reject(error);
+	};
+
+	SyncPromise.prototype.dispatch = function () {
+	    var _this = this;
+
+	    if (!this.resolved && !this.rejected) {
+	        return;
+	    }
+
+	    var _loop2 = function _loop2() {
+
+	        var handler = _this.handlers.shift();
+
+	        var result = void 0,
+	            error = void 0;
+
+	        try {
+	            if (_this.resolved) {
+	                result = handler.onSuccess ? handler.onSuccess(_this.value) : _this.value;
+	            } else if (_this.rejected) {
+	                if (handler.onError) {
+	                    result = handler.onError(_this.value);
+	                } else {
+	                    error = _this.value;
+	                }
+	            }
+	        } catch (err) {
+	            error = err;
+	        }
+
+	        if (result === _this) {
+	            throw new Error('Can not return a promise from the the then handler of the same promise');
+	        }
+
+	        if (!handler.promise) {
+	            return 'continue';
+	        }
+
+	        if (error) {
+	            handler.promise.reject(error);
+	        } else if (isPromise(result)) {
+	            result.then(function (res) {
+	                handler.promise.resolve(res);
+	            }, function (err) {
+	                handler.promise.reject(err);
+	            });
+	        } else {
+	            handler.promise.resolve(result);
+	        }
+	    };
+
+	    while (this.handlers.length) {
+	        var _ret2 = _loop2();
+
+	        if (_ret2 === 'continue') continue;
+	    }
+	};
+
+	SyncPromise.prototype.then = function (onSuccess, onError) {
+
+	    if (onSuccess && typeof onSuccess !== 'function' && !onSuccess.call) {
+	        throw new Error('Promise.then expected a function for success handler');
+	    }
+
+	    if (onError && typeof onError !== 'function' && !onError.call) {
+	        throw new Error('Promise.then expected a function for error handler');
+	    }
+
+	    var promise = new SyncPromise(null, this);
+
+	    this.handlers.push({
+	        promise: promise,
+	        onSuccess: onSuccess,
+	        onError: onError
+	    });
+
+	    this.silentReject = true;
+
+	    this.dispatch();
+
+	    return promise;
+	};
+
+	SyncPromise.prototype['catch'] = function (onError) {
+	    return this.then(null, onError);
+	};
+
+	SyncPromise.prototype['finally'] = function (handler) {
+	    return this.then(function (result) {
+	        return SyncPromise['try'](handler).then(function () {
+	            return result;
+	        });
+	    }, function (err) {
+	        return SyncPromise['try'](handler).then(function () {
+	            throw err;
+	        });
+	    });
+	};
+
+	SyncPromise.all = function (promises) {
+
+	    var promise = new SyncPromise();
+	    var count = promises.length;
+	    var results = [];
+
+	    var _loop3 = function _loop3(i) {
+
+	        var prom = isPromise(promises[i]) ? promises[i] : SyncPromise.resolve(promises[i]);
+
+	        prom.then(function (result) {
+	            results[i] = result;
+	            count -= 1;
+	            if (count === 0) {
+	                promise.resolve(results);
+	            }
+	        }, function (err) {
+	            promise.reject(err);
+	        });
+	    };
+
+	    for (var i = 0; i < promises.length; i++) {
+	        _loop3(i);
+	    }
+
+	    if (!count) {
+	        promise.resolve(results);
+	    }
+
+	    return promise;
+	};
+
+	SyncPromise.onPossiblyUnhandledException = function syncPromiseOnPossiblyUnhandledException(handler) {
+	    possiblyUnhandledPromiseHandlers.push(handler);
+	};
+
+	SyncPromise['try'] = function syncPromiseTry(method) {
+	    return SyncPromise.resolve().then(method);
+	};
+
+	SyncPromise.delay = function syncPromiseDelay(delay) {
+	    return new SyncPromise(function (resolve) {
+	        setTimeout(resolve, delay);
+	    });
+	};
+
+	SyncPromise.hash = function (obj) {
+
+	    var results = {};
+	    var promises = [];
+
+	    var _loop4 = function _loop4(key) {
+	        if (obj.hasOwnProperty(key)) {
+	            promises.push(SyncPromise.resolve(obj[key]).then(function (result) {
+	                results[key] = result;
+	            }));
+	        }
+	    };
+
+	    for (var key in obj) {
+	        _loop4(key);
+	    }
+
+	    return SyncPromise.all(promises).then(function () {
+	        return results;
+	    });
+	};
+
+	SyncPromise.promisifyCall = function () {
+
+	    var args = Array.prototype.slice.call(arguments);
+	    var method = args.shift();
+
+	    if (typeof method !== 'function') {
+	        throw new Error('Expected promisifyCall to be called with a function');
+	    }
+
+	    return new SyncPromise(function (resolve, reject) {
+
+	        args.push(function (err, result) {
+	            return err ? reject(err) : resolve(result);
+	        });
+
+	        return method.apply(null, args);
+	    });
+	};
+
+	function patchPromise() {
+	    window.Promise = SyncPromise;
+	}
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
-
-	// shim for using process in browser
-	var process = module.exports = {};
-
-	// cached from whatever global is present so that test runners that stub it
-	// don't break things.  But we need to wrap it in a try catch in case it is
-	// wrapped in strict mode code which doesn't define any globals.  It's inside a
-	// function because try/catches deoptimize in certain engines.
-
-	var cachedSetTimeout;
-	var cachedClearTimeout;
-
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
-	(function () {
-	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
-	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
-	    }
-	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
-	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
-	    }
-	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-
-
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-
-
-
-	}
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = runTimeout(cleanUpNextTick);
-	    draining = true;
-
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    runClearTimeout(timeout);
-	}
-
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
-	    }
-	};
-
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-
-	function noop() {}
-
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ },
-/* 5 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -821,7 +1014,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -863,7 +1056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var logLevels = exports.logLevels = ['error', 'warn', 'info', 'debug'];
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -873,11 +1066,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.init = init;
 
-	var _config = __webpack_require__(6);
+	var _config = __webpack_require__(5);
 
 	var _util = __webpack_require__(2);
 
-	var _performance = __webpack_require__(8);
+	var _performance = __webpack_require__(7);
 
 	var _logger = __webpack_require__(1);
 
@@ -927,7 +1120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -941,11 +1134,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.initHeartBeat = initHeartBeat;
 	exports.initPerformance = initPerformance;
 
-	var _config = __webpack_require__(6);
+	var _config = __webpack_require__(5);
 
 	var _logger = __webpack_require__(1);
 
-	var _builders = __webpack_require__(5);
+	var _builders = __webpack_require__(4);
 
 	var _util = __webpack_require__(2);
 
@@ -1079,7 +1272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1091,15 +1284,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.endTransition = endTransition;
 	exports.transition = transition;
 
-	var _performance = __webpack_require__(8);
+	var _performance = __webpack_require__(7);
 
 	var _logger = __webpack_require__(1);
 
-	var _builders = __webpack_require__(5);
+	var _builders = __webpack_require__(4);
 
 	var _util = __webpack_require__(2);
 
-	var _config = __webpack_require__(6);
+	var _config = __webpack_require__(5);
 
 	var windowID = (0, _util.uniqueID)();
 	var pageID = (0, _util.uniqueID)();
