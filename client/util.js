@@ -1,5 +1,5 @@
 
-import { Promise } from 'es6-promise-min';
+import { SyncPromise as Promise } from 'sync-browser-mocks/src/promise';
 
 export function extend(dest, src, over=true) {
     dest = dest || {};

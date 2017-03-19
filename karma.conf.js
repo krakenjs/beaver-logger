@@ -53,7 +53,6 @@ module.exports = function(config) {
                 loaders: [
                     {
                         test: /\.js$/,
-                        exclude: /(node_modules|bower_components|dist)/,
                         loader: 'babel',
                         query: {
                             presets: ['es2015'],
