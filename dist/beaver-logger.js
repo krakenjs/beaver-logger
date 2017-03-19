@@ -60,7 +60,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _logger = __webpack_require__(1);
+	var _interface = __webpack_require__(1);
+
+	Object.keys(_interface).forEach(function (key) {
+	  if (key === "default" || key === "__esModule") return;
+	  Object.defineProperty(exports, key, {
+	    enumerable: true,
+	    get: function get() {
+	      return _interface[key];
+	    }
+	  });
+	});
+
+	var INTERFACE = _interopRequireWildcard(_interface);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+	exports['default'] = INTERFACE;
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _logger = __webpack_require__(2);
 
 	Object.keys(_logger).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -72,7 +100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _init = __webpack_require__(6);
+	var _init = __webpack_require__(7);
 
 	Object.keys(_init).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -84,7 +112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _transitions = __webpack_require__(8);
+	var _transitions = __webpack_require__(9);
 
 	Object.keys(_transitions).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -96,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _builders = __webpack_require__(4);
+	var _builders = __webpack_require__(5);
 
 	Object.keys(_builders).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -108,7 +136,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _config = __webpack_require__(5);
+	var _config = __webpack_require__(6);
 
 	Object.keys(_config).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -119,10 +147,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	});
-	exports['default'] = module.exports;
 
 /***/ },
-/* 1 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -144,11 +171,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.error = error;
 	exports.track = track;
 
-	var _util = __webpack_require__(2);
+	var _util = __webpack_require__(3);
 
-	var _builders = __webpack_require__(4);
+	var _builders = __webpack_require__(5);
 
-	var _config = __webpack_require__(5);
+	var _config = __webpack_require__(6);
 
 	var buffer = exports.buffer = [];
 	var tracking = exports.tracking = {};
@@ -414,7 +441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -431,7 +458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.safeInterval = safeInterval;
 	exports.uniqueID = uniqueID;
 
-	var _promise = __webpack_require__(3);
+	var _promise = __webpack_require__(4);
 
 	function extend(dest, src) {
 	    var over = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
@@ -576,7 +603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -980,7 +1007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1014,7 +1041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1056,7 +1083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var logLevels = exports.logLevels = ['error', 'warn', 'info', 'debug'];
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1066,13 +1093,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.init = init;
 
-	var _config = __webpack_require__(5);
+	var _config = __webpack_require__(6);
 
-	var _util = __webpack_require__(2);
+	var _util = __webpack_require__(3);
 
-	var _performance = __webpack_require__(7);
+	var _performance = __webpack_require__(8);
 
-	var _logger = __webpack_require__(1);
+	var _logger = __webpack_require__(2);
 
 	var initiated = false;
 
@@ -1120,7 +1147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1134,13 +1161,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.initHeartBeat = initHeartBeat;
 	exports.initPerformance = initPerformance;
 
-	var _config = __webpack_require__(5);
+	var _config = __webpack_require__(6);
 
-	var _logger = __webpack_require__(1);
+	var _logger = __webpack_require__(2);
 
-	var _builders = __webpack_require__(4);
+	var _builders = __webpack_require__(5);
 
-	var _util = __webpack_require__(2);
+	var _util = __webpack_require__(3);
 
 	var enablePerformance = window && window.performance && performance.now && performance.timing && performance.timing.connectEnd && performance.timing.navigationStart && Math.abs(performance.now() - Date.now()) > 1000 && performance.now() - (performance.timing.connectEnd - performance.timing.navigationStart) > 0;
 
@@ -1272,7 +1299,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1284,15 +1311,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.endTransition = endTransition;
 	exports.transition = transition;
 
-	var _performance = __webpack_require__(7);
+	var _performance = __webpack_require__(8);
 
-	var _logger = __webpack_require__(1);
+	var _logger = __webpack_require__(2);
 
-	var _builders = __webpack_require__(4);
+	var _builders = __webpack_require__(5);
 
-	var _util = __webpack_require__(2);
+	var _util = __webpack_require__(3);
 
-	var _config = __webpack_require__(5);
+	var _config = __webpack_require__(6);
 
 	var windowID = (0, _util.uniqueID)();
 	var pageID = (0, _util.uniqueID)();
