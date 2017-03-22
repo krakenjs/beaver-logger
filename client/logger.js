@@ -1,5 +1,5 @@
 
-import { extend, promiseDebounce, ajax } from './util';
+import { extend, promiseDebounce, ajax, isIE } from './util';
 import { payloadBuilders, metaBuilders, trackingBuilders, headerBuilders } from './builders';
 import { config, logLevels } from './config';
 
@@ -37,6 +37,10 @@ export function print(level, event, payload) {
     payload = payload || {};
 
     let args = [event];
+
+    if(isIE()){
+        payload = JSON.stringify(payload);
+    }
 
     args.push(payload);
 

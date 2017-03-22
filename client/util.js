@@ -137,3 +137,7 @@ export function uniqueID() {
         return chars.charAt(Math.floor(Math.random() * chars.length));
     });
 }
+
+export function isIE() {
+    return Boolean(window.document.documentMode);
+}
