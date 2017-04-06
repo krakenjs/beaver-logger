@@ -214,6 +214,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var args = [event];
 
+	    if ((0, _util.isIE)()) {
+	        payload = JSON.stringify(payload);
+	    }
+
 	    args.push(payload);
 
 	    if (payload.error || payload.warning) {
@@ -457,6 +461,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.promiseDebounce = promiseDebounce;
 	exports.safeInterval = safeInterval;
 	exports.uniqueID = uniqueID;
+	exports.isIE = isIE;
 
 	var _promise = __webpack_require__(4);
 
@@ -600,6 +605,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return 'xxxxxxxxxx'.replace(/./g, function () {
 	        return chars.charAt(Math.floor(Math.random() * chars.length));
 	    });
+	}
+
+	function isIE() {
+	    return Boolean(window.document.documentMode);
 	}
 
 /***/ },
