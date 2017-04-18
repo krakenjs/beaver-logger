@@ -178,7 +178,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _config = __webpack_require__(6);
 
 	var buffer = exports.buffer = [];
-	var tracking = exports.tracking = {};
+	var tracking = exports.tracking = [];
 
 	if (Function.prototype.bind && window.console && _typeof(console.log) === 'object') {
 	    ['log', 'info', 'warn', 'error'].forEach(function (method) {
@@ -244,7 +244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var hasBuffer = buffer.length;
-	    var hasTracking = Object.keys(tracking).length;
+	    var hasTracking = tracking.length;
 
 	    if (!hasBuffer && !hasTracking) {
 	        return;
@@ -292,7 +292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _builder = _ref2;
 
 	        try {
-	            (0, _util.extend)(tracking, _builder(), false);
+	            tracking.push(_builder());
 	        } catch (err) {
 	            console.error('Error in custom tracking builder:', err.stack || err.toString());
 	        }
@@ -330,7 +330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, async);
 
 	    exports.buffer = buffer = [];
-	    exports.tracking = tracking = {};
+	    exports.tracking = tracking = [];
 
 	    return req;
 	}
@@ -441,7 +441,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function track(payload) {
-	    (0, _util.extend)(tracking, payload || {}, false);
+	    if (payload) {
+	        tracking.push(payload);
+	    }
 	}
 
 /***/ },
