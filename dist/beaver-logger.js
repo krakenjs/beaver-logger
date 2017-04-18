@@ -157,7 +157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.flush = exports.tracking = exports.buffer = undefined;
+	exports.track = exports.flush = exports.tracking = exports.buffer = undefined;
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -169,7 +169,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.info = info;
 	exports.warn = warn;
 	exports.error = error;
-	exports.track = track;
 
 	var _util = __webpack_require__(3);
 
@@ -393,6 +392,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        error: function error(event, payload) {
 	            return log('error', name + '_' + event, payload);
 	        },
+	        track: function track(payload) {
+	            return _track(payload);
+	        },
 	        flush: function flush() {
 	            return _flush();
 	        }
@@ -415,7 +417,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return log('error', event, payload);
 	}
 
-	function track(payload) {
+	function _track(payload) {
 	    if (payload) {
 
 	        for (var _iterator4 = _builders.trackingBuilders, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
@@ -444,6 +446,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        tracking.push(payload);
 	    }
 	}
+	exports.track = _track;
 
 /***/ },
 /* 3 */
