@@ -6,7 +6,8 @@ var gulpWebpack = require('gulp-webpack');
 var Server = require('karma').Server;
 var argv = require('yargs').argv;
 
-gulp.task('build', ['karma', 'webpack', 'webpack-min']);
+gulp.task('test', ['lint', 'karma']);
+gulp.task('build', ['test', 'webpack', 'webpack-min']);
 
 var FILE_NAME = 'beaver-logger';
 var MODULE_NAME = '$logger';
