@@ -4,7 +4,7 @@ import { payloadBuilders, metaBuilders, trackingBuilders, headerBuilders } from 
 import { config, logLevels } from './config';
 
 export let buffer = [];
-export let tracking = {};
+export let tracking = [];
 
 if (Function.prototype.bind && window.console && typeof console.log === 'object') {
     [ 'log', 'info', 'warn', 'error' ].forEach(function(method) {
@@ -66,7 +66,7 @@ export function immediateFlush(async=true) {
     }
 
     let hasBuffer = buffer.length;
-    let hasTracking = Object.keys(tracking).length;
+    let hasTracking = tracking.length;
 
     if (!hasBuffer && !hasTracking) {
         return;
@@ -88,7 +88,7 @@ export function immediateFlush(async=true) {
 
     for (let builder of trackingBuilders) {
         try {
-            extend(tracking, builder(), false);
+            tracking.push(builder());
         } catch (err) {
             console.error('Error in custom tracking builder:', err.stack || err.toString());
         }
@@ -113,7 +113,7 @@ export function immediateFlush(async=true) {
     }, async);
 
     buffer = [];
-    tracking = {};
+    tracking = [];
 
     return req;
 }
@@ -217,5 +217,7 @@ export function error(event, payload) {
 }
 
 export function track(payload) {
-    extend(tracking, payload || {}, false);
+    if (payload) {
+        tracking.push(payload);
+    }
 }
