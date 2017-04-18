@@ -86,14 +86,6 @@ export function immediateFlush(async=true) {
         }
     }
 
-    for (let builder of trackingBuilders) {
-        try {
-            tracking.push(builder());
-        } catch (err) {
-            console.error('Error in custom tracking builder:', err.stack || err.toString());
-        }
-    }
-
     let headers = {};
 
     for (let builder of headerBuilders) {
@@ -218,6 +210,15 @@ export function error(event, payload) {
 
 export function track(payload) {
     if (payload) {
+
+        for (let builder of trackingBuilders) {
+            try {
+                extend(payload, builder(), false);
+            } catch (err) {
+                console.error('Error in custom tracking builder:', err.stack || err.toString());
+            }
+        }
+
         tracking.push(payload);
     }
 }
