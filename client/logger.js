@@ -72,10 +72,6 @@ export function immediateFlush(async=true) {
         return;
     }
 
-    if (hasTracking) {
-        print('info', 'tracking', tracking);
-    }
-
     let meta = {};
 
     for (let builder of metaBuilders) {
@@ -218,6 +214,8 @@ export function track(payload) {
                 console.error('Error in custom tracking builder:', err.stack || err.toString());
             }
         }
+
+        print('debug', 'tracking', payload);
 
         tracking.push(payload);
     }
