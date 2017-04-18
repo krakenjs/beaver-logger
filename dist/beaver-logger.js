@@ -250,10 +250,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	    }
 
-	    if (hasTracking) {
-	        print('info', 'tracking', tracking);
-	    }
-
 	    var meta = {};
 
 	    for (var _iterator = _builders.metaBuilders, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -442,6 +438,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                console.error('Error in custom tracking builder:', err.stack || err.toString());
 	            }
 	        }
+
+	        print('debug', 'tracking', payload);
 
 	        tracking.push(payload);
 	    }
