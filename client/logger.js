@@ -182,6 +182,10 @@ export function prefix(name) {
             return log('error', `${name}_${event}`, payload);
         },
 
+        track(payload) {
+            return track(payload);
+        },
+
         flush() {
             return flush();
         }
