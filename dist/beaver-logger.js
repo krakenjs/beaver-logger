@@ -277,7 +277,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 
-	    for (var _iterator2 = _builders.trackingBuilders, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+	    var headers = {};
+
+	    for (var _iterator2 = _builders.headerBuilders, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
 	        var _ref2;
 
 	        if (_isArray2) {
@@ -292,30 +294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _builder = _ref2;
 
 	        try {
-	            tracking.push(_builder());
-	        } catch (err) {
-	            console.error('Error in custom tracking builder:', err.stack || err.toString());
-	        }
-	    }
-
-	    var headers = {};
-
-	    for (var _iterator3 = _builders.headerBuilders, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-	        var _ref3;
-
-	        if (_isArray3) {
-	            if (_i3 >= _iterator3.length) break;
-	            _ref3 = _iterator3[_i3++];
-	        } else {
-	            _i3 = _iterator3.next();
-	            if (_i3.done) break;
-	            _ref3 = _i3.value;
-	        }
-
-	        var _builder2 = _ref3;
-
-	        try {
-	            (0, _util.extend)(headers, _builder2(), false);
+	            (0, _util.extend)(headers, _builder(), false);
 	        } catch (err) {
 	            console.error('Error in custom header builder:', err.stack || err.toString());
 	        }
@@ -371,19 +350,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    payload.timestamp = Date.now();
 
-	    for (var _iterator4 = _builders.payloadBuilders, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-	        var _ref4;
+	    for (var _iterator3 = _builders.payloadBuilders, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+	        var _ref3;
 
-	        if (_isArray4) {
-	            if (_i4 >= _iterator4.length) break;
-	            _ref4 = _iterator4[_i4++];
+	        if (_isArray3) {
+	            if (_i3 >= _iterator3.length) break;
+	            _ref3 = _iterator3[_i3++];
 	        } else {
-	            _i4 = _iterator4.next();
-	            if (_i4.done) break;
-	            _ref4 = _i4.value;
+	            _i3 = _iterator3.next();
+	            if (_i3.done) break;
+	            _ref3 = _i3.value;
 	        }
 
-	        var builder = _ref4;
+	        var builder = _ref3;
 
 	        try {
 	            (0, _util.extend)(payload, builder(), false);
@@ -442,6 +421,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function track(payload) {
 	    if (payload) {
+
+	        for (var _iterator4 = _builders.trackingBuilders, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+	            var _ref4;
+
+	            if (_isArray4) {
+	                if (_i4 >= _iterator4.length) break;
+	                _ref4 = _iterator4[_i4++];
+	            } else {
+	                _i4 = _iterator4.next();
+	                if (_i4.done) break;
+	                _ref4 = _i4.value;
+	            }
+
+	            var builder = _ref4;
+
+	            try {
+	                (0, _util.extend)(payload, builder(), false);
+	            } catch (err) {
+	                console.error('Error in custom tracking builder:', err.stack || err.toString());
+	            }
+	        }
+
 	        tracking.push(payload);
 	    }
 	}
