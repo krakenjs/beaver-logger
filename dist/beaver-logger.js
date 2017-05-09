@@ -343,6 +343,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    }
 
+	    try {
+	        JSON.stringify(payload);
+	    } catch (err) {
+	        return;
+	    }
+
 	    payload.timestamp = Date.now();
 
 	    for (var _iterator3 = _builders.payloadBuilders, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
@@ -419,6 +425,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _track(payload) {
 	    if (payload) {
+
+	        try {
+	            JSON.stringify(payload);
+	        } catch (err) {
+	            return;
+	        }
 
 	        for (var _iterator4 = _builders.trackingBuilders, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
 	            var _ref4;
@@ -819,6 +831,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw new Error('Can not reject promise with another promise');
 	    }
 
+	    if (!(error instanceof Error)) {
+	        error = new Error('Expected reject to be called with Error, got ' + error);
+	    }
+
 	    this.rejected = true;
 	    this.value = error;
 	    this.dispatch();
@@ -842,6 +858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var handler = _this.handlers.shift();
 
+	        var isError = false;
 	        var result = void 0,
 	            error = void 0;
 
@@ -852,10 +869,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (handler.onError) {
 	                    result = handler.onError(_this.value);
 	                } else {
+	                    isError = true;
 	                    error = _this.value;
 	                }
 	            }
 	        } catch (err) {
+	            isError = true;
 	            error = err;
 	        }
 
@@ -867,7 +886,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return 'continue';
 	        }
 
-	        if (error) {
+	        if (isError) {
 	            handler.promise.reject(error);
 	        } else if (isPromise(result)) {
 	            result.then(function (res) {
