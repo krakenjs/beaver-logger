@@ -141,6 +141,12 @@ export function log(level, event, payload) {
         }
     }
 
+    try {
+        JSON.stringify(payload);
+    } catch (err) {
+        return;
+    }
+
     payload.timestamp = Date.now();
 
     for (let builder of payloadBuilders) {
@@ -210,6 +216,12 @@ export function error(event, payload) {
 
 export function track(payload) {
     if (payload) {
+
+        try {
+            JSON.stringify(payload);
+        } catch (err) {
+            return;
+        }
 
         for (let builder of trackingBuilders) {
             try {
