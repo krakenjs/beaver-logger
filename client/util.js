@@ -1,5 +1,5 @@
 
-import { SyncPromise as Promise } from 'sync-browser-mocks/src/promise';
+import { ZalgoPromise } from 'zalgo-promise';
 
 export function extend(dest, src, over=true) {
     dest = dest || {};
@@ -32,7 +32,7 @@ export function isSameDomain(url) {
 
 export function ajax(method, url, headers={}, data={}, async=true) {
 
-    return new Promise(resolve => {
+    return new ZalgoPromise(resolve => {
         let XRequest = window.XMLHttpRequest || window.ActiveXObject;
 
         if (window.XDomainRequest && !isSameDomain(url)) {
@@ -86,14 +86,14 @@ export function promiseDebounce(method, interval) {
             delete debounce.resolver;
             delete debounce.rejector;
             delete debounce.timeout;
-            
-            return Promise.resolve().then(() => {
+
+            return ZalgoPromise.resolve().then(() => {
                 return method.apply(null, args);
             }).then(resolver, rejector);
 
         }, interval);
 
-        debounce.promise = debounce.promise || new Promise((resolver, rejector) => {
+        debounce.promise = debounce.promise || new ZalgoPromise((resolver, rejector) => {
             debounce.resolver = resolver;
             debounce.rejector = rejector;
         });
@@ -102,7 +102,7 @@ export function promiseDebounce(method, interval) {
     };
 }
 
-export let windowReady = new Promise(resolve => {
+export let windowReady = new ZalgoPromise(resolve => {
     if (document.readyState === 'complete') {
         resolve();
     }

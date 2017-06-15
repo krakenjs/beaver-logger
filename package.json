@@ -68,6 +68,6 @@
     "yargs": "^4.7.1"
   },
   "dependencies": {
-    "sync-browser-mocks": "^1.0.38"
+    "zalgo-promise": "^1.0.3"
   }
 }

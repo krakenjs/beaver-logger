@@ -12,8 +12,8 @@ if ! git diff-index --quiet --cached HEAD; then
     exit 1;
 fi;
 
-rm -rf node_modules/sync-browser-mocks
-npm install sync-browser-mocks
+rm -rf node_modules/zalgo-promise
+npm install zalgo-promise
 
 gulp build;
 
