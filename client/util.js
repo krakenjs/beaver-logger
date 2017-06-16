@@ -1,5 +1,5 @@
 
-import { ZalgoPromise } from 'zalgo-promise';
+import { ZalgoPromise } from 'zalgo-promise/src';
 
 export function extend(dest, src, over=true) {
     dest = dest || {};
