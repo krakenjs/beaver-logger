@@ -47,12 +47,14 @@ export function ajax(method, url, headers={}, data={}, async=true) {
         let req = new XRequest('MSXML2.XMLHTTP.3.0');
         req.open(method.toUpperCase(), url, async);
 
-        req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        req.setRequestHeader('Content-type', 'application/json');
+        if (typeof req.setRequestHeader === 'function') {
+            req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            req.setRequestHeader('Content-type', 'application/json');
 
-        for (let headerName in headers) {
-            if (headers.hasOwnProperty(headerName)) {
-                req.setRequestHeader(headerName, headers[headerName]);
+            for (let headerName in headers) {
+                if (headers.hasOwnProperty(headerName)) {
+                    req.setRequestHeader(headerName, headers[headerName]);
+                }
             }
         }
 
