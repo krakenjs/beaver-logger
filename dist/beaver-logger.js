@@ -533,12 +533,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var req = new XRequest('MSXML2.XMLHTTP.3.0');
 	        req.open(method.toUpperCase(), url, async);
 
-	        req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-	        req.setRequestHeader('Content-type', 'application/json');
+	        if (typeof req.setRequestHeader === 'function') {
+	            req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	            req.setRequestHeader('Content-type', 'application/json');
 
-	        for (var headerName in headers) {
-	            if (headers.hasOwnProperty(headerName)) {
-	                req.setRequestHeader(headerName, headers[headerName]);
+	            for (var headerName in headers) {
+	                if (headers.hasOwnProperty(headerName)) {
+	                    req.setRequestHeader(headerName, headers[headerName]);
+	                }
 	            }
 	        }
 
@@ -633,14 +635,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
 	var _promise = __webpack_require__(5);
 
-	module.exports = _promise.ZalgoPromise;
-
-	// $FlowFixMe
-
-
-	module.exports.ZalgoPromise = _promise.ZalgoPromise;
+	Object.defineProperty(exports, 'ZalgoPromise', {
+	  enumerable: true,
+	  get: function get() {
+	    return _promise.ZalgoPromise;
+	  }
+	});
 
 /***/ },
 /* 5 */
@@ -774,63 +780,63 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function dispatch() {
 	            var _this3 = this;
 
-	            var resolved = this.resolved,
+	            var dispatching = this.dispatching,
+	                resolved = this.resolved,
 	                rejected = this.rejected,
 	                handlers = this.handlers;
 
+
+	            if (dispatching) {
+	                return;
+	            }
 
 	            if (!resolved && !rejected) {
 	                return;
 	            }
 
-	            var i = 0;
+	            this.dispatching = true;
 
-	            var _loop = function _loop() {
+	            var _loop = function _loop(i) {
 	                var _handlers$i = handlers[i],
 	                    onSuccess = _handlers$i.onSuccess,
 	                    onError = _handlers$i.onError,
 	                    promise = _handlers$i.promise;
 
-	                i += 1;
 
-	                var isError = false;
 	                var result = void 0;
-	                var error = void 0;
 
 	                if (resolved) {
 
 	                    try {
 	                        result = onSuccess ? onSuccess(_this3.value) : _this3.value;
 	                    } catch (err) {
-	                        isError = true;
-	                        error = err;
+	                        promise.reject(err);
+	                        return 'continue';
 	                    }
 	                } else if (rejected) {
 
-	                    if (onError) {
+	                    if (!onError) {
+	                        promise.reject(_this3.error);
+	                        return 'continue';
+	                    }
 
-	                        try {
-	                            result = onError(_this3.error);
-	                        } catch (err) {
-	                            isError = true;
-	                            error = err;
-	                        }
-	                    } else {
-	                        isError = true;
-	                        error = _this3.error;
+	                    try {
+	                        result = onError(_this3.error);
+	                    } catch (err) {
+	                        promise.reject(err);
+	                        return 'continue';
 	                    }
 	                }
 
-	                if (result === _this3) {
-	                    throw new Error('Can not return a promise from the the then handler of the same promise');
-	                }
+	                if (result instanceof ZalgoPromise && (result.resolved || result.rejected)) {
 
-	                if (!promise) {
-	                    return 'continue';
-	                }
+	                    if (result.resolved) {
+	                        promise.resolve(result.value);
+	                    } else {
+	                        promise.reject(result.error);
+	                    }
 
-	                if (isError) {
-	                    promise.reject(error);
+	                    result.errorHandled = true;
 	                } else if ((0, _utils.isPromise)(result)) {
 
 	                    // $FlowFixMe
@@ -840,17 +846,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        promise.reject(err);
 	                    });
 	                } else {
+
 	                    promise.resolve(result);
 	                }
 	            };
 
-	            while (i < handlers.length) {
-	                var _ret = _loop();
+	            for (var i = 0; i < handlers.length; i++) {
+	                var _ret = _loop(i);
 
 	                if (_ret === 'continue') continue;
 	            }
 
 	            handlers.length = 0;
+	            this.dispatching = false;
 	        }
 	    }, {
 	        key: 'then',
@@ -908,7 +916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'resolve',
 	        value: function resolve(value) {
 
-	            if ((0, _utils.isPromise)(value) || value instanceof ZalgoPromise) {
+	            if (value instanceof ZalgoPromise || (0, _utils.isPromise)(value)) {
 	                // $FlowFixMe
 	                return value;
 	            }
@@ -928,11 +936,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var count = promises.length;
 	            var results = [];
 
+	            if (!count) {
+	                promise.resolve(results);
+	                return promise;
+	            }
+
 	            var _loop2 = function _loop2(i) {
-
-	                var val = promises[i];
-
-	                ZalgoPromise.resolve(val).then(function (result) {
+	                ZalgoPromise.resolve(promises[i]).then(function (result) {
 	                    // $FlowFixMe
 	                    results[i] = result;
 	                    count -= 1;
@@ -948,10 +958,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _loop2(i);
 	            }
 
-	            if (!count) {
-	                promise.resolve(results);
-	            }
-
 	            return promise;
 	        }
 	    }, {
@@ -961,8 +967,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'try',
-	        value: function _try(method) {
-	            return ZalgoPromise.resolve().then(method);
+	        value: function _try(method, context, args) {
+
+	            var result = void 0;
+
+	            try {
+	                result = method.apply(context, args || []);
+	            } catch (err) {
+	                return ZalgoPromise.reject(err);
+	            }
+
+	            return ZalgoPromise.resolve(result);
 	        }
 	    }, {
 	        key: 'delay',
