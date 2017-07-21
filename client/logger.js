@@ -12,6 +12,18 @@ if (Function.prototype.bind && window.console && typeof console.log === 'object'
     }, Function.prototype.call);
 }
 
+let transport = (headers, data) => {
+    return ajax('post', config.uri, headers, data);
+}
+
+export function getTransport() {
+    return transport;
+}
+
+export function setTransport(newTransport) {
+    transport = newTransport;
+}
+
 let loaded = false;
 
 setTimeout(() => {
@@ -59,7 +71,7 @@ export function print(level, event, payload) {
     }
 }
 
-export function immediateFlush(async=true) {
+export function immediateFlush() {
 
     if (!config.uri) {
         return;
@@ -94,11 +106,11 @@ export function immediateFlush(async=true) {
 
     let events = buffer;
 
-    let req = ajax('post', config.uri, headers, {
+    let req = transport(headers, {
         events,
         meta,
         tracking
-    }, async);
+    });
 
     buffer = [];
     tracking = [];

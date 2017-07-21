@@ -30,7 +30,7 @@ export function isSameDomain(url) {
     return match[0] === `${window.location.protocol}//${window.location.host}`;
 }
 
-export function ajax(method, url, headers={}, data={}, async=true) {
+export function ajax(method, url, headers={}, data={}) {
 
     return new ZalgoPromise(resolve => {
         let XRequest = window.XMLHttpRequest || window.ActiveXObject;
@@ -45,7 +45,7 @@ export function ajax(method, url, headers={}, data={}, async=true) {
         }
 
         let req = new XRequest('MSXML2.XMLHTTP.3.0');
-        req.open(method.toUpperCase(), url, async);
+        req.open(method.toUpperCase(), url, true);
 
         if (typeof req.setRequestHeader === 'function') {
             req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
