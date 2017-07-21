@@ -161,6 +161,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+	exports.getTransport = getTransport;
+	exports.setTransport = setTransport;
 	exports.print = print;
 	exports.immediateFlush = immediateFlush;
 	exports.log = log;
@@ -183,6 +185,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ['log', 'info', 'warn', 'error'].forEach(function (method) {
 	        console[method] = this.bind(console[method], console);
 	    }, Function.prototype.call);
+	}
+
+	var transport = function transport(headers, data) {
+	    return (0, _util.ajax)('post', _config.config.uri, headers, data);
+	};
+
+	function getTransport() {
+	    return transport;
+	}
+
+	function setTransport(newTransport) {
+	    transport = newTransport;
 	}
 
 	var loaded = false;
@@ -235,8 +249,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function immediateFlush() {
-	    var async = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
 
 	    if (!_config.config.uri) {
 	        return;
@@ -297,11 +309,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var events = buffer;
 
-	    var req = (0, _util.ajax)('post', _config.config.uri, headers, {
+	    var req = transport(headers, {
 	        events: events,
 	        meta: meta,
 	        tracking: tracking
-	    }, async);
+	    });
 
 	    exports.buffer = buffer = [];
 	    exports.tracking = tracking = [];
@@ -515,7 +527,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function ajax(method, url) {
 	    var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	    var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-	    var async = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
 
 	    return new _src.ZalgoPromise(function (resolve) {
@@ -531,7 +542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        var req = new XRequest('MSXML2.XMLHTTP.3.0');
-	        req.open(method.toUpperCase(), url, async);
+	        req.open(method.toUpperCase(), url, true);
 
 	        if (typeof req.setRequestHeader === 'function') {
 	            req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
