@@ -21,7 +21,7 @@ export let config = {
     heartbeatTooBusy: false,
     heartbeatTooBusyThreshold: 10000,
 
-    logLevel: 'debug',
+    logLevel: 'warn',
 
     autoLog: ['warn', 'error'],
 
