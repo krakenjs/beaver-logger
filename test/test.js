@@ -19,8 +19,8 @@ describe('xcomponent tests', function() {
         var logEndpoint = $mockEndpoint.register({
             method: 'POST',
             uri: '/test/api/log',
-            handler: function(data) {
-                var hasLog = data.events.some(event => event.event === 'hello_world' && event.level === 'info');
+            handler: function(req) {
+                var hasLog = req.data.events.some(event => event.event === 'hello_world' && event.level === 'info');
                 assert.isTrue(hasLog, 'Expected posted payload to contain logged log')
             }
         });
