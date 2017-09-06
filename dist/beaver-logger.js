@@ -52,7 +52,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -78,9 +78,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['default'] = INTERFACE;
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -148,9 +148,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -187,8 +187,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, Function.prototype.call);
 	}
 
-	var transport = function transport(headers, data) {
-	    return (0, _util.ajax)('post', _config.config.uri, headers, data);
+	var transport = function transport(headers, data, options) {
+	    return (0, _util.ajax)('post', _config.config.uri, headers, data, options);
 	};
 
 	function getTransport() {
@@ -249,6 +249,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function immediateFlush() {
+	    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+	        _ref$fireAndForget = _ref.fireAndForget,
+	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
 
 	    if (!_config.config.uri) {
 	        return;
@@ -264,18 +267,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var meta = {};
 
 	    for (var _iterator = _builders.metaBuilders, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-	        var _ref;
+	        var _ref2;
 
 	        if (_isArray) {
 	            if (_i >= _iterator.length) break;
-	            _ref = _iterator[_i++];
+	            _ref2 = _iterator[_i++];
 	        } else {
 	            _i = _iterator.next();
 	            if (_i.done) break;
-	            _ref = _i.value;
+	            _ref2 = _i.value;
 	        }
 
-	        var builder = _ref;
+	        var builder = _ref2;
 
 	        try {
 	            (0, _util.extend)(meta, builder(), false);
@@ -287,18 +290,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var headers = {};
 
 	    for (var _iterator2 = _builders.headerBuilders, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-	        var _ref2;
+	        var _ref3;
 
 	        if (_isArray2) {
 	            if (_i2 >= _iterator2.length) break;
-	            _ref2 = _iterator2[_i2++];
+	            _ref3 = _iterator2[_i2++];
 	        } else {
 	            _i2 = _iterator2.next();
 	            if (_i2.done) break;
-	            _ref2 = _i2.value;
+	            _ref3 = _i2.value;
 	        }
 
-	        var _builder = _ref2;
+	        var _builder = _ref3;
 
 	        try {
 	            (0, _util.extend)(headers, _builder(), false);
@@ -313,6 +316,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        events: events,
 	        meta: meta,
 	        tracking: tracking
+	    }, {
+	        fireAndForget: fireAndForget
 	    });
 
 	    exports.buffer = buffer = [];
@@ -364,18 +369,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    payload.timestamp = Date.now();
 
 	    for (var _iterator3 = _builders.payloadBuilders, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-	        var _ref3;
+	        var _ref4;
 
 	        if (_isArray3) {
 	            if (_i3 >= _iterator3.length) break;
-	            _ref3 = _iterator3[_i3++];
+	            _ref4 = _iterator3[_i3++];
 	        } else {
 	            _i3 = _iterator3.next();
 	            if (_i3.done) break;
-	            _ref3 = _i3.value;
+	            _ref4 = _i3.value;
 	        }
 
-	        var builder = _ref3;
+	        var builder = _ref4;
 
 	        try {
 	            (0, _util.extend)(payload, builder(), false);
@@ -445,18 +450,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        for (var _iterator4 = _builders.trackingBuilders, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-	            var _ref4;
+	            var _ref5;
 
 	            if (_isArray4) {
 	                if (_i4 >= _iterator4.length) break;
-	                _ref4 = _iterator4[_i4++];
+	                _ref5 = _iterator4[_i4++];
 	            } else {
 	                _i4 = _iterator4.next();
 	                if (_i4.done) break;
-	                _ref4 = _i4.value;
+	                _ref5 = _i4.value;
 	            }
 
-	            var builder = _ref4;
+	            var builder = _ref5;
 
 	            try {
 	                (0, _util.extend)(payload, builder(), false);
@@ -472,9 +477,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.track = _track;
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -528,6 +533,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	    var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
+	    var _ref = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {},
+	        _ref$fireAndForget = _ref.fireAndForget,
+	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
 
 	    return new _src.ZalgoPromise(function (resolve) {
 	        var XRequest = window.XMLHttpRequest || window.ActiveXObject;
@@ -555,11 +563,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 
-	        req.onreadystatechange = function () {
-	            if (req.readyState > 3) {
-	                resolve();
-	            }
-	        };
+	        if (fireAndForget) {
+	            resolve();
+	        } else {
+	            req.onreadystatechange = function () {
+	                if (req.readyState > 3) {
+	                    resolve();
+	                }
+	            };
+	        }
+
 	        req.send(JSON.stringify(data).replace(/&/g, '%26'));
 	    });
 	}
@@ -601,11 +614,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	var windowReady = exports.windowReady = new _src.ZalgoPromise(function (resolve) {
-	    if (document.readyState === 'complete') {
+	    // guard document, and window.addEventListener for JSC (react-native)
+	    if (typeof document !== 'undefined' && document.readyState === 'complete') {
 	        resolve();
 	    }
 
-	    window.addEventListener('load', resolve);
+	    if (window.addEventListener) {
+	        window.addEventListener('load', resolve);
+	    }
 	});
 
 	function safeInterval(method, time) {
@@ -640,9 +656,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Boolean(window.document.documentMode);
 	}
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -659,9 +675,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -850,12 +866,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    result.errorHandled = true;
 	                } else if ((0, _utils.isPromise)(result)) {
 
-	                    // $FlowFixMe
-	                    result.then(function (res) {
-	                        promise.resolve(res);
-	                    }, function (err) {
-	                        promise.reject(err);
-	                    });
+	                    if (result instanceof ZalgoPromise && (result.resolved || result.rejected)) {
+	                        if (result.resolved) {
+	                            promise.resolve(result.value);
+	                        } else {
+	                            promise.reject(result.error);
+	                        }
+	                    } else {
+	                        // $FlowFixMe
+	                        result.then(function (res) {
+	                            promise.resolve(res);
+	                        }, function (err) {
+	                            promise.reject(err);
+	                        });
+	                    }
 	                } else {
 
 	                    promise.resolve(result);
@@ -916,6 +940,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	    }, {
+	        key: 'timeout',
+	        value: function timeout(time, err) {
+	            var _this4 = this;
+
+	            if (this.resolved || this.rejected) {
+	                return this;
+	            }
+
+	            var timeout = setTimeout(function () {
+
+	                if (_this4.resolved || _this4.rejected) {
+	                    return;
+	                }
+
+	                _this4.reject(err || new Error('Promise timed out after ' + time + 'ms'));
+	            }, time);
+
+	            return this.then(function (result) {
+	                clearTimeout(timeout);
+	                return result;
+	            });
+	        }
+	    }, {
 	        key: 'toPromise',
 	        value: function toPromise() {
 	            if (!window.Promise) {
@@ -927,9 +974,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'resolve',
 	        value: function resolve(value) {
 
-	            if (value instanceof ZalgoPromise || (0, _utils.isPromise)(value)) {
-	                // $FlowFixMe
+	            if (value instanceof ZalgoPromise) {
 	                return value;
+	            }
+
+	            if ((0, _utils.isPromise)(value)) {
+	                // $FlowFixMe
+	                return new ZalgoPromise(function (resolve, reject) {
+	                    return value.then(resolve, reject);
+	                });
 	            }
 
 	            return new ZalgoPromise().resolve(value);
@@ -972,6 +1025,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return promise;
 	        }
 	    }, {
+	        key: 'map',
+	        value: function map(promises, method) {
+
+	            var promise = new ZalgoPromise();
+	            var count = promises.length;
+	            var results = [];
+
+	            if (!count) {
+	                promise.resolve(results);
+	                return promise;
+	            }
+
+	            var _loop3 = function _loop3(i) {
+	                ZalgoPromise['try'](function () {
+	                    return method(promises[i]);
+	                }).then(function (result) {
+	                    results[i] = result;
+	                    count -= 1;
+	                    if (count === 0) {
+	                        promise.resolve(results);
+	                    }
+	                }, function (err) {
+	                    promise.reject(err);
+	                });
+	            };
+
+	            for (var i = 0; i < promises.length; i++) {
+	                _loop3(i);
+	            }
+
+	            return promise;
+	        }
+	    }, {
 	        key: 'onPossiblyUnhandledException',
 	        value: function onPossiblyUnhandledException(handler) {
 	            return (0, _exceptions.onPossiblyUnhandledException)(handler);
@@ -1004,7 +1090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var results = {};
 	            var promises = [];
 
-	            var _loop3 = function _loop3(key) {
+	            var _loop4 = function _loop4(key) {
 	                if (obj.hasOwnProperty(key)) {
 	                    promises.push(ZalgoPromise.resolve(obj[key]).then(function (result) {
 	                        results[key] = result;
@@ -1013,12 +1099,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            };
 
 	            for (var key in obj) {
-	                _loop3(key);
+	                _loop4(key);
 	            }
 
 	            return ZalgoPromise.all(promises).then(function () {
 	                return results;
 	            });
+	        }
+	    }, {
+	        key: 'isPromise',
+	        value: function isPromise(value) {
+
+	            if (value && value instanceof ZalgoPromise) {
+	                return true;
+	            }
+
+	            return (0, _utils.isPromise)(value);
 	        }
 	    }]);
 
@@ -1027,14 +1123,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.ZalgoPromise = ZalgoPromise;
 
-
-	var prom = new ZalgoPromise();
-
-	prom.resolve(undefined);
-
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1049,6 +1140,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    try {
 	        if (!item) {
 	            return false;
+	        }
+
+	        if (window.Promise && item instanceof window.Promise) {
+	            return true;
 	        }
 
 	        if (window.Window && item instanceof window.Window) {
@@ -1067,7 +1162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 
-	        if (item && item.then instanceof Function) {
+	        if (typeof item.then === 'function') {
 	            return true;
 	        }
 	    } catch (err) {
@@ -1077,9 +1172,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return false;
 	}
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -1119,9 +1214,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 
@@ -1153,9 +1248,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    headerBuilders.push(builder);
 	}
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1189,15 +1284,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    autoLog: ['warn', 'error'],
 
 	    logUnload: true,
-	    logUnloadSync: false,
 	    logPerformance: true
 	};
 
 	var logLevels = exports.logLevels = ['error', 'warn', 'info', 'debug'];
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1234,16 +1328,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (_config.config.logUnload) {
-	        var async = !_config.config.logUnloadSync;
-
 	        window.addEventListener('beforeunload', function () {
 	            (0, _logger.info)('window_beforeunload');
-	            (0, _logger.immediateFlush)(async);
+	            (0, _logger.immediateFlush)({ fireAndForget: true });
 	        });
 
 	        window.addEventListener('unload', function () {
 	            (0, _logger.info)('window_unload');
-	            (0, _logger.immediateFlush)(async);
+	            (0, _logger.immediateFlush)({ fireAndForget: true });
 	        });
 	    }
 
@@ -1259,9 +1351,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1411,9 +1503,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	}
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1490,7 +1582,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	});
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
