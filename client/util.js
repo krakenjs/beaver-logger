@@ -30,7 +30,7 @@ export function isSameDomain(url) {
     return match[0] === `${window.location.protocol}//${window.location.host}`;
 }
 
-export function ajax(method, url, headers={}, data={}) {
+export function ajax(method, url, headers={}, data={}, { fireAndForget = false } = {}) {
 
     return new ZalgoPromise(resolve => {
         let XRequest = window.XMLHttpRequest || window.ActiveXObject;
@@ -58,11 +58,16 @@ export function ajax(method, url, headers={}, data={}) {
             }
         }
 
-        req.onreadystatechange = () => {
-            if (req.readyState > 3) {
-                resolve();
-            }
-        };
+        if (fireAndForget) {
+            resolve();
+        } else {
+            req.onreadystatechange = () => {
+                if (req.readyState > 3) {
+                    resolve();
+                }
+            };
+        }
+
         req.send(JSON.stringify(data).replace(/&/g, '%26'));
     });
 }

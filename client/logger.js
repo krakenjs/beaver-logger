@@ -12,8 +12,8 @@ if (Function.prototype.bind && window.console && typeof console.log === 'object'
     }, Function.prototype.call);
 }
 
-let transport = (headers, data) => {
-    return ajax('post', config.uri, headers, data);
+let transport = (headers, data, options) => {
+    return ajax('post', config.uri, headers, data, options);
 }
 
 export function getTransport() {
@@ -71,7 +71,7 @@ export function print(level, event, payload) {
     }
 }
 
-export function immediateFlush() {
+export function immediateFlush({ fireAndForget = false } = {}) {
 
     if (!config.uri) {
         return;
@@ -110,6 +110,8 @@ export function immediateFlush() {
         events,
         meta,
         tracking
+    }, {
+        fireAndForget
     });
 
     buffer = [];

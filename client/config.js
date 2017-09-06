@@ -26,7 +26,6 @@ export let config = {
     autoLog: ['warn', 'error'],
 
     logUnload:      true,
-    logUnloadSync:  false,
     logPerformance: true
 };
 

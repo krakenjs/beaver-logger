@@ -24,16 +24,14 @@ export function init(conf) {
     }
 
     if (config.logUnload) {
-        let async = !config.logUnloadSync;
-
         window.addEventListener('beforeunload', () => {
             info('window_beforeunload');
-            immediateFlush(async);
+            immediateFlush({ fireAndForget: true });
         });
 
         window.addEventListener('unload', () => {
             info('window_unload');
-            immediateFlush(async);
+            immediateFlush({ fireAndForget: true });
         });
     }
 
