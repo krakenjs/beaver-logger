@@ -281,7 +281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var builder = _ref2;
 
 	        try {
-	            (0, _util.extend)(meta, builder(), false);
+	            (0, _util.extend)(meta, builder(meta), false);
 	        } catch (err) {
 	            console.error('Error in custom meta builder:', err.stack || err.toString());
 	        }
@@ -304,7 +304,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _builder = _ref3;
 
 	        try {
-	            (0, _util.extend)(headers, _builder(), false);
+	            (0, _util.extend)(headers, _builder(headers), false);
 	        } catch (err) {
 	            console.error('Error in custom header builder:', err.stack || err.toString());
 	        }
@@ -383,7 +383,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var builder = _ref4;
 
 	        try {
-	            (0, _util.extend)(payload, builder(), false);
+	            (0, _util.extend)(payload, builder(payload), false);
 	        } catch (err) {
 	            console.error('Error in custom payload builder:', err.stack || err.toString());
 	        }
@@ -464,7 +464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var builder = _ref5;
 
 	            try {
-	                (0, _util.extend)(payload, builder(), false);
+	                (0, _util.extend)(payload, builder(payload), false);
 	            } catch (err) {
 	                console.error('Error in custom tracking builder:', err.stack || err.toString());
 	            }
@@ -694,6 +694,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var global = window.__zalgopromise__ = window.__zalgopromise__ || {
+	    flushPromises: [],
+	    activeCount: 0
+	};
+
 	var ZalgoPromise = function () {
 	    function ZalgoPromise(handler) {
 	        var _this = this;
@@ -822,6 +827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            this.dispatching = true;
+	            global.activeCount += 1;
 
 	            var _loop = function _loop(i) {
 	                var _handlers$i = handlers[i],
@@ -894,6 +900,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            handlers.length = 0;
 	            this.dispatching = false;
+	            global.activeCount -= 1;
+
+	            if (global.activeCount === 0) {
+	                ZalgoPromise.flushQueue();
+	            }
 	        }
 	    }, {
 	        key: 'then',
@@ -1006,8 +1017,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            var _loop2 = function _loop2(i) {
-	                ZalgoPromise.resolve(promises[i]).then(function (result) {
-	                    // $FlowFixMe
+	                var prom = promises[i];
+
+	                if (prom instanceof ZalgoPromise) {
+	                    if (prom.resolved) {
+	                        results[i] = prom.value;
+	                        count -= 1;
+	                        return 'continue';
+	                    }
+	                } else if (!(0, _utils.isPromise)(prom)) {
+	                    results[i] = prom;
+	                    count -= 1;
+	                    return 'continue';
+	                }
+
+	                ZalgoPromise.resolve(prom).then(function (result) {
 	                    results[i] = result;
 	                    count -= 1;
 	                    if (count === 0) {
@@ -1019,43 +1043,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	            };
 
 	            for (var i = 0; i < promises.length; i++) {
-	                _loop2(i);
+	                var _ret2 = _loop2(i);
+
+	                if (_ret2 === 'continue') continue;
+	            }
+
+	            if (count === 0) {
+	                promise.resolve(results);
 	            }
 
 	            return promise;
 	        }
 	    }, {
-	        key: 'map',
-	        value: function map(promises, method) {
+	        key: 'hash',
+	        value: function hash(promises) {
+	            var result = {};
 
-	            var promise = new ZalgoPromise();
-	            var count = promises.length;
-	            var results = [];
-
-	            if (!count) {
-	                promise.resolve(results);
-	                return promise;
-	            }
-
-	            var _loop3 = function _loop3(i) {
-	                ZalgoPromise['try'](function () {
-	                    return method(promises[i]);
-	                }).then(function (result) {
-	                    results[i] = result;
-	                    count -= 1;
-	                    if (count === 0) {
-	                        promise.resolve(results);
-	                    }
-	                }, function (err) {
-	                    promise.reject(err);
+	            return ZalgoPromise.all(Object.keys(promises).map(function (key) {
+	                return ZalgoPromise.resolve(promises[key]).then(function (value) {
+	                    result[key] = value;
 	                });
-	            };
-
-	            for (var i = 0; i < promises.length; i++) {
-	                _loop3(i);
-	            }
-
-	            return promise;
+	            })).then(function () {
+	                return result;
+	            });
+	        }
+	    }, {
+	        key: 'map',
+	        value: function map(items, method) {
+	            // $FlowFixMe
+	            return ZalgoPromise.all(items.map(method));
 	        }
 	    }, {
 	        key: 'onPossiblyUnhandledException',
@@ -1069,6 +1085,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var result = void 0;
 
 	            try {
+	                // $FlowFixMe
 	                result = method.apply(context, args || []);
 	            } catch (err) {
 	                return ZalgoPromise.reject(err);
@@ -1084,29 +1101,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	    }, {
-	        key: 'hash',
-	        value: function hash(obj) {
-
-	            var results = {};
-	            var promises = [];
-
-	            var _loop4 = function _loop4(key) {
-	                if (obj.hasOwnProperty(key)) {
-	                    promises.push(ZalgoPromise.resolve(obj[key]).then(function (result) {
-	                        results[key] = result;
-	                    }));
-	                }
-	            };
-
-	            for (var key in obj) {
-	                _loop4(key);
-	            }
-
-	            return ZalgoPromise.all(promises).then(function () {
-	                return results;
-	            });
-	        }
-	    }, {
 	        key: 'isPromise',
 	        value: function isPromise(value) {
 
@@ -1115,6 +1109,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            return (0, _utils.isPromise)(value);
+	        }
+	    }, {
+	        key: 'flush',
+	        value: function flush() {
+	            var promise = new ZalgoPromise();
+	            global.flushPromises.push(promise);
+
+	            if (global.activeCount === 0) {
+	                ZalgoPromise.flushQueue();
+	            }
+
+	            return promise;
+	        }
+	    }, {
+	        key: 'flushQueue',
+	        value: function flushQueue() {
+	            var promisesToFlush = global.flushPromises;
+	            global.flushPromises = [];
+
+	            for (var _iterator = promisesToFlush, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+	                var _ref;
+
+	                if (_isArray) {
+	                    if (_i >= _iterator.length) break;
+	                    _ref = _iterator[_i++];
+	                } else {
+	                    _i = _iterator.next();
+	                    if (_i.done) break;
+	                    _ref = _i.value;
+	                }
+
+	                var _promise = _ref;
+
+	                _promise.resolve();
+	            }
 	        }
 	    }]);
 
