@@ -88,7 +88,7 @@ export function immediateFlush({ fireAndForget = false } = {}) {
 
     for (let builder of metaBuilders) {
         try {
-            extend(meta, builder(), false);
+            extend(meta, builder(meta), false);
         } catch (err) {
             console.error('Error in custom meta builder:', err.stack || err.toString());
         }
@@ -98,7 +98,7 @@ export function immediateFlush({ fireAndForget = false } = {}) {
 
     for (let builder of headerBuilders) {
         try {
-            extend(headers, builder(), false);
+            extend(headers, builder(headers), false);
         } catch (err) {
             console.error('Error in custom header builder:', err.stack || err.toString());
         }
@@ -165,7 +165,7 @@ export function log(level, event, payload) {
 
     for (let builder of payloadBuilders) {
         try {
-            extend(payload, builder(), false);
+            extend(payload, builder(payload), false);
         } catch (err) {
             console.error('Error in custom payload builder:', err.stack || err.toString());
         }
@@ -239,7 +239,7 @@ export function track(payload) {
 
         for (let builder of trackingBuilders) {
             try {
-                extend(payload, builder(), false);
+                extend(payload, builder(payload), false);
             } catch (err) {
                 console.error('Error in custom tracking builder:', err.stack || err.toString());
             }
