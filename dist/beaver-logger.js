@@ -100,7 +100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _init = __webpack_require__(10);
+	var _init = __webpack_require__(11);
 
 	Object.keys(_init).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -112,7 +112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _transitions = __webpack_require__(12);
+	var _transitions = __webpack_require__(13);
 
 	Object.keys(_transitions).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -124,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _builders = __webpack_require__(8);
+	var _builders = __webpack_require__(9);
 
 	Object.keys(_builders).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -136,7 +136,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _config = __webpack_require__(9);
+	var _config = __webpack_require__(10);
 
 	Object.keys(_config).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -174,9 +174,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _util = __webpack_require__(3);
 
-	var _builders = __webpack_require__(8);
+	var _builders = __webpack_require__(9);
 
-	var _config = __webpack_require__(9);
+	var _config = __webpack_require__(10);
 
 	var buffer = exports.buffer = [];
 	var tracking = exports.tracking = [];
@@ -692,12 +692,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _exceptions = __webpack_require__(7);
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var _global = __webpack_require__(8);
 
-	var global = window.__zalgopromise__ = window.__zalgopromise__ || {
-	    flushPromises: [],
-	    activeCount: 0
-	};
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var ZalgoPromise = function () {
 	    function ZalgoPromise(handler) {
@@ -827,7 +824,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            this.dispatching = true;
-	            global.activeCount += 1;
+	            (0, _global.getGlobal)().activeCount += 1;
 
 	            var _loop = function _loop(i) {
 	                var _handlers$i = handlers[i],
@@ -900,9 +897,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            handlers.length = 0;
 	            this.dispatching = false;
-	            global.activeCount -= 1;
+	            (0, _global.getGlobal)().activeCount -= 1;
 
-	            if (global.activeCount === 0) {
+	            if ((0, _global.getGlobal)().activeCount === 0) {
 	                ZalgoPromise.flushQueue();
 	            }
 	        }
@@ -973,13 +970,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return result;
 	            });
 	        }
+
+	        // $FlowFixMe
+
 	    }, {
 	        key: 'toPromise',
 	        value: function toPromise() {
-	            if (!window.Promise) {
-	                throw new Error('Could not find window.Promise');
+	            // $FlowFixMe
+	            if (typeof Promise === 'undefined') {
+	                throw new Error('Could not find Promise');
 	            }
-	            return window.Promise.resolve(this);
+	            // $FlowFixMe
+	            return Promise.resolve(this);
 	        }
 	    }], [{
 	        key: 'resolve',
@@ -1114,9 +1116,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'flush',
 	        value: function flush() {
 	            var promise = new ZalgoPromise();
-	            global.flushPromises.push(promise);
+	            (0, _global.getGlobal)().flushPromises.push(promise);
 
-	            if (global.activeCount === 0) {
+	            if ((0, _global.getGlobal)().activeCount === 0) {
 	                ZalgoPromise.flushQueue();
 	            }
 
@@ -1125,8 +1127,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'flushQueue',
 	        value: function flushQueue() {
-	            var promisesToFlush = global.flushPromises;
-	            global.flushPromises = [];
+	            var promisesToFlush = (0, _global.getGlobal)().flushPromises;
+	            (0, _global.getGlobal)().flushPromises = [];
 
 	            for (var _iterator = promisesToFlush, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
 	                var _ref;
@@ -1162,29 +1164,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	exports.isPromise = isPromise;
-
-	var toString = {}.toString;
-
 	function isPromise(item) {
 	    try {
 	        if (!item) {
 	            return false;
 	        }
 
-	        if (window.Promise && item instanceof window.Promise) {
+	        if (typeof Promise !== 'undefined' && item instanceof Promise) {
 	            return true;
 	        }
 
-	        if (window.Window && item instanceof window.Window) {
+	        if (typeof window !== 'undefined' && window.Window && item instanceof window.Window) {
 	            return false;
 	        }
 
-	        if (window.constructor && item instanceof window.constructor) {
+	        if (typeof window !== 'undefined' && window.constructor && item instanceof window.constructor) {
 	            return false;
 	        }
 
-	        if (toString) {
-	            var name = toString.call(item);
+	        var _toString = {}.toString;
+
+	        if (_toString) {
+	            var name = _toString.call(item);
 
 	            if (name === '[object Window]' || name === '[object global]' || name === '[object DOMWindow]') {
 	                return false;
@@ -1203,9 +1204,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -1213,38 +1214,69 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.dispatchPossiblyUnhandledError = dispatchPossiblyUnhandledError;
 	exports.onPossiblyUnhandledException = onPossiblyUnhandledException;
 
-	var possiblyUnhandledPromiseHandlers = [];
-	var dispatchedErrors = [];
+	var _global = __webpack_require__(8);
 
 	function dispatchPossiblyUnhandledError(err) {
 
-	    if (dispatchedErrors.indexOf(err) !== -1) {
+	    if ((0, _global.getGlobal)().dispatchedErrors.indexOf(err) !== -1) {
 	        return;
 	    }
 
-	    dispatchedErrors.push(err);
+	    (0, _global.getGlobal)().dispatchedErrors.push(err);
 
 	    setTimeout(function () {
 	        throw err;
 	    }, 1);
 
-	    for (var j = 0; j < possiblyUnhandledPromiseHandlers.length; j++) {
-	        possiblyUnhandledPromiseHandlers[j](err);
+	    for (var j = 0; j < (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.length; j++) {
+	        (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers[j](err);
 	    }
 	}
 
 	function onPossiblyUnhandledException(handler) {
-	    possiblyUnhandledPromiseHandlers.push(handler);
+	    (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.push(handler);
 
 	    return {
 	        cancel: function cancel() {
-	            possiblyUnhandledPromiseHandlers.splice(possiblyUnhandledPromiseHandlers.indexOf(handler), 1);
+	            (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.splice((0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.indexOf(handler), 1);
 	        }
 	    };
 	}
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.getGlobal = getGlobal;
+	function getGlobal() {
+
+	    var glob = void 0;
+
+	    if (typeof window !== 'undefined') {
+	        glob = window;
+	    } else if (typeof global !== 'undefined') {
+	        glob = global;
+	    } else {
+	        throw new Error('Can not find global');
+	    }
+
+	    var zalgoGlobal = glob.__zalgopromise__ = glob.__zalgopromise__ || {};
+	    zalgoGlobal.flushPromises = zalgoGlobal.flushPromises || [];
+	    zalgoGlobal.activeCount = zalgoGlobal.activeCount || 0;
+	    zalgoGlobal.possiblyUnhandledPromiseHandlers = zalgoGlobal.possiblyUnhandledPromiseHandlers || [];
+	    zalgoGlobal.dispatchedErrors = zalgoGlobal.dispatchedErrors || [];
+
+	    return zalgoGlobal;
+	}
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1278,7 +1310,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -1319,7 +1351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var logLevels = exports.logLevels = ['error', 'warn', 'info', 'debug'];
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1329,11 +1361,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.init = init;
 
-	var _config = __webpack_require__(9);
+	var _config = __webpack_require__(10);
 
 	var _util = __webpack_require__(3);
 
-	var _performance = __webpack_require__(11);
+	var _performance = __webpack_require__(12);
 
 	var _logger = __webpack_require__(2);
 
@@ -1381,7 +1413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1395,11 +1427,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.initHeartBeat = initHeartBeat;
 	exports.initPerformance = initPerformance;
 
-	var _config = __webpack_require__(9);
+	var _config = __webpack_require__(10);
 
 	var _logger = __webpack_require__(2);
 
-	var _builders = __webpack_require__(8);
+	var _builders = __webpack_require__(9);
 
 	var _util = __webpack_require__(3);
 
@@ -1533,7 +1565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1545,15 +1577,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.endTransition = endTransition;
 	exports.transition = transition;
 
-	var _performance = __webpack_require__(11);
+	var _performance = __webpack_require__(12);
 
 	var _logger = __webpack_require__(2);
 
-	var _builders = __webpack_require__(8);
+	var _builders = __webpack_require__(9);
 
 	var _util = __webpack_require__(3);
 
-	var _config = __webpack_require__(9);
+	var _config = __webpack_require__(10);
 
 	var windowID = (0, _util.uniqueID)();
 	var pageID = (0, _util.uniqueID)();
