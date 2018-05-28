@@ -59,7 +59,7 @@ Attach a method which is called and will attach general information to the loggi
 
 ```javascript
 $logger.addMetaBuilder(function() {
-    return {
+    return 
         current_page: getMyCurrentPage()
     };
 });
@@ -147,7 +147,7 @@ $logger.init({
     // Limit on number of logs before auto-flush happens
     sizeLimit: 300,
 
-    // Supress `console.log`s when `true`
+    // Suppress `console.log`s when `true`
     // Recommended for production usage
     silent: false,
 
