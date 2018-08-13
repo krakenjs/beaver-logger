@@ -2,7 +2,7 @@
 import { config } from './config';
 import { info } from './logger';
 import { addPayloadBuilder } from './builders'
-import { windowReady, safeInterval } from './util';
+import { onWindowReady, safeInterval } from './util';
 
 let enablePerformance = window &&
     window.performance &&
@@ -105,7 +105,7 @@ export function initPerformance() {
         return payload;
     });
 
-    windowReady.then(() => {
+    onWindowReady().then(() => {
 
         let keys = [
             'connectEnd', 'connectStart', 'domComplete', 'domContentLoadedEventEnd',

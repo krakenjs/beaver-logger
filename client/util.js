@@ -109,16 +109,15 @@ export function promiseDebounce(method, interval) {
     };
 }
 
-export let windowReady = new ZalgoPromise(resolve => {
-    // guard document, and window.addEventListener for JSC (react-native)
-    if (typeof(document) !== 'undefined' && document.readyState === 'complete') {
-        resolve();
-    }
-    
-    if(window.addEventListener) {
-        window.addEventListener ('load', resolve);
-    }
-});
+export function onWindowReady() : ZalgoPromise<void> {
+    return new ZalgoPromise(resolve => {
+        if (typeof document !== 'undefined' && document.readyState === 'complete') {
+            resolve();
+        }
+
+        window.addEventListener('load', resolve);
+    });
+}
 
 export function safeInterval(method, time) {
 
