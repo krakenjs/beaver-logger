@@ -6,12 +6,6 @@ import { config, logLevels } from './config';
 export let buffer = [];
 export let tracking = [];
 
-if (Function.prototype.bind && window.console && typeof console.log === 'object') {
-    [ 'log', 'info', 'warn', 'error' ].forEach(function(method) {
-        console[method] = this.bind(console[method], console);
-    }, Function.prototype.call);
-}
-
 let transport = (headers, data, options) => {
     return ajax('post', config.uri, headers, data, options);
 }
