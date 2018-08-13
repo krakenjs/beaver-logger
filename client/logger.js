@@ -32,15 +32,19 @@ setTimeout(() => {
 
 export function print(level, event, payload) {
 
+    if (typeof window === 'undefined' || !window.console || !window.console.log) {
+        return;
+    }
+
     if (!loaded) {
         return setTimeout(() => print(level, event, payload), 1);
     }
 
-    if (!window.console || !window.console.log) {
-        return;
-    }
+    let logLevel = config.logLevel;
 
-    let logLevel = window.LOG_LEVEL || config.logLevel;
+    if (window.LOG_LEVEL) {
+        logLevel = window.LOG_LEVEL;
+    }
 
     if (logLevels.indexOf(level) > logLevels.indexOf(logLevel)) {
         return;
@@ -72,6 +76,10 @@ export function print(level, event, payload) {
 }
 
 export function immediateFlush({ fireAndForget = false } = {}) {
+
+    if (typeof window === 'undefined') {
+        return;
+    }
 
     if (!config.uri) {
         return;
@@ -138,6 +146,10 @@ function enqueue(level, event, payload) {
 
 
 export function log(level, event, payload) {
+
+    if (typeof window === 'undefined') {
+        return;
+    }
 
     if (config.prefix) {
         event = `${config.prefix}_${event}`;
@@ -229,6 +241,11 @@ export function error(event, payload) {
 }
 
 export function track(payload) {
+
+    if (typeof window === 'undefined') {
+        return;
+    }
+
     if (payload) {
 
         try {
