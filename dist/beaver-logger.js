@@ -158,9 +158,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	exports.track = exports.flush = exports.tracking = exports.buffer = undefined;
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 	exports.getTransport = getTransport;
 	exports.setTransport = setTransport;
 	exports.print = print;
@@ -180,12 +177,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var buffer = exports.buffer = [];
 	var tracking = exports.tracking = [];
-
-	if (Function.prototype.bind && window.console && _typeof(console.log) === 'object') {
-	    ['log', 'info', 'warn', 'error'].forEach(function (method) {
-	        console[method] = this.bind(console[method], console);
-	    }, Function.prototype.call);
-	}
 
 	var transport = function transport(headers, data, options) {
 	    return (0, _util.ajax)('post', _config.config.uri, headers, data, options);
