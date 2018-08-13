@@ -486,12 +486,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.windowReady = undefined;
 	exports.extend = extend;
 	exports.isSameProtocol = isSameProtocol;
 	exports.isSameDomain = isSameDomain;
 	exports.ajax = ajax;
 	exports.promiseDebounce = promiseDebounce;
+	exports.onWindowReady = onWindowReady;
 	exports.safeInterval = safeInterval;
 	exports.uniqueID = uniqueID;
 	exports.isIE = isIE;
@@ -613,16 +613,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	}
 
-	var windowReady = exports.windowReady = new _src.ZalgoPromise(function (resolve) {
-	    // guard document, and window.addEventListener for JSC (react-native)
-	    if (typeof document !== 'undefined' && document.readyState === 'complete') {
-	        resolve();
-	    }
+	function onWindowReady() {
+	    return new _src.ZalgoPromise(function (resolve) {
+	        if (typeof document !== 'undefined' && document.readyState === 'complete') {
+	            resolve();
+	        }
 
-	    if (window.addEventListener) {
 	        window.addEventListener('load', resolve);
-	    }
-	});
+	    });
+	}
 
 	function safeInterval(method, time) {
 
@@ -804,6 +803,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.errorHandled = true;
 	            this.reject(error);
 	        }
+
+	        // eslint-disable-next-line complexity
+
 	    }, {
 	        key: 'dispatch',
 	        value: function dispatch() {
@@ -878,6 +880,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    } else {
 	                        // $FlowFixMe
 	                        result.then(function (res) {
+	                            // eslint-disable-line promise/catch-or-return
 	                            promise.resolve(res);
 	                        }, function (err) {
 	                            promise.reject(err);
@@ -978,7 +981,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function toPromise() {
 	            // $FlowFixMe
 	            if (typeof Promise === 'undefined') {
-	                throw new Error('Could not find Promise');
+	                throw new TypeError('Could not find Promise');
 	            }
 	            // $FlowFixMe
 	            return Promise.resolve(this);
@@ -1034,6 +1037,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 
 	                ZalgoPromise.resolve(prom).then(function (result) {
+	                    // eslint-disable-line promise/catch-or-return
 	                    results[i] = result;
 	                    count -= 1;
 	                    if (count === 0) {
@@ -1262,7 +1266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else if (typeof global !== 'undefined') {
 	        glob = global;
 	    } else {
-	        throw new Error('Can not find global');
+	        throw new TypeError('Can not find global');
 	    }
 
 	    var zalgoGlobal = glob.__zalgopromise__ = glob.__zalgopromise__ || {};
@@ -1526,7 +1530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return payload;
 	    });
 
-	    _util.windowReady.then(function () {
+	    (0, _util.onWindowReady)().then(function () {
 
 	        var keys = ['connectEnd', 'connectStart', 'domComplete', 'domContentLoadedEventEnd', 'domContentLoadedEventStart', 'domInteractive', 'domLoading', 'domainLookupEnd', 'domainLookupStart', 'fetchStart', 'loadEventEnd', 'loadEventStart', 'navigationStart', 'redirectEnd', 'redirectStart', 'requestStart', 'responseEnd', 'responseStart', 'secureConnectionStart', 'unloadEventEnd', 'unloadEventStart'];
 
