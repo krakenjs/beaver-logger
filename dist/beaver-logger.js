@@ -207,17 +207,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function print(level, event, payload) {
 
+	    if (typeof window === 'undefined' || !window.console || !window.console.log) {
+	        return;
+	    }
+
 	    if (!loaded) {
 	        return setTimeout(function () {
 	            return print(level, event, payload);
 	        }, 1);
 	    }
 
-	    if (!window.console || !window.console.log) {
-	        return;
-	    }
+	    var logLevel = _config.config.logLevel;
 
-	    var logLevel = window.LOG_LEVEL || _config.config.logLevel;
+	    if (window.LOG_LEVEL) {
+	        logLevel = window.LOG_LEVEL;
+	    }
 
 	    if (_config.logLevels.indexOf(level) > _config.logLevels.indexOf(logLevel)) {
 	        return;
@@ -252,6 +256,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	        _ref$fireAndForget = _ref.fireAndForget,
 	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
+
+	    if (typeof window === 'undefined') {
+	        return;
+	    }
 
 	    if (!_config.config.uri) {
 	        return;
@@ -343,6 +351,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function log(level, event, payload) {
+
+	    if (typeof window === 'undefined') {
+	        return;
+	    }
 
 	    if (_config.config.prefix) {
 	        event = _config.config.prefix + '_' + event;
@@ -441,6 +453,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function _track(payload) {
+
+	    if (typeof window === 'undefined') {
+	        return;
+	    }
+
 	    if (payload) {
 
 	        try {
