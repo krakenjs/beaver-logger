@@ -1,1661 +1,842 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define("$logger", [], factory);
-	else if(typeof exports === 'object')
-		exports["$logger"] = factory();
-	else
-		root["$logger"] = factory();
-})(this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
-
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
-/******/ 		};
-
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
-
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-
-
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _interface = __webpack_require__(1);
-
-	Object.keys(_interface).forEach(function (key) {
-	  if (key === "default" || key === "__esModule") return;
-	  Object.defineProperty(exports, key, {
-	    enumerable: true,
-	    get: function get() {
-	      return _interface[key];
-	    }
-	  });
-	});
-
-	var INTERFACE = _interopRequireWildcard(_interface);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-
-	exports['default'] = INTERFACE;
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _logger = __webpack_require__(2);
-
-	Object.keys(_logger).forEach(function (key) {
-	  if (key === "default" || key === "__esModule") return;
-	  Object.defineProperty(exports, key, {
-	    enumerable: true,
-	    get: function get() {
-	      return _logger[key];
-	    }
-	  });
-	});
-
-	var _init = __webpack_require__(11);
-
-	Object.keys(_init).forEach(function (key) {
-	  if (key === "default" || key === "__esModule") return;
-	  Object.defineProperty(exports, key, {
-	    enumerable: true,
-	    get: function get() {
-	      return _init[key];
-	    }
-	  });
-	});
-
-	var _transitions = __webpack_require__(13);
-
-	Object.keys(_transitions).forEach(function (key) {
-	  if (key === "default" || key === "__esModule") return;
-	  Object.defineProperty(exports, key, {
-	    enumerable: true,
-	    get: function get() {
-	      return _transitions[key];
-	    }
-	  });
-	});
-
-	var _builders = __webpack_require__(9);
-
-	Object.keys(_builders).forEach(function (key) {
-	  if (key === "default" || key === "__esModule") return;
-	  Object.defineProperty(exports, key, {
-	    enumerable: true,
-	    get: function get() {
-	      return _builders[key];
-	    }
-	  });
-	});
-
-	var _config = __webpack_require__(10);
-
-	Object.keys(_config).forEach(function (key) {
-	  if (key === "default" || key === "__esModule") return;
-	  Object.defineProperty(exports, key, {
-	    enumerable: true,
-	    get: function get() {
-	      return _config[key];
-	    }
-	  });
-	});
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.track = exports.flush = exports.tracking = exports.buffer = undefined;
-	exports.getTransport = getTransport;
-	exports.setTransport = setTransport;
-	exports.print = print;
-	exports.immediateFlush = immediateFlush;
-	exports.log = log;
-	exports.prefix = prefix;
-	exports.debug = debug;
-	exports.info = info;
-	exports.warn = warn;
-	exports.error = error;
-
-	var _util = __webpack_require__(3);
-
-	var _builders = __webpack_require__(9);
-
-	var _config = __webpack_require__(10);
-
-	var buffer = exports.buffer = [];
-	var tracking = exports.tracking = [];
-
-	var transport = function transport(headers, data, options) {
-	    return (0, _util.ajax)('post', _config.config.uri, headers, data, options);
-	};
-
-	function getTransport() {
-	    return transport;
-	}
-
-	function setTransport(newTransport) {
-	    transport = newTransport;
-	}
-
-	var loaded = false;
-
-	setTimeout(function () {
-	    loaded = true;
-	}, 1);
-
-	function print(level, event, payload) {
-
-	    if (typeof window === 'undefined' || !window.console || !window.console.log) {
-	        return;
-	    }
-
-	    if (!loaded) {
-	        return setTimeout(function () {
-	            return print(level, event, payload);
-	        }, 1);
-	    }
-
-	    var logLevel = _config.config.logLevel;
-
-	    if (window.LOG_LEVEL) {
-	        logLevel = window.LOG_LEVEL;
-	    }
-
-	    if (_config.logLevels.indexOf(level) > _config.logLevels.indexOf(logLevel)) {
-	        return;
-	    }
-
-	    payload = payload || {};
-
-	    var args = [event];
-
-	    if ((0, _util.isIE)()) {
-	        payload = JSON.stringify(payload);
-	    }
-
-	    args.push(payload);
-
-	    if (payload.error || payload.warning) {
-	        args.push('\n\n', payload.error || payload.warning);
-	    }
-
-	    try {
-	        if (window.console[level] && window.console[level].apply) {
-	            window.console[level].apply(window.console, args);
-	        } else if (window.console.log && window.console.log.apply) {
-	            window.console.log.apply(window.console, args);
-	        }
-	    } catch (err) {
-	        // pass
-	    }
-	}
-
-	function immediateFlush() {
-	    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-	        _ref$fireAndForget = _ref.fireAndForget,
-	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
-
-	    if (typeof window === 'undefined') {
-	        return;
-	    }
-
-	    if (!_config.config.uri) {
-	        return;
-	    }
-
-	    var hasBuffer = buffer.length;
-	    var hasTracking = tracking.length;
-
-	    if (!hasBuffer && !hasTracking) {
-	        return;
-	    }
-
-	    var meta = {};
-
-	    for (var _iterator = _builders.metaBuilders, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-	        var _ref2;
-
-	        if (_isArray) {
-	            if (_i >= _iterator.length) break;
-	            _ref2 = _iterator[_i++];
-	        } else {
-	            _i = _iterator.next();
-	            if (_i.done) break;
-	            _ref2 = _i.value;
-	        }
-
-	        var builder = _ref2;
-
-	        try {
-	            (0, _util.extend)(meta, builder(meta), false);
-	        } catch (err) {
-	            console.error('Error in custom meta builder:', err.stack || err.toString());
-	        }
-	    }
-
-	    var headers = {};
-
-	    for (var _iterator2 = _builders.headerBuilders, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-	        var _ref3;
-
-	        if (_isArray2) {
-	            if (_i2 >= _iterator2.length) break;
-	            _ref3 = _iterator2[_i2++];
-	        } else {
-	            _i2 = _iterator2.next();
-	            if (_i2.done) break;
-	            _ref3 = _i2.value;
-	        }
-
-	        var _builder = _ref3;
-
-	        try {
-	            (0, _util.extend)(headers, _builder(headers), false);
-	        } catch (err) {
-	            console.error('Error in custom header builder:', err.stack || err.toString());
-	        }
-	    }
-
-	    var events = buffer;
-
-	    var req = transport(headers, {
-	        events: events,
-	        meta: meta,
-	        tracking: tracking
-	    }, {
-	        fireAndForget: fireAndForget
-	    });
-
-	    exports.buffer = buffer = [];
-	    exports.tracking = tracking = [];
-
-	    return req;
-	}
-
-	var _flush = (0, _util.promiseDebounce)(immediateFlush, _config.config.debounceInterval);
-
-	exports.flush = _flush;
-	function enqueue(level, event, payload) {
-
-	    buffer.push({
-	        level: level,
-	        event: event,
-	        payload: payload
-	    });
-
-	    if (_config.config.autoLog.indexOf(level) > -1) {
-	        _flush();
-	    }
-	}
-
-	function log(level, event, payload) {
-
-	    if (typeof window === 'undefined') {
-	        return;
-	    }
-
-	    if (_config.config.prefix) {
-	        event = _config.config.prefix + '_' + event;
-	    }
-
-	    payload = payload || {};
-
-	    if (typeof payload === 'string') {
-	        payload = {
-	            message: payload
-	        };
-	    } else if (payload instanceof Error) {
-	        payload = {
-	            error: payload.stack || payload.toString()
-	        };
-	    }
-
-	    try {
-	        JSON.stringify(payload);
-	    } catch (err) {
-	        return;
-	    }
-
-	    payload.timestamp = Date.now();
-
-	    for (var _iterator3 = _builders.payloadBuilders, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-	        var _ref4;
-
-	        if (_isArray3) {
-	            if (_i3 >= _iterator3.length) break;
-	            _ref4 = _iterator3[_i3++];
-	        } else {
-	            _i3 = _iterator3.next();
-	            if (_i3.done) break;
-	            _ref4 = _i3.value;
-	        }
-
-	        var builder = _ref4;
-
-	        try {
-	            (0, _util.extend)(payload, builder(payload), false);
-	        } catch (err) {
-	            console.error('Error in custom payload builder:', err.stack || err.toString());
-	        }
-	    }
-
-	    if (!_config.config.silent) {
-	        print(level, event, payload);
-	    }
-
-	    if (buffer.length === _config.config.sizeLimit) {
-	        enqueue('info', 'logger_max_buffer_length');
-	    } else if (buffer.length < _config.config.sizeLimit) {
-	        enqueue(level, event, payload);
-	    }
-	}
-
-	function prefix(name) {
-
-	    return {
-	        debug: function debug(event, payload) {
-	            return log('debug', name + '_' + event, payload);
-	        },
-	        info: function info(event, payload) {
-	            return log('info', name + '_' + event, payload);
-	        },
-	        warn: function warn(event, payload) {
-	            return log('warn', name + '_' + event, payload);
-	        },
-	        error: function error(event, payload) {
-	            return log('error', name + '_' + event, payload);
-	        },
-	        track: function track(payload) {
-	            return _track(payload);
-	        },
-	        flush: function flush() {
-	            return _flush();
-	        }
-	    };
-	}
-
-	function debug(event, payload) {
-	    return log('debug', event, payload);
-	}
-
-	function info(event, payload) {
-	    return log('info', event, payload);
-	}
-
-	function warn(event, payload) {
-	    return log('warn', event, payload);
-	}
-
-	function error(event, payload) {
-	    return log('error', event, payload);
-	}
-
-	function _track(payload) {
-
-	    if (typeof window === 'undefined') {
-	        return;
-	    }
-
-	    if (payload) {
-
-	        try {
-	            JSON.stringify(payload);
-	        } catch (err) {
-	            return;
-	        }
-
-	        for (var _iterator4 = _builders.trackingBuilders, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-	            var _ref5;
-
-	            if (_isArray4) {
-	                if (_i4 >= _iterator4.length) break;
-	                _ref5 = _iterator4[_i4++];
-	            } else {
-	                _i4 = _iterator4.next();
-	                if (_i4.done) break;
-	                _ref5 = _i4.value;
-	            }
-
-	            var builder = _ref5;
-
-	            try {
-	                (0, _util.extend)(payload, builder(payload), false);
-	            } catch (err) {
-	                console.error('Error in custom tracking builder:', err.stack || err.toString());
-	            }
-	        }
-
-	        print('debug', 'tracking', payload);
-
-	        tracking.push(payload);
-	    }
-	}
-	exports.track = _track;
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.extend = extend;
-	exports.isSameProtocol = isSameProtocol;
-	exports.isSameDomain = isSameDomain;
-	exports.ajax = ajax;
-	exports.promiseDebounce = promiseDebounce;
-	exports.onWindowReady = onWindowReady;
-	exports.safeInterval = safeInterval;
-	exports.uniqueID = uniqueID;
-	exports.isIE = isIE;
-
-	var _src = __webpack_require__(4);
-
-	function extend(dest, src) {
-	    var over = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
-	    dest = dest || {};
-	    src = src || {};
-
-	    for (var i in src) {
-	        if (src.hasOwnProperty(i)) {
-	            if (over || !dest.hasOwnProperty(i)) {
-	                dest[i] = src[i];
-	            }
-	        }
-	    }
-
-	    return dest;
-	}
-
-	function isSameProtocol(url) {
-	    return window.location.protocol === url.split('/')[0];
-	}
-
-	function isSameDomain(url) {
-	    var match = url.match(/https?:\/\/[^/]+/);
-
-	    if (!match) {
-	        return true;
-	    }
-
-	    return match[0] === window.location.protocol + '//' + window.location.host;
-	}
-
-	function ajax(method, url) {
-	    var headers = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-	    var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-
-	    var _ref = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {},
-	        _ref$fireAndForget = _ref.fireAndForget,
-	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
-
-	    return new _src.ZalgoPromise(function (resolve) {
-	        var XRequest = window.XMLHttpRequest || window.ActiveXObject;
-
-	        if (window.XDomainRequest && !isSameDomain(url)) {
-
-	            if (!isSameProtocol(url)) {
-	                return resolve();
-	            }
-
-	            XRequest = window.XDomainRequest;
-	        }
-
-	        var req = new XRequest('MSXML2.XMLHTTP.3.0');
-	        req.open(method.toUpperCase(), url, true);
-
-	        if (typeof req.setRequestHeader === 'function') {
-	            req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-	            req.setRequestHeader('Content-type', 'application/json');
-
-	            for (var headerName in headers) {
-	                if (headers.hasOwnProperty(headerName)) {
-	                    req.setRequestHeader(headerName, headers[headerName]);
-	                }
-	            }
-	        }
-
-	        if (fireAndForget) {
-	            resolve();
-	        } else {
-	            req.onreadystatechange = function () {
-	                if (req.readyState > 3) {
-	                    resolve();
-	                }
-	            };
-	        }
-
-	        req.send(JSON.stringify(data).replace(/&/g, '%26'));
-	    });
-	}
-
-	function promiseDebounce(method, interval) {
-
-	    var debounce = {};
-
-	    return function () {
-	        var args = arguments;
-
-	        if (debounce.timeout) {
-	            clearTimeout(debounce.timeout);
-	            delete debounce.timeout;
-	        }
-
-	        debounce.timeout = setTimeout(function () {
-
-	            var resolver = debounce.resolver;
-	            var rejector = debounce.rejector;
-
-	            delete debounce.promise;
-	            delete debounce.resolver;
-	            delete debounce.rejector;
-	            delete debounce.timeout;
-
-	            return _src.ZalgoPromise.resolve().then(function () {
-	                return method.apply(null, args);
-	            }).then(resolver, rejector);
-	        }, interval);
-
-	        debounce.promise = debounce.promise || new _src.ZalgoPromise(function (resolver, rejector) {
-	            debounce.resolver = resolver;
-	            debounce.rejector = rejector;
-	        });
-
-	        return debounce.promise;
-	    };
-	}
-
-	function onWindowReady() {
-	    return new _src.ZalgoPromise(function (resolve) {
-	        if (typeof document !== 'undefined' && document.readyState === 'complete') {
-	            resolve();
-	        }
-
-	        window.addEventListener('load', resolve);
-	    });
-	}
-
-	function safeInterval(method, time) {
-
-	    var timeout = void 0;
-
-	    function loop() {
-	        timeout = setTimeout(function () {
-	            method();
-	            loop();
-	        }, time);
-	    }
-
-	    loop();
-
-	    return {
-	        cancel: function cancel() {
-	            clearTimeout(timeout);
-	        }
-	    };
-	}
-
-	function uniqueID() {
-	    var chars = '0123456789abcdef';
-
-	    return 'xxxxxxxxxx'.replace(/./g, function () {
-	        return chars.charAt(Math.floor(Math.random() * chars.length));
-	    });
-	}
-
-	function isIE() {
-	    return Boolean(window.document.documentMode);
-	}
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _promise = __webpack_require__(5);
-
-	Object.defineProperty(exports, 'ZalgoPromise', {
-	  enumerable: true,
-	  get: function get() {
-	    return _promise.ZalgoPromise;
-	  }
-	});
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.ZalgoPromise = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _utils = __webpack_require__(6);
-
-	var _exceptions = __webpack_require__(7);
-
-	var _global = __webpack_require__(8);
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var ZalgoPromise = function () {
-	    function ZalgoPromise(handler) {
-	        var _this = this;
-
-	        _classCallCheck(this, ZalgoPromise);
-
-	        this.resolved = false;
-	        this.rejected = false;
-	        this.errorHandled = false;
-
-	        this.handlers = [];
-
-	        if (handler) {
-
-	            var _result = void 0;
-	            var _error = void 0;
-	            var resolved = false;
-	            var rejected = false;
-	            var isAsync = false;
-
-	            try {
-	                handler(function (res) {
-	                    if (isAsync) {
-	                        _this.resolve(res);
-	                    } else {
-	                        resolved = true;
-	                        _result = res;
-	                    }
-	                }, function (err) {
-	                    if (isAsync) {
-	                        _this.reject(err);
-	                    } else {
-	                        rejected = true;
-	                        _error = err;
-	                    }
-	                });
-	            } catch (err) {
-	                this.reject(err);
-	                return;
-	            }
-
-	            isAsync = true;
-
-	            if (resolved) {
-	                // $FlowFixMe
-	                this.resolve(_result);
-	            } else if (rejected) {
-	                this.reject(_error);
-	            }
-	        }
-	    }
-
-	    _createClass(ZalgoPromise, [{
-	        key: 'resolve',
-	        value: function resolve(result) {
-	            if (this.resolved || this.rejected) {
-	                return this;
-	            }
-
-	            if ((0, _utils.isPromise)(result)) {
-	                throw new Error('Can not resolve promise with another promise');
-	            }
-
-	            this.resolved = true;
-	            this.value = result;
-	            this.dispatch();
-
-	            return this;
-	        }
-	    }, {
-	        key: 'reject',
-	        value: function reject(error) {
-	            var _this2 = this;
-
-	            if (this.resolved || this.rejected) {
-	                return this;
-	            }
-
-	            if ((0, _utils.isPromise)(error)) {
-	                throw new Error('Can not reject promise with another promise');
-	            }
-
-	            if (!error) {
-	                var _err = error && typeof error.toString === 'function' ? error.toString() : Object.prototype.toString.call(error);
-	                error = new Error('Expected reject to be called with Error, got ' + _err);
-	            }
-
-	            this.rejected = true;
-	            this.error = error;
-
-	            if (!this.errorHandled) {
-	                setTimeout(function () {
-	                    if (!_this2.errorHandled) {
-	                        (0, _exceptions.dispatchPossiblyUnhandledError)(error);
-	                    }
-	                }, 1);
-	            }
-
-	            this.dispatch();
-
-	            return this;
-	        }
-	    }, {
-	        key: 'asyncReject',
-	        value: function asyncReject(error) {
-	            this.errorHandled = true;
-	            this.reject(error);
-	        }
-
-	        // eslint-disable-next-line complexity
-
-	    }, {
-	        key: 'dispatch',
-	        value: function dispatch() {
-	            var _this3 = this;
-
-	            var dispatching = this.dispatching,
-	                resolved = this.resolved,
-	                rejected = this.rejected,
-	                handlers = this.handlers;
-
-
-	            if (dispatching) {
-	                return;
-	            }
-
-	            if (!resolved && !rejected) {
-	                return;
-	            }
-
-	            this.dispatching = true;
-	            (0, _global.getGlobal)().activeCount += 1;
-
-	            var _loop = function _loop(i) {
-	                var _handlers$i = handlers[i],
-	                    onSuccess = _handlers$i.onSuccess,
-	                    onError = _handlers$i.onError,
-	                    promise = _handlers$i.promise;
-
-
-	                var result = void 0;
-
-	                if (resolved) {
-
-	                    try {
-	                        result = onSuccess ? onSuccess(_this3.value) : _this3.value;
-	                    } catch (err) {
-	                        promise.reject(err);
-	                        return 'continue';
-	                    }
-	                } else if (rejected) {
-
-	                    if (!onError) {
-	                        promise.reject(_this3.error);
-	                        return 'continue';
-	                    }
-
-	                    try {
-	                        result = onError(_this3.error);
-	                    } catch (err) {
-	                        promise.reject(err);
-	                        return 'continue';
-	                    }
-	                }
-
-	                if (result instanceof ZalgoPromise && (result.resolved || result.rejected)) {
-
-	                    if (result.resolved) {
-	                        promise.resolve(result.value);
-	                    } else {
-	                        promise.reject(result.error);
-	                    }
-
-	                    result.errorHandled = true;
-	                } else if ((0, _utils.isPromise)(result)) {
-
-	                    if (result instanceof ZalgoPromise && (result.resolved || result.rejected)) {
-	                        if (result.resolved) {
-	                            promise.resolve(result.value);
-	                        } else {
-	                            promise.reject(result.error);
-	                        }
-	                    } else {
-	                        // $FlowFixMe
-	                        result.then(function (res) {
-	                            // eslint-disable-line promise/catch-or-return
-	                            promise.resolve(res);
-	                        }, function (err) {
-	                            promise.reject(err);
-	                        });
-	                    }
-	                } else {
-
-	                    promise.resolve(result);
-	                }
-	            };
-
-	            for (var i = 0; i < handlers.length; i++) {
-	                var _ret = _loop(i);
-
-	                if (_ret === 'continue') continue;
-	            }
-
-	            handlers.length = 0;
-	            this.dispatching = false;
-	            (0, _global.getGlobal)().activeCount -= 1;
-
-	            if ((0, _global.getGlobal)().activeCount === 0) {
-	                ZalgoPromise.flushQueue();
-	            }
-	        }
-	    }, {
-	        key: 'then',
-	        value: function then(onSuccess, onError) {
-
-	            if (onSuccess && typeof onSuccess !== 'function' && !onSuccess.call) {
-	                throw new Error('Promise.then expected a function for success handler');
-	            }
-
-	            if (onError && typeof onError !== 'function' && !onError.call) {
-	                throw new Error('Promise.then expected a function for error handler');
-	            }
-
-	            var promise = new ZalgoPromise();
-
-	            this.handlers.push({
-	                promise: promise,
-	                onSuccess: onSuccess,
-	                onError: onError
-	            });
-
-	            this.errorHandled = true;
-
-	            this.dispatch();
-
-	            return promise;
-	        }
-	    }, {
-	        key: 'catch',
-	        value: function _catch(onError) {
-	            return this.then(undefined, onError);
-	        }
-	    }, {
-	        key: 'finally',
-	        value: function _finally(handler) {
-	            return this.then(function (result) {
-	                return ZalgoPromise['try'](handler).then(function () {
-	                    return result;
-	                });
-	            }, function (err) {
-	                return ZalgoPromise['try'](handler).then(function () {
-	                    throw err;
-	                });
-	            });
-	        }
-	    }, {
-	        key: 'timeout',
-	        value: function timeout(time, err) {
-	            var _this4 = this;
-
-	            if (this.resolved || this.rejected) {
-	                return this;
-	            }
-
-	            var timeout = setTimeout(function () {
-
-	                if (_this4.resolved || _this4.rejected) {
-	                    return;
-	                }
-
-	                _this4.reject(err || new Error('Promise timed out after ' + time + 'ms'));
-	            }, time);
-
-	            return this.then(function (result) {
-	                clearTimeout(timeout);
-	                return result;
-	            });
-	        }
-
-	        // $FlowFixMe
-
-	    }, {
-	        key: 'toPromise',
-	        value: function toPromise() {
-	            // $FlowFixMe
-	            if (typeof Promise === 'undefined') {
-	                throw new TypeError('Could not find Promise');
-	            }
-	            // $FlowFixMe
-	            return Promise.resolve(this);
-	        }
-	    }], [{
-	        key: 'resolve',
-	        value: function resolve(value) {
-
-	            if (value instanceof ZalgoPromise) {
-	                return value;
-	            }
-
-	            if ((0, _utils.isPromise)(value)) {
-	                // $FlowFixMe
-	                return new ZalgoPromise(function (resolve, reject) {
-	                    return value.then(resolve, reject);
-	                });
-	            }
-
-	            return new ZalgoPromise().resolve(value);
-	        }
-	    }, {
-	        key: 'reject',
-	        value: function reject(error) {
-	            return new ZalgoPromise().reject(error);
-	        }
-	    }, {
-	        key: 'all',
-	        value: function all(promises) {
-
-	            var promise = new ZalgoPromise();
-	            var count = promises.length;
-	            var results = [];
-
-	            if (!count) {
-	                promise.resolve(results);
-	                return promise;
-	            }
-
-	            var _loop2 = function _loop2(i) {
-	                var prom = promises[i];
-
-	                if (prom instanceof ZalgoPromise) {
-	                    if (prom.resolved) {
-	                        results[i] = prom.value;
-	                        count -= 1;
-	                        return 'continue';
-	                    }
-	                } else if (!(0, _utils.isPromise)(prom)) {
-	                    results[i] = prom;
-	                    count -= 1;
-	                    return 'continue';
-	                }
-
-	                ZalgoPromise.resolve(prom).then(function (result) {
-	                    // eslint-disable-line promise/catch-or-return
-	                    results[i] = result;
-	                    count -= 1;
-	                    if (count === 0) {
-	                        promise.resolve(results);
-	                    }
-	                }, function (err) {
-	                    promise.reject(err);
-	                });
-	            };
-
-	            for (var i = 0; i < promises.length; i++) {
-	                var _ret2 = _loop2(i);
-
-	                if (_ret2 === 'continue') continue;
-	            }
-
-	            if (count === 0) {
-	                promise.resolve(results);
-	            }
-
-	            return promise;
-	        }
-	    }, {
-	        key: 'hash',
-	        value: function hash(promises) {
-	            var result = {};
-
-	            return ZalgoPromise.all(Object.keys(promises).map(function (key) {
-	                return ZalgoPromise.resolve(promises[key]).then(function (value) {
-	                    result[key] = value;
-	                });
-	            })).then(function () {
-	                return result;
-	            });
-	        }
-	    }, {
-	        key: 'map',
-	        value: function map(items, method) {
-	            // $FlowFixMe
-	            return ZalgoPromise.all(items.map(method));
-	        }
-	    }, {
-	        key: 'onPossiblyUnhandledException',
-	        value: function onPossiblyUnhandledException(handler) {
-	            return (0, _exceptions.onPossiblyUnhandledException)(handler);
-	        }
-	    }, {
-	        key: 'try',
-	        value: function _try(method, context, args) {
-
-	            var result = void 0;
-
-	            try {
-	                // $FlowFixMe
-	                result = method.apply(context, args || []);
-	            } catch (err) {
-	                return ZalgoPromise.reject(err);
-	            }
-
-	            return ZalgoPromise.resolve(result);
-	        }
-	    }, {
-	        key: 'delay',
-	        value: function delay(_delay) {
-	            return new ZalgoPromise(function (resolve) {
-	                setTimeout(resolve, _delay);
-	            });
-	        }
-	    }, {
-	        key: 'isPromise',
-	        value: function isPromise(value) {
-
-	            if (value && value instanceof ZalgoPromise) {
-	                return true;
-	            }
-
-	            return (0, _utils.isPromise)(value);
-	        }
-	    }, {
-	        key: 'flush',
-	        value: function flush() {
-	            var promise = new ZalgoPromise();
-	            (0, _global.getGlobal)().flushPromises.push(promise);
-
-	            if ((0, _global.getGlobal)().activeCount === 0) {
-	                ZalgoPromise.flushQueue();
-	            }
-
-	            return promise;
-	        }
-	    }, {
-	        key: 'flushQueue',
-	        value: function flushQueue() {
-	            var promisesToFlush = (0, _global.getGlobal)().flushPromises;
-	            (0, _global.getGlobal)().flushPromises = [];
-
-	            for (var _iterator = promisesToFlush, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-	                var _ref;
-
-	                if (_isArray) {
-	                    if (_i >= _iterator.length) break;
-	                    _ref = _iterator[_i++];
-	                } else {
-	                    _i = _iterator.next();
-	                    if (_i.done) break;
-	                    _ref = _i.value;
-	                }
-
-	                var _promise = _ref;
-
-	                _promise.resolve();
-	            }
-	        }
-	    }]);
-
-	    return ZalgoPromise;
-	}();
-
-	exports.ZalgoPromise = ZalgoPromise;
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.isPromise = isPromise;
-	function isPromise(item) {
-	    try {
-	        if (!item) {
-	            return false;
-	        }
-
-	        if (typeof Promise !== 'undefined' && item instanceof Promise) {
-	            return true;
-	        }
-
-	        if (typeof window !== 'undefined' && window.Window && item instanceof window.Window) {
-	            return false;
-	        }
-
-	        if (typeof window !== 'undefined' && window.constructor && item instanceof window.constructor) {
-	            return false;
-	        }
-
-	        var _toString = {}.toString;
-
-	        if (_toString) {
-	            var name = _toString.call(item);
-
-	            if (name === '[object Window]' || name === '[object global]' || name === '[object DOMWindow]') {
-	                return false;
-	            }
-	        }
-
-	        if (typeof item.then === 'function') {
-	            return true;
-	        }
-	    } catch (err) {
-	        return false;
-	    }
-
-	    return false;
-	}
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.dispatchPossiblyUnhandledError = dispatchPossiblyUnhandledError;
-	exports.onPossiblyUnhandledException = onPossiblyUnhandledException;
-
-	var _global = __webpack_require__(8);
-
-	function dispatchPossiblyUnhandledError(err) {
-
-	    if ((0, _global.getGlobal)().dispatchedErrors.indexOf(err) !== -1) {
-	        return;
-	    }
-
-	    (0, _global.getGlobal)().dispatchedErrors.push(err);
-
-	    setTimeout(function () {
-	        throw err;
-	    }, 1);
-
-	    for (var j = 0; j < (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.length; j++) {
-	        (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers[j](err);
-	    }
-	}
-
-	function onPossiblyUnhandledException(handler) {
-	    (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.push(handler);
-
-	    return {
-	        cancel: function cancel() {
-	            (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.splice((0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.indexOf(handler), 1);
-	        }
-	    };
-	}
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.getGlobal = getGlobal;
-	function getGlobal() {
-
-	    var glob = void 0;
-
-	    if (typeof window !== 'undefined') {
-	        glob = window;
-	    } else if (typeof global !== 'undefined') {
-	        glob = global;
-	    } else {
-	        throw new TypeError('Can not find global');
-	    }
-
-	    var zalgoGlobal = glob.__zalgopromise__ = glob.__zalgopromise__ || {};
-	    zalgoGlobal.flushPromises = zalgoGlobal.flushPromises || [];
-	    zalgoGlobal.activeCount = zalgoGlobal.activeCount || 0;
-	    zalgoGlobal.possiblyUnhandledPromiseHandlers = zalgoGlobal.possiblyUnhandledPromiseHandlers || [];
-	    zalgoGlobal.dispatchedErrors = zalgoGlobal.dispatchedErrors || [];
-
-	    return zalgoGlobal;
-	}
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.addPayloadBuilder = addPayloadBuilder;
-	exports.addMetaBuilder = addMetaBuilder;
-	exports.addTrackingBuilder = addTrackingBuilder;
-	exports.addHeaderBuilder = addHeaderBuilder;
-	var payloadBuilders = exports.payloadBuilders = [];
-	var metaBuilders = exports.metaBuilders = [];
-	var trackingBuilders = exports.trackingBuilders = [];
-	var headerBuilders = exports.headerBuilders = [];
-
-	function addPayloadBuilder(builder) {
-	    payloadBuilders.push(builder);
-	}
-
-	function addMetaBuilder(builder) {
-	    metaBuilders.push(builder);
-	}
-
-	function addTrackingBuilder(builder) {
-	    trackingBuilders.push(builder);
-	}
-
-	function addHeaderBuilder(builder) {
-	    headerBuilders.push(builder);
-	}
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var config = exports.config = {
-
-	    uri: '',
-	    prefix: '',
-
-	    initial_state_name: 'init',
-
-	    flushInterval: 10 * 60 * 1000,
-	    debounceInterval: 10,
-
-	    sizeLimit: 300,
-
-	    // Supress `console.log`s when `true`
-	    // Recommended for production usage
-	    silent: false,
-
-	    heartbeat: true,
-	    heartbeatConsoleLog: true,
-	    heartbeatInterval: 5000,
-	    heartbeatTooBusy: false,
-	    heartbeatTooBusyThreshold: 10000,
-
-	    logLevel: 'warn',
-
-	    autoLog: ['warn', 'error'],
-
-	    logUnload: true,
-	    logPerformance: true
-	};
-
-	var logLevels = exports.logLevels = ['error', 'warn', 'info', 'debug'];
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.init = init;
-
-	var _config = __webpack_require__(10);
-
-	var _util = __webpack_require__(3);
-
-	var _performance = __webpack_require__(12);
-
-	var _logger = __webpack_require__(2);
-
-	var initiated = false;
-
-	function init(conf) {
-	    (0, _util.extend)(_config.config, conf || {});
-
-	    if (initiated) {
-	        return;
-	    }
-
-	    initiated = true;
-
-	    if (_config.config.logPerformance) {
-	        (0, _performance.initPerformance)();
-	    }
-
-	    if (_config.config.heartbeat) {
-	        (0, _performance.initHeartBeat)();
-	    }
-
-	    if (_config.config.logUnload) {
-	        window.addEventListener('beforeunload', function () {
-	            (0, _logger.info)('window_beforeunload');
-	            (0, _logger.immediateFlush)({ fireAndForget: true });
-	        });
-
-	        window.addEventListener('unload', function () {
-	            (0, _logger.info)('window_unload');
-	            (0, _logger.immediateFlush)({ fireAndForget: true });
-	        });
-	    }
-
-	    if (_config.config.flushInterval) {
-	        setInterval(_logger.flush, _config.config.flushInterval);
-	    }
-
-	    if (window.beaverLogQueue) {
-	        window.beaverLogQueue.forEach(function (payload) {
-	            (0, _logger.log)(payload.level, payload.event, payload);
-	        });
-	        delete window.beaverLogQueue;
-	    }
-	}
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.reqTimer = exports.clientTimer = undefined;
-	exports.now = now;
-	exports.reqStartElapsed = reqStartElapsed;
-	exports.initHeartBeat = initHeartBeat;
-	exports.initPerformance = initPerformance;
-
-	var _config = __webpack_require__(10);
-
-	var _logger = __webpack_require__(2);
-
-	var _builders = __webpack_require__(9);
-
-	var _util = __webpack_require__(3);
-
-	var enablePerformance = window && window.performance && performance.now && performance.timing && performance.timing.connectEnd && performance.timing.navigationStart && Math.abs(performance.now() - Date.now()) > 1000 && performance.now() - (performance.timing.connectEnd - performance.timing.navigationStart) > 0;
-
-	function now() {
-	    if (enablePerformance) {
-	        return performance.now();
-	    } else {
-	        return Date.now();
-	    }
-	}
-
-	function timer(startTime) {
-	    startTime = startTime !== undefined ? startTime : now();
-
-	    return {
-	        startTime: startTime,
-
-	        elapsed: function elapsed() {
-	            return parseInt(now() - startTime, 10);
-	        },
-	        reset: function reset() {
-	            startTime = now();
-	        }
-	    };
-	}
-
-	function reqStartElapsed() {
-	    if (enablePerformance) {
-	        var timing = window.performance.timing;
-	        return parseInt(timing.connectEnd - timing.navigationStart, 10);
-	    }
-	}
-
-	var clientTimer = exports.clientTimer = timer();
-	var reqTimer = exports.reqTimer = timer(reqStartElapsed());
-
-	function initHeartBeat() {
-
-	    var heartBeatTimer = timer();
-	    var heartbeatCount = 0;
-
-	    (0, _util.safeInterval)(function () {
-
-	        if (_config.config.heartbeatMaxThreshold && heartbeatCount > _config.config.heartbeatMaxThreshold) {
-	            return;
-	        }
-
-	        heartbeatCount += 1;
-
-	        var elapsed = heartBeatTimer.elapsed();
-	        var lag = elapsed - _config.config.heartbeatInterval;
-
-	        var heartbeatPayload = {
-	            count: heartbeatCount,
-	            elapsed: elapsed
-	        };
-
-	        if (_config.config.heartbeatTooBusy) {
-	            heartbeatPayload.lag = lag;
-
-	            if (lag >= _config.config.heartbeatTooBusyThreshold) {
-	                (0, _logger.info)('toobusy', heartbeatPayload, {
-	                    noConsole: !_config.config.heartbeatConsoleLog
-	                });
-	            }
-	        }
-
-	        (0, _logger.info)('heartbeat', heartbeatPayload, {
-	            noConsole: !_config.config.heartbeatConsoleLog
-	        });
-	    }, _config.config.heartbeatInterval);
-	}
-
-	function initPerformance() {
-
-	    if (!enablePerformance) {
-	        return (0, _logger.info)('no_performance_data');
-	    }
-
-	    (0, _builders.addPayloadBuilder)(function () {
-
-	        var payload = {};
-
-	        payload.client_elapsed = clientTimer.elapsed();
-
-	        if (enablePerformance) {
-	            payload.req_elapsed = reqTimer.elapsed();
-	        }
-
-	        return payload;
-	    });
-
-	    (0, _util.onWindowReady)().then(function () {
-
-	        var keys = ['connectEnd', 'connectStart', 'domComplete', 'domContentLoadedEventEnd', 'domContentLoadedEventStart', 'domInteractive', 'domLoading', 'domainLookupEnd', 'domainLookupStart', 'fetchStart', 'loadEventEnd', 'loadEventStart', 'navigationStart', 'redirectEnd', 'redirectStart', 'requestStart', 'responseEnd', 'responseStart', 'secureConnectionStart', 'unloadEventEnd', 'unloadEventStart'];
-
-	        var timing = {};
-
-	        keys.forEach(function (key) {
-	            timing[key] = parseInt(window.performance.timing[key], 10) || 0;
-	        });
-
-	        var offset = timing.connectEnd - timing.navigationStart;
-
-	        if (timing.connectEnd) {
-	            Object.keys(timing).forEach(function (name) {
-	                var time = timing[name];
-	                if (time) {
-	                    (0, _logger.info)('timing_' + name, {
-	                        client_elapsed: parseInt(time - timing.connectEnd - (clientTimer.startTime - offset), 10),
-	                        req_elapsed: parseInt(time - timing.connectEnd, 10)
-	                    });
-	                }
-	            });
-	        }
-
-	        (0, _logger.info)('timing', timing);
-	        (0, _logger.info)('memory', window.performance.memory);
-	        (0, _logger.info)('navigation', window.performance.navigation);
-
-	        if (window.performance.getEntries) {
-	            window.performance.getEntries().forEach(function (resource) {
-	                if (['link', 'script', 'img', 'css'].indexOf(resource.initiatorType) > -1) {
-	                    (0, _logger.info)(resource.initiatorType, resource);
-	                }
-	            });
-	        }
-	    });
-	}
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.startTransition = startTransition;
-	exports.endTransition = endTransition;
-	exports.transition = transition;
-
-	var _performance = __webpack_require__(12);
-
-	var _logger = __webpack_require__(2);
-
-	var _builders = __webpack_require__(9);
-
-	var _util = __webpack_require__(3);
-
-	var _config = __webpack_require__(10);
-
-	var windowID = (0, _util.uniqueID)();
-	var pageID = (0, _util.uniqueID)();
-
-	var currentState = _config.config.initial_state_name;
-	var startTime = void 0;
-
-	function startTransition() {
-	    startTime = (0, _performance.now)();
-	}
-
-	function endTransition(toState) {
-	    startTime = startTime || (0, _performance.reqStartElapsed)();
-
-	    var currentTime = (0, _performance.now)();
-	    var elapsedTime = void 0;
-
-	    if (startTime !== undefined) {
-	        elapsedTime = parseInt(currentTime - startTime, 0);
-	    }
-
-	    var transitionName = 'transition_' + currentState + '_to_' + toState;
-
-	    (0, _logger.info)(transitionName, {
-	        duration: elapsedTime
-	    });
-
-	    (0, _logger.track)({
-	        transition: transitionName,
-	        transition_time: elapsedTime
-	    });
-
-	    (0, _logger.immediateFlush)();
-
-	    startTime = currentTime;
-	    currentState = toState;
-	    pageID = (0, _util.uniqueID)();
-	}
-
-	function transition(toState) {
-	    startTransition();
-	    endTransition(toState);
-	}
-
-	(0, _builders.addPayloadBuilder)(function () {
-	    return {
-	        windowID: windowID,
-	        pageID: pageID
-	    };
-	});
-
-	(0, _builders.addMetaBuilder)(function () {
-	    return {
-	        state: 'ui_' + currentState
-	    };
-	});
-
-/***/ })
-/******/ ])
+!function(root, factory) {
+    "object" == typeof exports && "object" == typeof module ? module.exports = factory() : "function" == typeof define && define.amd ? define("beaver", [], factory) : "object" == typeof exports ? exports.beaver = factory() : root.beaver = factory();
+}("undefined" != typeof self ? self : this, function() {
+    return function(modules) {
+        var installedModules = {};
+        function __webpack_require__(moduleId) {
+            if (installedModules[moduleId]) return installedModules[moduleId].exports;
+            var module = installedModules[moduleId] = {
+                i: moduleId,
+                l: !1,
+                exports: {}
+            };
+            modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+            module.l = !0;
+            return module.exports;
+        }
+        __webpack_require__.m = modules;
+        __webpack_require__.c = installedModules;
+        __webpack_require__.d = function(exports, name, getter) {
+            __webpack_require__.o(exports, name) || Object.defineProperty(exports, name, {
+                configurable: !1,
+                enumerable: !0,
+                get: getter
+            });
+        };
+        __webpack_require__.n = function(module) {
+            var getter = module && module.__esModule ? function() {
+                return module.default;
+            } : function() {
+                return module;
+            };
+            __webpack_require__.d(getter, "a", getter);
+            return getter;
+        };
+        __webpack_require__.o = function(object, property) {
+            return Object.prototype.hasOwnProperty.call(object, property);
+        };
+        __webpack_require__.p = "";
+        return __webpack_require__(__webpack_require__.s = "./src/index.js");
+    }({
+        "./node_modules/belter/src/device.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_exports__.a = function() {
+                return !!(window.navigator.mockUserAgent || window.navigator.userAgent).match(/Android|webOS|iPhone|iPad|iPod|bada|Symbian|Palm|CriOS|BlackBerry|IEMobile|WindowsMobile|Opera Mini/i);
+            };
+        },
+        "./node_modules/belter/src/dom.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_exports__.a = function() {
+                return "undefined" != typeof window;
+            };
+            __webpack_require__("./node_modules/zalgo-promise/src/index.js"), __webpack_require__("./node_modules/belter/src/util.js"), 
+            __webpack_require__("./node_modules/belter/src/device.js");
+        },
+        "./node_modules/belter/src/experiment.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_require__("./node_modules/belter/src/util.js"), __webpack_require__("./node_modules/belter/src/storage.js");
+        },
+        "./node_modules/belter/src/global.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_require__("./node_modules/belter/src/util.js");
+        },
+        "./node_modules/belter/src/http.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_exports__.a = function(_ref) {
+                var url = _ref.url, _ref$method = _ref.method, method = void 0 === _ref$method ? "get" : _ref$method, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers, json = _ref.json, data = _ref.data, body = _ref.body, _ref$win = _ref.win, win = void 0 === _ref$win ? window : _ref$win, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 0 : _ref$timeout;
+                return new __WEBPACK_IMPORTED_MODULE_0_zalgo_promise_src__.a(function(resolve, reject) {
+                    if (json && data || json && body || data && json) throw new Error("Only options.json or options.data or options.body should be passed");
+                    for (var normalizedHeaders = {}, _i4 = 0, _Object$keys2 = Object.keys(headers), _length4 = null == _Object$keys2 ? 0 : _Object$keys2.length; _i4 < _length4; _i4++) {
+                        var _key2 = _Object$keys2[_i4];
+                        normalizedHeaders[_key2.toLowerCase()] = headers[_key2];
+                    }
+                    json ? normalizedHeaders[HEADERS.CONTENT_TYPE] = normalizedHeaders[HEADERS.CONTENT_TYPE] || "application/json" : (data || body) && (normalizedHeaders[HEADERS.CONTENT_TYPE] = normalizedHeaders[HEADERS.CONTENT_TYPE] || "application/x-www-form-urlencoded; charset=utf-8");
+                    normalizedHeaders[HEADERS.ACCEPT] = normalizedHeaders[HEADERS.ACCEPT] || "application/json";
+                    for (var _i6 = 0, _length6 = null == headerBuilders ? 0 : headerBuilders.length; _i6 < _length6; _i6++) for (var builtHeaders = (0, 
+                    headerBuilders[_i6])(), _i8 = 0, _Object$keys4 = Object.keys(builtHeaders), _length8 = null == _Object$keys4 ? 0 : _Object$keys4.length; _i8 < _length8; _i8++) {
+                        var _key3 = _Object$keys4[_i8];
+                        normalizedHeaders[_key3.toLowerCase()] = builtHeaders[_key3];
+                    }
+                    var xhr = new win.XMLHttpRequest();
+                    xhr.addEventListener("load", function() {
+                        var responseHeaders = function() {
+                            for (var result = {}, _i2 = 0, _rawHeaders$trim$spli2 = (arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : "").trim().split("\n"), _length2 = null == _rawHeaders$trim$spli2 ? 0 : _rawHeaders$trim$spli2.length; _i2 < _length2; _i2++) {
+                                var _line$split = _rawHeaders$trim$spli2[_i2].split(":"), _key = _line$split[0], values = _line$split.slice(1);
+                                result[_key.toLowerCase()] = values.join(":").trim();
+                            }
+                            return result;
+                        }(this.getAllResponseHeaders());
+                        if (!this.status) return reject(new Error("Request to " + method.toLowerCase() + " " + url + " failed: no response status code."));
+                        var contentType = responseHeaders["content-type"], isJSON = contentType && (0 === contentType.indexOf("application/json") || 0 === contentType.indexOf("text/json")), res = this.responseText;
+                        try {
+                            res = JSON.parse(this.responseText);
+                        } catch (err) {
+                            if (isJSON) return reject(new Error("Invalid json: " + this.responseText + "."));
+                        }
+                        if (this.status >= 400) {
+                            var message = "Request to " + method.toLowerCase() + " " + url + " failed with " + this.status + " error.";
+                            if (res) {
+                                "object" === (void 0 === res ? "undefined" : _typeof(res)) && null !== res && (res = JSON.stringify(res, null, 4));
+                                message = message + "\n\n" + res + "\n";
+                            }
+                            return reject(new Error(message));
+                        }
+                        return resolve(res);
+                    }, !1);
+                    xhr.addEventListener("error", function(evt) {
+                        reject(new Error("Request to " + method.toLowerCase() + " " + url + " failed: " + evt.toString() + "."));
+                    }, !1);
+                    xhr.open(method, url, !0);
+                    for (var _key4 in normalizedHeaders) normalizedHeaders.hasOwnProperty(_key4) && xhr.setRequestHeader(_key4, normalizedHeaders[_key4]);
+                    json ? body = JSON.stringify(json) : data && (body = Object.keys(data).map(function(key) {
+                        return encodeURIComponent(key) + "=" + (data ? encodeURIComponent(data[key]) : "");
+                    }).join("&"));
+                    xhr.timeout = timeout;
+                    xhr.ontimeout = function() {
+                        reject(new Error("Request to " + method.toLowerCase() + " " + url + " has timed out"));
+                    };
+                    xhr.send(body);
+                });
+            };
+            var __WEBPACK_IMPORTED_MODULE_0_zalgo_promise_src__ = __webpack_require__("./node_modules/zalgo-promise/src/index.js"), _typeof = (__webpack_require__("./node_modules/cross-domain-utils/src/index.js"), 
+            "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(obj) {
+                return typeof obj;
+            } : function(obj) {
+                return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+            }), HEADERS = {
+                CONTENT_TYPE: "content-type",
+                ACCEPT: "accept"
+            }, headerBuilders = [];
+        },
+        "./node_modules/belter/src/index.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_require__("./node_modules/belter/src/device.js");
+            var __WEBPACK_IMPORTED_MODULE_1__dom__ = __webpack_require__("./node_modules/belter/src/dom.js");
+            __webpack_require__.d(__webpack_exports__, "isBrowser", function() {
+                return __WEBPACK_IMPORTED_MODULE_1__dom__.a;
+            });
+            __webpack_require__("./node_modules/belter/src/experiment.js"), __webpack_require__("./node_modules/belter/src/global.js"), 
+            __webpack_require__("./node_modules/belter/src/jsx.jsx"), __webpack_require__("./node_modules/belter/src/storage.js");
+            var __WEBPACK_IMPORTED_MODULE_6__util__ = __webpack_require__("./node_modules/belter/src/util.js");
+            __webpack_require__.d(__webpack_exports__, "extend", function() {
+                return __WEBPACK_IMPORTED_MODULE_6__util__.a;
+            });
+            __webpack_require__.d(__webpack_exports__, "noop", function() {
+                return __WEBPACK_IMPORTED_MODULE_6__util__.e;
+            });
+            __webpack_require__.d(__webpack_exports__, "promiseDebounce", function() {
+                return __WEBPACK_IMPORTED_MODULE_6__util__.f;
+            });
+            __webpack_require__.d(__webpack_exports__, "safeInterval", function() {
+                return __WEBPACK_IMPORTED_MODULE_6__util__.i;
+            });
+            var __WEBPACK_IMPORTED_MODULE_7__http__ = __webpack_require__("./node_modules/belter/src/http.js");
+            __webpack_require__.d(__webpack_exports__, "request", function() {
+                return __WEBPACK_IMPORTED_MODULE_7__http__.a;
+            });
+            var __WEBPACK_IMPORTED_MODULE_8__types__ = __webpack_require__("./node_modules/belter/src/types.js");
+            __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8__types__);
+        },
+        "./node_modules/belter/src/jsx.jsx": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_require__("./node_modules/belter/src/util.js"), Object.assign;
+            function _classCallCheck(instance, Constructor) {
+                if (!(instance instanceof Constructor)) throw new TypeError("Cannot call a class as a function");
+            }
+            function htmlEncode() {
+                return (arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/\//g, "&#x2F;");
+            }
+            !function(_JsxHTMLNode) {
+                !function(subClass, superClass) {
+                    if ("function" != typeof superClass && null !== superClass) throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+                    subClass.prototype = Object.create(superClass && superClass.prototype, {
+                        constructor: {
+                            value: subClass,
+                            enumerable: !1,
+                            writable: !0,
+                            configurable: !0
+                        }
+                    });
+                    superClass && (Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass);
+                }(JsxHTMLNodeContainer, _JsxHTMLNode);
+                function JsxHTMLNodeContainer(children) {
+                    _classCallCheck(this, JsxHTMLNodeContainer);
+                    return function(self, call) {
+                        if (!self) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+                        return !call || "object" != typeof call && "function" != typeof call ? self : call;
+                    }(this, _JsxHTMLNode.call(this, "", {}, children));
+                }
+                JsxHTMLNodeContainer.prototype.toString = function() {
+                    return this.childrenToString();
+                };
+            }(function() {
+                function JsxHTMLNode(name, props, children) {
+                    _classCallCheck(this, JsxHTMLNode);
+                    this.name = name;
+                    this.props = props;
+                    this.children = children;
+                }
+                JsxHTMLNode.prototype.toString = function() {
+                    return "<" + this.name + (this.props ? " " : "") + (this.props ? this.propsToString() : "") + ">" + this.childrenToString() + "</" + this.name + ">";
+                };
+                JsxHTMLNode.prototype.propsToString = function() {
+                    var props = this.props;
+                    return props ? Object.keys(props).filter(function(key) {
+                        return "innerHTML" !== key && props && !1 !== props[key];
+                    }).map(function(key) {
+                        if (props) {
+                            var val = props[key];
+                            if (!0 === val) return "" + htmlEncode(key);
+                            if ("string" == typeof val) return htmlEncode(key) + '="' + htmlEncode(val) + '"';
+                        }
+                        return "";
+                    }).filter(Boolean).join(" ") : "";
+                };
+                JsxHTMLNode.prototype.childrenToString = function() {
+                    if (this.props && this.props.innerHTML) return this.props.innerHTML;
+                    if (!this.children) return "";
+                    var result = "";
+                    !function iterate(children) {
+                        for (var _i2 = 0, _length2 = null == children ? 0 : children.length; _i2 < _length2; _i2++) {
+                            var child = children[_i2];
+                            null !== child && void 0 !== child && (Array.isArray(child) ? iterate(child) : result += child instanceof JsxHTMLNode ? child.toString() : htmlEncode(child));
+                        }
+                    }(this.children);
+                    return result;
+                };
+                return JsxHTMLNode;
+            }());
+        },
+        "./node_modules/belter/src/storage.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_exports__.a = function(_ref) {
+                var name = _ref.name, _ref$version = _ref.version, version = void 0 === _ref$version ? "latest" : _ref$version, _ref$lifetime = _ref.lifetime, lifetime = void 0 === _ref$lifetime ? 3e5 : _ref$lifetime, STORAGE_KEY = "__" + name + "_" + version + "_storage__", accessedStorage = void 0;
+                function getState(handler) {
+                    var localStorageEnabled = Object(__WEBPACK_IMPORTED_MODULE_0__util__.d)(), storage = void 0;
+                    accessedStorage && (storage = accessedStorage);
+                    if (!storage && localStorageEnabled) {
+                        var rawStorage = window.localStorage.getItem(STORAGE_KEY);
+                        rawStorage && (storage = JSON.parse(rawStorage));
+                    }
+                    storage || (storage = Object(__WEBPACK_IMPORTED_MODULE_0__util__.b)()[STORAGE_KEY]);
+                    storage || (storage = {
+                        id: Object(__WEBPACK_IMPORTED_MODULE_0__util__.k)()
+                    });
+                    storage.id || (storage.id = Object(__WEBPACK_IMPORTED_MODULE_0__util__.k)());
+                    accessedStorage = storage;
+                    var result = handler(storage);
+                    localStorageEnabled ? window.localStorage.setItem(STORAGE_KEY, JSON.stringify(storage)) : Object(__WEBPACK_IMPORTED_MODULE_0__util__.b)()[STORAGE_KEY] = storage;
+                    accessedStorage = null;
+                    return result;
+                }
+                function getSession(handler) {
+                    return getState(function(storage) {
+                        var session = storage.__session__, now = Date.now();
+                        session && now - session.created > lifetime && (session = null);
+                        session || (session = {
+                            guid: Object(__WEBPACK_IMPORTED_MODULE_0__util__.k)(),
+                            created: now
+                        });
+                        storage.__session__ = session;
+                        return handler(session);
+                    });
+                }
+                return {
+                    getState: getState,
+                    getID: function() {
+                        return getState(function(storage) {
+                            return storage.id;
+                        });
+                    },
+                    getSessionState: function(handler) {
+                        return getSession(function(session) {
+                            session.state = session.state || {};
+                            return handler(session.state);
+                        });
+                    },
+                    getSessionID: function() {
+                        return getSession(function(session) {
+                            return session.guid;
+                        });
+                    }
+                };
+            };
+            var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__("./node_modules/belter/src/util.js");
+        },
+        "./node_modules/belter/src/types.js": function(module, exports) {},
+        "./node_modules/belter/src/util.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_exports__.b = getGlobal;
+            __webpack_exports__.c = inlineMemoize;
+            __webpack_exports__.e = function() {};
+            __webpack_exports__.k = function() {
+                var chars = "0123456789abcdef";
+                return "xxxxxxxxxx".replace(/./g, function() {
+                    return chars.charAt(Math.floor(Math.random() * chars.length));
+                }) + "_" + base64encode(new Date().toISOString().slice(11, 19).replace("T", ".")).replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            };
+            __webpack_exports__.d = function isLocalStorageEnabled() {
+                return inlineMemoize(isLocalStorageEnabled, function() {
+                    try {
+                        if ("undefined" == typeof window) return !1;
+                        if (window.localStorage) {
+                            var _value = Math.random().toString();
+                            window.localStorage.setItem("__test__localStorage__", _value);
+                            var result = window.localStorage.getItem("__test__localStorage__");
+                            window.localStorage.removeItem("__test__localStorage__");
+                            if (_value === result) return !0;
+                        }
+                    } catch (err) {}
+                    return !1;
+                });
+            };
+            __webpack_exports__.a = function(obj, source) {
+                if (!source) return obj;
+                if (Object.assign) return Object.assign(obj, source);
+                for (var _key2 in source) source.hasOwnProperty(_key2) && (obj[_key2] = source[_key2]);
+                return obj;
+            };
+            __webpack_exports__.g = function(str, regex, handler) {
+                var results = [];
+                str.replace(regex, function() {
+                    results.push(handler.apply(null, arguments));
+                });
+                return results;
+            };
+            __webpack_exports__.j = function(svg) {
+                return "data:image/svg+xml;base64," + base64encode(svg);
+            };
+            __webpack_exports__.h = function(text, regex) {
+                var result = [];
+                text.replace(regex, function(token) {
+                    result.push(token);
+                    return "";
+                });
+                return result;
+            };
+            __webpack_exports__.f = function(method) {
+                var delay = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : 50, promise = void 0, timeout = void 0;
+                return function() {
+                    timeout && clearTimeout(timeout);
+                    var localPromise = promise = promise || new __WEBPACK_IMPORTED_MODULE_0_zalgo_promise_src__.a();
+                    timeout = setTimeout(function() {
+                        promise = null;
+                        timeout = null;
+                        __WEBPACK_IMPORTED_MODULE_0_zalgo_promise_src__.a.try(method).then(function(result) {
+                            return localPromise.resolve(result);
+                        }, function(err) {
+                            return localPromise.reject(err);
+                        });
+                    }, delay);
+                    return localPromise;
+                };
+            };
+            __webpack_exports__.i = function(method, time) {
+                var timeout = void 0;
+                !function loop() {
+                    timeout = setTimeout(function() {
+                        method();
+                        loop();
+                    }, time);
+                }();
+                return {
+                    cancel: function() {
+                        clearTimeout(timeout);
+                    }
+                };
+            };
+            var __WEBPACK_IMPORTED_MODULE_0_zalgo_promise_src__ = __webpack_require__("./node_modules/zalgo-promise/src/index.js");
+            function getGlobal() {
+                if ("undefined" != typeof window) return window;
+                if ("undefined" != typeof global) return global;
+                throw new Error("No global found");
+            }
+            function inlineMemoize(method, logic) {
+                var args = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : [];
+                method.__memoized__ || (method.__memoized__ = function(method) {
+                    var options = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};
+                    if (method.__memoized__) return method.__memoized__;
+                    var cache = {};
+                    method.__memoized__ = function() {
+                        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) args[_key] = arguments[_key];
+                        if (method.__memoized__ && method.__memoized__.__calling__) throw new Error("Can not call memoized method recursively");
+                        var key = void 0;
+                        try {
+                            key = JSON.stringify(Array.prototype.slice.call(arguments));
+                        } catch (err) {
+                            throw new Error("Arguments not serializable -- can not be used to memoize");
+                        }
+                        var cacheTime = options.time;
+                        cache[key] && cacheTime && Date.now() - cache[key].time < cacheTime && delete cache[key];
+                        var glob = getGlobal();
+                        glob.__CACHE_START_TIME__ && cache[key] && cache[key].time < glob.__CACHE_START_TIME__ && delete cache[key];
+                        if (cache[key]) return cache[key].value;
+                        method.__memoized__.__calling__ = !0;
+                        var time = Date.now(), value = method.apply(this, arguments);
+                        method.__memoized__.__calling__ = !1;
+                        cache[key] = {
+                            time: time,
+                            value: value
+                        };
+                        return cache[key].value;
+                    };
+                    return method.__memoized__;
+                }(logic));
+                return method.__memoized__.apply(method, args);
+            }
+            function base64encode(str) {
+                return window.btoa(str);
+            }
+        },
+        "./node_modules/cross-domain-utils/src/index.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            __webpack_require__("./node_modules/cross-domain-utils/src/utils.js");
+            var __WEBPACK_IMPORTED_MODULE_1__types__ = __webpack_require__("./node_modules/cross-domain-utils/src/types.js");
+            __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__types__);
+        },
+        "./node_modules/cross-domain-utils/src/types.js": function(module, exports) {},
+        "./node_modules/cross-domain-utils/src/utils.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+        },
+        "./node_modules/zalgo-promise/src/index.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            function utils_isPromise(item) {
+                try {
+                    if (!item) return !1;
+                    if ("undefined" != typeof Promise && item instanceof Promise) return !0;
+                    if ("undefined" != typeof window && window.Window && item instanceof window.Window) return !1;
+                    if ("undefined" != typeof window && window.constructor && item instanceof window.constructor) return !1;
+                    var _toString = {}.toString;
+                    if (_toString) {
+                        var name = _toString.call(item);
+                        if ("[object Window]" === name || "[object global]" === name || "[object DOMWindow]" === name) return !1;
+                    }
+                    if ("function" == typeof item.then) return !0;
+                } catch (err) {
+                    return !1;
+                }
+                return !1;
+            }
+            function getGlobal() {
+                var glob = void 0;
+                if ("undefined" != typeof window) glob = window; else {
+                    if ("undefined" == typeof global) throw new TypeError("Can not find global");
+                    glob = global;
+                }
+                var zalgoGlobal = glob.__zalgopromise__ = glob.__zalgopromise__ || {};
+                zalgoGlobal.flushPromises = zalgoGlobal.flushPromises || [];
+                zalgoGlobal.activeCount = zalgoGlobal.activeCount || 0;
+                zalgoGlobal.possiblyUnhandledPromiseHandlers = zalgoGlobal.possiblyUnhandledPromiseHandlers || [];
+                zalgoGlobal.dispatchedErrors = zalgoGlobal.dispatchedErrors || [];
+                return zalgoGlobal;
+            }
+            var promise_ZalgoPromise = function() {
+                function ZalgoPromise(handler) {
+                    var _this = this;
+                    !function(instance, Constructor) {
+                        if (!(instance instanceof ZalgoPromise)) throw new TypeError("Cannot call a class as a function");
+                    }(this);
+                    this.resolved = !1;
+                    this.rejected = !1;
+                    this.errorHandled = !1;
+                    this.handlers = [];
+                    if (handler) {
+                        var _result = void 0, _error = void 0, resolved = !1, rejected = !1, isAsync = !1;
+                        try {
+                            handler(function(res) {
+                                if (isAsync) _this.resolve(res); else {
+                                    resolved = !0;
+                                    _result = res;
+                                }
+                            }, function(err) {
+                                if (isAsync) _this.reject(err); else {
+                                    rejected = !0;
+                                    _error = err;
+                                }
+                            });
+                        } catch (err) {
+                            this.reject(err);
+                            return;
+                        }
+                        isAsync = !0;
+                        resolved ? this.resolve(_result) : rejected && this.reject(_error);
+                    }
+                }
+                ZalgoPromise.prototype.resolve = function(result) {
+                    if (this.resolved || this.rejected) return this;
+                    if (utils_isPromise(result)) throw new Error("Can not resolve promise with another promise");
+                    this.resolved = !0;
+                    this.value = result;
+                    this.dispatch();
+                    return this;
+                };
+                ZalgoPromise.prototype.reject = function(error) {
+                    var _this2 = this;
+                    if (this.resolved || this.rejected) return this;
+                    if (utils_isPromise(error)) throw new Error("Can not reject promise with another promise");
+                    if (!error) {
+                        var _err = error && "function" == typeof error.toString ? error.toString() : Object.prototype.toString.call(error);
+                        error = new Error("Expected reject to be called with Error, got " + _err);
+                    }
+                    this.rejected = !0;
+                    this.error = error;
+                    this.errorHandled || setTimeout(function() {
+                        _this2.errorHandled || function(err) {
+                            if (-1 === getGlobal().dispatchedErrors.indexOf(err)) {
+                                getGlobal().dispatchedErrors.push(err);
+                                setTimeout(function() {
+                                    throw err;
+                                }, 1);
+                                for (var j = 0; j < getGlobal().possiblyUnhandledPromiseHandlers.length; j++) getGlobal().possiblyUnhandledPromiseHandlers[j](err);
+                            }
+                        }(error);
+                    }, 1);
+                    this.dispatch();
+                    return this;
+                };
+                ZalgoPromise.prototype.asyncReject = function(error) {
+                    this.errorHandled = !0;
+                    this.reject(error);
+                };
+                ZalgoPromise.prototype.dispatch = function() {
+                    var _this3 = this, dispatching = this.dispatching, resolved = this.resolved, rejected = this.rejected, handlers = this.handlers;
+                    if (!dispatching && (resolved || rejected)) {
+                        this.dispatching = !0;
+                        getGlobal().activeCount += 1;
+                        for (var _loop = function(i) {
+                            var _handlers$i = handlers[i], onSuccess = _handlers$i.onSuccess, onError = _handlers$i.onError, promise = _handlers$i.promise, result = void 0;
+                            if (resolved) try {
+                                result = onSuccess ? onSuccess(_this3.value) : _this3.value;
+                            } catch (err) {
+                                promise.reject(err);
+                                return "continue";
+                            } else if (rejected) {
+                                if (!onError) {
+                                    promise.reject(_this3.error);
+                                    return "continue";
+                                }
+                                try {
+                                    result = onError(_this3.error);
+                                } catch (err) {
+                                    promise.reject(err);
+                                    return "continue";
+                                }
+                            }
+                            if (result instanceof ZalgoPromise && (result.resolved || result.rejected)) {
+                                result.resolved ? promise.resolve(result.value) : promise.reject(result.error);
+                                result.errorHandled = !0;
+                            } else utils_isPromise(result) ? result instanceof ZalgoPromise && (result.resolved || result.rejected) ? result.resolved ? promise.resolve(result.value) : promise.reject(result.error) : result.then(function(res) {
+                                promise.resolve(res);
+                            }, function(err) {
+                                promise.reject(err);
+                            }) : promise.resolve(result);
+                        }, i = 0; i < handlers.length; i++) _loop(i);
+                        handlers.length = 0;
+                        this.dispatching = !1;
+                        getGlobal().activeCount -= 1;
+                        0 === getGlobal().activeCount && ZalgoPromise.flushQueue();
+                    }
+                };
+                ZalgoPromise.prototype.then = function(onSuccess, onError) {
+                    if (onSuccess && "function" != typeof onSuccess && !onSuccess.call) throw new Error("Promise.then expected a function for success handler");
+                    if (onError && "function" != typeof onError && !onError.call) throw new Error("Promise.then expected a function for error handler");
+                    var promise = new ZalgoPromise();
+                    this.handlers.push({
+                        promise: promise,
+                        onSuccess: onSuccess,
+                        onError: onError
+                    });
+                    this.errorHandled = !0;
+                    this.dispatch();
+                    return promise;
+                };
+                ZalgoPromise.prototype.catch = function(onError) {
+                    return this.then(void 0, onError);
+                };
+                ZalgoPromise.prototype.finally = function(handler) {
+                    return this.then(function(result) {
+                        return ZalgoPromise.try(handler).then(function() {
+                            return result;
+                        });
+                    }, function(err) {
+                        return ZalgoPromise.try(handler).then(function() {
+                            throw err;
+                        });
+                    });
+                };
+                ZalgoPromise.prototype.timeout = function(time, err) {
+                    var _this4 = this;
+                    if (this.resolved || this.rejected) return this;
+                    var timeout = setTimeout(function() {
+                        _this4.resolved || _this4.rejected || _this4.reject(err || new Error("Promise timed out after " + time + "ms"));
+                    }, time);
+                    return this.then(function(result) {
+                        clearTimeout(timeout);
+                        return result;
+                    });
+                };
+                ZalgoPromise.prototype.toPromise = function() {
+                    if ("undefined" == typeof Promise) throw new TypeError("Could not find Promise");
+                    return Promise.resolve(this);
+                };
+                ZalgoPromise.resolve = function(value) {
+                    return value instanceof ZalgoPromise ? value : utils_isPromise(value) ? new ZalgoPromise(function(resolve, reject) {
+                        return value.then(resolve, reject);
+                    }) : new ZalgoPromise().resolve(value);
+                };
+                ZalgoPromise.reject = function(error) {
+                    return new ZalgoPromise().reject(error);
+                };
+                ZalgoPromise.all = function(promises) {
+                    var promise = new ZalgoPromise(), count = promises.length, results = [];
+                    if (!count) {
+                        promise.resolve(results);
+                        return promise;
+                    }
+                    for (var _loop2 = function(i) {
+                        var prom = promises[i];
+                        if (prom instanceof ZalgoPromise) {
+                            if (prom.resolved) {
+                                results[i] = prom.value;
+                                count -= 1;
+                                return "continue";
+                            }
+                        } else if (!utils_isPromise(prom)) {
+                            results[i] = prom;
+                            count -= 1;
+                            return "continue";
+                        }
+                        ZalgoPromise.resolve(prom).then(function(result) {
+                            results[i] = result;
+                            0 == (count -= 1) && promise.resolve(results);
+                        }, function(err) {
+                            promise.reject(err);
+                        });
+                    }, i = 0; i < promises.length; i++) _loop2(i);
+                    0 === count && promise.resolve(results);
+                    return promise;
+                };
+                ZalgoPromise.hash = function(promises) {
+                    var result = {};
+                    return ZalgoPromise.all(Object.keys(promises).map(function(key) {
+                        return ZalgoPromise.resolve(promises[key]).then(function(value) {
+                            result[key] = value;
+                        });
+                    })).then(function() {
+                        return result;
+                    });
+                };
+                ZalgoPromise.map = function(items, method) {
+                    return ZalgoPromise.all(items.map(method));
+                };
+                ZalgoPromise.onPossiblyUnhandledException = function(handler) {
+                    return function(handler) {
+                        getGlobal().possiblyUnhandledPromiseHandlers.push(handler);
+                        return {
+                            cancel: function() {
+                                getGlobal().possiblyUnhandledPromiseHandlers.splice(getGlobal().possiblyUnhandledPromiseHandlers.indexOf(handler), 1);
+                            }
+                        };
+                    }(handler);
+                };
+                ZalgoPromise.try = function(method, context, args) {
+                    var result = void 0;
+                    try {
+                        result = method.apply(context, args || []);
+                    } catch (err) {
+                        return ZalgoPromise.reject(err);
+                    }
+                    return ZalgoPromise.resolve(result);
+                };
+                ZalgoPromise.delay = function(_delay) {
+                    return new ZalgoPromise(function(resolve) {
+                        setTimeout(resolve, _delay);
+                    });
+                };
+                ZalgoPromise.isPromise = function(value) {
+                    return !!(value && value instanceof ZalgoPromise) || utils_isPromise(value);
+                };
+                ZalgoPromise.flush = function() {
+                    var promise = new ZalgoPromise();
+                    getGlobal().flushPromises.push(promise);
+                    0 === getGlobal().activeCount && ZalgoPromise.flushQueue();
+                    return promise;
+                };
+                ZalgoPromise.flushQueue = function() {
+                    var promisesToFlush = getGlobal().flushPromises;
+                    getGlobal().flushPromises = [];
+                    for (var _i2 = 0, _length2 = null == promisesToFlush ? 0 : promisesToFlush.length; _i2 < _length2; _i2++) promisesToFlush[_i2].resolve();
+                };
+                return ZalgoPromise;
+            }();
+            __webpack_require__.d(__webpack_exports__, "a", function() {
+                return promise_ZalgoPromise;
+            });
+        },
+        "./src/index.js": function(module, __webpack_exports__, __webpack_require__) {
+            "use strict";
+            Object.defineProperty(__webpack_exports__, "__esModule", {
+                value: !0
+            });
+            var src = __webpack_require__("./node_modules/zalgo-promise/src/index.js"), belter_src = __webpack_require__("./node_modules/belter/src/index.js"), LOG_LEVEL = {
+                DEBUG: "debug",
+                INFO: "info",
+                WARN: "warn",
+                ERROR: "error"
+            }, AUTO_FLUSH_LEVEL = [ LOG_LEVEL.WARN, LOG_LEVEL.ERROR ], LOG_LEVEL_PRIORITY = [ LOG_LEVEL.ERROR, LOG_LEVEL.WARN, LOG_LEVEL.INFO, LOG_LEVEL.DEBUG ], FLUSH_INTERVAL = 6e4, DEFAULT_LOG_LEVEL = LOG_LEVEL.WARN, _extends = Object.assign || function(target) {
+                for (var i = 1; i < arguments.length; i++) {
+                    var source = arguments[i];
+                    for (var key in source) Object.prototype.hasOwnProperty.call(source, key) && (target[key] = source[key]);
+                }
+                return target;
+            };
+            function httpTransport(_ref) {
+                var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json;
+                return Object(belter_src.request)({
+                    url: url,
+                    method: method,
+                    headers: headers,
+                    json: json
+                }).then(belter_src.noop);
+            }
+            function Logger(_ref2) {
+                var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? FLUSH_INTERVAL : _ref2$flushInterval, events = [], tracking = [], payloadBuilders = [], metaBuilders = [], trackingBuilders = [], headerBuilders = [];
+                function print(level, event, payload) {
+                    if (Object(belter_src.isBrowser)() && window.console && window.console.log) {
+                        var consoleLogLevel = logLevel;
+                        window.LOG_LEVEL && -1 !== LOG_LEVEL_PRIORITY.indexOf(window.LOG_LEVEL) && (consoleLogLevel = window.LOG_LEVEL);
+                        if (!(LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(consoleLogLevel))) {
+                            var args = [ event ];
+                            args.push(payload);
+                            (payload.error || payload.warning) && args.push("\n\n", payload.error || payload.warning);
+                            try {
+                                window.console[level] && window.console[level].apply ? window.console[level].apply(window.console, args) : window.console.log && window.console.log.apply && window.console.log.apply(window.console, args);
+                            } catch (err) {}
+                        }
+                    }
+                }
+                function immediateFlush() {
+                    return src.a.try(function() {
+                        if (Object(belter_src.isBrowser)() && (events.length || tracking.length)) {
+                            for (var meta = {}, _i2 = 0, _length2 = null == metaBuilders ? 0 : metaBuilders.length; _i2 < _length2; _i2++) {
+                                var builder = metaBuilders[_i2];
+                                Object(belter_src.extend)(meta, builder(meta));
+                            }
+                            for (var headers = {}, _i4 = 0, _length4 = null == headerBuilders ? 0 : headerBuilders.length; _i4 < _length4; _i4++) {
+                                var _builder = headerBuilders[_i4];
+                                Object(belter_src.extend)(headers, _builder(headers));
+                            }
+                            var req = transport({
+                                method: "POST",
+                                url: url,
+                                headers: headers,
+                                json: {
+                                    events: events,
+                                    meta: meta,
+                                    tracking: tracking
+                                }
+                            });
+                            events = [];
+                            tracking = [];
+                            return req.then(belter_src.noop);
+                        }
+                    });
+                }
+                var flush = Object(belter_src.promiseDebounce)(immediateFlush);
+                function log(level, event) {
+                    var payload = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {};
+                    if (Object(belter_src.isBrowser)()) {
+                        prefix && (event = prefix + "_" + event);
+                        payload = _extends({}, payload, {
+                            timestamp: Date.now().toString()
+                        });
+                        for (var _i6 = 0, _length6 = null == payloadBuilders ? 0 : payloadBuilders.length; _i6 < _length6; _i6++) {
+                            var builder = payloadBuilders[_i6];
+                            Object(belter_src.extend)(payload, builder(payload));
+                        }
+                        !function(level, event, payload) {
+                            events.push({
+                                level: level,
+                                event: event,
+                                payload: payload
+                            });
+                            -1 !== AUTO_FLUSH_LEVEL.indexOf(level) && flush();
+                        }(level, event, payload);
+                        print(level, event, payload);
+                    }
+                }
+                Object(belter_src.safeInterval)(flush, flushInterval);
+                return {
+                    debug: function(event, payload) {
+                        log(LOG_LEVEL.DEBUG, event, payload);
+                    },
+                    info: function(event, payload) {
+                        log(LOG_LEVEL.INFO, event, payload);
+                    },
+                    warn: function(event, payload) {
+                        log(LOG_LEVEL.WARN, event, payload);
+                    },
+                    error: function(event, payload) {
+                        log(LOG_LEVEL.ERROR, event, payload);
+                    },
+                    track: function() {
+                        var payload = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {};
+                        if (Object(belter_src.isBrowser)()) {
+                            for (var _i8 = 0, _length8 = null == trackingBuilders ? 0 : trackingBuilders.length; _i8 < _length8; _i8++) {
+                                var builder = trackingBuilders[_i8];
+                                Object(belter_src.extend)(payload, builder(payload));
+                            }
+                            print(LOG_LEVEL.DEBUG, "track", payload);
+                            tracking.push(payload);
+                        }
+                    },
+                    flush: flush,
+                    immediateFlush: immediateFlush,
+                    addPayloadBuilder: function(builder) {
+                        payloadBuilders.push(builder);
+                    },
+                    addMetaBuilder: function(builder) {
+                        metaBuilders.push(builder);
+                    },
+                    addTrackingBuilder: function(builder) {
+                        trackingBuilders.push(builder);
+                    },
+                    addHeaderBuilder: function(builder) {
+                        headerBuilders.push(builder);
+                    },
+                    setTransport: function(newTransport) {
+                        transport = newTransport;
+                    }
+                };
+            }
+            __webpack_require__.d(__webpack_exports__, "Logger", function() {
+                return Logger;
+            });
+            __webpack_require__.d(__webpack_exports__, "LOG_LEVEL", function() {
+                return LOG_LEVEL;
+            });
+        }
+    });
 });
-;
+//# sourceMappingURL=beaver-logger.js.map
+//# sourceMappingURL=beaver-logger.js.map
