@@ -1,4 +1,0 @@
-
-import * as INTERFACE from './interface';
-export * from './interface';
-export default INTERFACE;

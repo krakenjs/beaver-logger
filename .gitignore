@@ -7,3 +7,4 @@ plato-reports
 *.log
 checkstyle.xml
 xunit.xml
+flow-typed
