@@ -39,7 +39,7 @@
   ],
   "files": [
     "server/",
-    "client/",
+    "src/",
     "dist/"
   ],
   "readmeFilename": "README.md",
