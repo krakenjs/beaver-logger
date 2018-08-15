@@ -6,7 +6,7 @@
   "scripts": {
     "setup": "npm install && npm run flow-typed",
     "lint": "eslint client/ server/ test/ *.js",
-    "flow-typed": "flow-typed install",
+    "flow-typed": "flow-typed install && flow-typed install express@4",
     "flow": "flow",
     "karma": "cross-env NODE_ENV=test babel-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/karma start",
     "babel": "babel src/ --out-dir dist/module",
@@ -52,8 +52,5 @@
   "dependencies": {
     "belter": "^1.0.17",
     "zalgo-promise": "^1.0.26"
-  },
-  "peerDependencies": {
-    "express": "^4"
   }
 }
