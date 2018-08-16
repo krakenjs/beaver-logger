@@ -10,6 +10,7 @@
     "flow": "flow",
     "karma": "cross-env NODE_ENV=test babel-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/karma start",
     "babel": "babel src/ --out-dir dist/module",
+    "babel-server": "babel server/**/*.js --exclude=node_modules --out-dir .",
     "webpack": "babel-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/webpack --progress",
     "test": "npm run lint && npm run flow-typed && npm run flow && npm run karma",
     "build": "npm run test && npm run babel && npm run webpack",
@@ -18,7 +19,9 @@
     "release:minor": "./publish.sh minor",
     "release:major": "./publish.sh major",
     "clean": "rimraf dist coverage",
-    "reinstall": "rimraf flow-typed && rimraf node_modules && npm install && flow-typed install"
+    "reinstall": "rimraf flow-typed && rimraf node_modules && npm install && flow-typed install",
+    "prepublish": "in-publish && npm run babel-server || not-in-publish",
+    "postpublish": "git checkout server"
   },
   "repository": {
     "type": "git",
