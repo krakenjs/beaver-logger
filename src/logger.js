@@ -227,7 +227,9 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         transport = newTransport;
     }
 
-    safeInterval(flush, flushInterval);
+    if (isBrowser()) {
+        safeInterval(flush, flushInterval);
+    }
 
     return {
         debug,
