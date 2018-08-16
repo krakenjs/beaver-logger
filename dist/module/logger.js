@@ -1,7 +1,7 @@
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 import { ZalgoPromise } from 'zalgo-promise/src';
-import { request, extend, isBrowser, promiseDebounce, noop, safeInterval } from 'belter/src';
+import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
 import { LOG_LEVEL } from './constants';
@@ -13,6 +13,14 @@ function httpTransport(_ref) {
         json = _ref.json;
 
     return request({ url: url, method: method, headers: headers, json: json }).then(noop);
+}
+
+function extendIfDefined(target, source) {
+    for (var key in source) {
+        if (source.hasOwnProperty(key) && source[key]) {
+            target[key] = source[key];
+        }
+    }
 }
 
 export function Logger(_ref2) {
@@ -83,14 +91,14 @@ export function Logger(_ref2) {
 
             for (var _i2 = 0, _length2 = metaBuilders == null ? 0 : metaBuilders.length; _i2 < _length2; _i2++) {
                 var builder = metaBuilders[_i2];
-                extend(meta, builder(meta));
+                extendIfDefined(meta, builder(meta));
             }
 
             var headers = {};
 
             for (var _i4 = 0, _length4 = headerBuilders == null ? 0 : headerBuilders.length; _i4 < _length4; _i4++) {
                 var _builder = headerBuilders[_i4];
-                extend(headers, _builder(headers));
+                extendIfDefined(headers, _builder(headers));
             }
 
             var req = transport({
@@ -138,17 +146,17 @@ export function Logger(_ref2) {
             event = prefix + '_' + event;
         }
 
-        payload = _extends({}, payload, {
+        var logPayload = _extends({}, objFilter(payload), {
             timestamp: Date.now().toString()
         });
 
         for (var _i6 = 0, _length6 = payloadBuilders == null ? 0 : payloadBuilders.length; _i6 < _length6; _i6++) {
             var builder = payloadBuilders[_i6];
-            extend(payload, builder(payload));
+            extendIfDefined(logPayload, builder(logPayload));
         }
 
-        enqueue(level, event, payload);
-        print(level, event, payload);
+        enqueue(level, event, logPayload);
+        print(level, event, logPayload);
     }
 
     function addPayloadBuilder(builder) {
@@ -190,14 +198,15 @@ export function Logger(_ref2) {
             return;
         }
 
+        var trackingPayload = objFilter(payload);
+
         for (var _i8 = 0, _length8 = trackingBuilders == null ? 0 : trackingBuilders.length; _i8 < _length8; _i8++) {
             var builder = trackingBuilders[_i8];
-            extend(payload, builder(payload));
+            extendIfDefined(trackingPayload, builder(trackingPayload));
         }
 
-        print(LOG_LEVEL.DEBUG, 'track', payload);
-
-        tracking.push(payload);
+        print(LOG_LEVEL.DEBUG, 'track', trackingPayload);
+        tracking.push(trackingPayload);
     }
 
     function setTransport(newTransport) {

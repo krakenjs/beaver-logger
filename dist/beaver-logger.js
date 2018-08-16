@@ -138,10 +138,10 @@
             __webpack_require__("./node_modules/belter/src/experiment.js"), __webpack_require__("./node_modules/belter/src/global.js"), 
             __webpack_require__("./node_modules/belter/src/jsx.jsx"), __webpack_require__("./node_modules/belter/src/storage.js");
             var __WEBPACK_IMPORTED_MODULE_6__util__ = __webpack_require__("./node_modules/belter/src/util.js");
-            __webpack_require__.d(__webpack_exports__, "extend", function() {
-                return __WEBPACK_IMPORTED_MODULE_6__util__.a;
-            });
             __webpack_require__.d(__webpack_exports__, "noop", function() {
+                return __WEBPACK_IMPORTED_MODULE_6__util__.d;
+            });
+            __webpack_require__.d(__webpack_exports__, "objFilter", function() {
                 return __WEBPACK_IMPORTED_MODULE_6__util__.e;
             });
             __webpack_require__.d(__webpack_exports__, "promiseDebounce", function() {
@@ -232,20 +232,20 @@
             __webpack_exports__.a = function(_ref) {
                 var name = _ref.name, _ref$version = _ref.version, version = void 0 === _ref$version ? "latest" : _ref$version, _ref$lifetime = _ref.lifetime, lifetime = void 0 === _ref$lifetime ? 3e5 : _ref$lifetime, STORAGE_KEY = "__" + name + "_" + version + "_storage__", accessedStorage = void 0;
                 function getState(handler) {
-                    var localStorageEnabled = Object(__WEBPACK_IMPORTED_MODULE_0__util__.d)(), storage = void 0;
+                    var localStorageEnabled = Object(__WEBPACK_IMPORTED_MODULE_0__util__.c)(), storage = void 0;
                     accessedStorage && (storage = accessedStorage);
                     if (!storage && localStorageEnabled) {
                         var rawStorage = window.localStorage.getItem(STORAGE_KEY);
                         rawStorage && (storage = JSON.parse(rawStorage));
                     }
-                    storage || (storage = Object(__WEBPACK_IMPORTED_MODULE_0__util__.b)()[STORAGE_KEY]);
+                    storage || (storage = Object(__WEBPACK_IMPORTED_MODULE_0__util__.a)()[STORAGE_KEY]);
                     storage || (storage = {
                         id: Object(__WEBPACK_IMPORTED_MODULE_0__util__.k)()
                     });
                     storage.id || (storage.id = Object(__WEBPACK_IMPORTED_MODULE_0__util__.k)());
                     accessedStorage = storage;
                     var result = handler(storage);
-                    localStorageEnabled ? window.localStorage.setItem(STORAGE_KEY, JSON.stringify(storage)) : Object(__WEBPACK_IMPORTED_MODULE_0__util__.b)()[STORAGE_KEY] = storage;
+                    localStorageEnabled ? window.localStorage.setItem(STORAGE_KEY, JSON.stringify(storage)) : Object(__WEBPACK_IMPORTED_MODULE_0__util__.a)()[STORAGE_KEY] = storage;
                     accessedStorage = null;
                     return result;
                 }
@@ -286,16 +286,16 @@
         "./node_modules/belter/src/types.js": function(module, exports) {},
         "./node_modules/belter/src/util.js": function(module, __webpack_exports__, __webpack_require__) {
             "use strict";
-            __webpack_exports__.b = getGlobal;
-            __webpack_exports__.c = inlineMemoize;
-            __webpack_exports__.e = function() {};
+            __webpack_exports__.a = getGlobal;
+            __webpack_exports__.b = inlineMemoize;
+            __webpack_exports__.d = function() {};
             __webpack_exports__.k = function() {
                 var chars = "0123456789abcdef";
                 return "xxxxxxxxxx".replace(/./g, function() {
                     return chars.charAt(Math.floor(Math.random() * chars.length));
                 }) + "_" + base64encode(new Date().toISOString().slice(11, 19).replace("T", ".")).replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
             };
-            __webpack_exports__.d = function isLocalStorageEnabled() {
+            __webpack_exports__.c = function isLocalStorageEnabled() {
                 return inlineMemoize(isLocalStorageEnabled, function() {
                     try {
                         if ("undefined" == typeof window) return !1;
@@ -310,12 +310,6 @@
                     return !1;
                 });
             };
-            __webpack_exports__.a = function(obj, source) {
-                if (!source) return obj;
-                if (Object.assign) return Object.assign(obj, source);
-                for (var _key2 in source) source.hasOwnProperty(_key2) && (obj[_key2] = source[_key2]);
-                return obj;
-            };
             __webpack_exports__.g = function(str, regex, handler) {
                 var results = [];
                 str.replace(regex, function() {
@@ -325,6 +319,11 @@
             };
             __webpack_exports__.j = function(svg) {
                 return "data:image/svg+xml;base64," + base64encode(svg);
+            };
+            __webpack_exports__.e = function(obj) {
+                var filter = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : Boolean, result = {};
+                for (var _key4 in obj) obj.hasOwnProperty(_key4) && filter(obj[_key4], _key4) && (result[_key4] = obj[_key4]);
+                return result;
             };
             __webpack_exports__.h = function(text, regex) {
                 var result = [];
@@ -719,6 +718,9 @@
                     json: json
                 }).then(belter_src.noop);
             }
+            function extendIfDefined(target, source) {
+                for (var key in source) source.hasOwnProperty(key) && source[key] && (target[key] = source[key]);
+            }
             function Logger(_ref2) {
                 var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? FLUSH_INTERVAL : _ref2$flushInterval, events = [], tracking = [], payloadBuilders = [], metaBuilders = [], trackingBuilders = [], headerBuilders = [];
                 function print(level, event, payload) {
@@ -738,14 +740,10 @@
                 function immediateFlush() {
                     return src.a.try(function() {
                         if (Object(belter_src.isBrowser)() && (events.length || tracking.length)) {
-                            for (var meta = {}, _i2 = 0, _length2 = null == metaBuilders ? 0 : metaBuilders.length; _i2 < _length2; _i2++) {
-                                var builder = metaBuilders[_i2];
-                                Object(belter_src.extend)(meta, builder(meta));
-                            }
-                            for (var headers = {}, _i4 = 0, _length4 = null == headerBuilders ? 0 : headerBuilders.length; _i4 < _length4; _i4++) {
-                                var _builder = headerBuilders[_i4];
-                                Object(belter_src.extend)(headers, _builder(headers));
-                            }
+                            for (var meta = {}, _i2 = 0, _length2 = null == metaBuilders ? 0 : metaBuilders.length; _i2 < _length2; _i2++) extendIfDefined(meta, (0, 
+                            metaBuilders[_i2])(meta));
+                            for (var headers = {}, _i4 = 0, _length4 = null == headerBuilders ? 0 : headerBuilders.length; _i4 < _length4; _i4++) extendIfDefined(headers, (0, 
+                            headerBuilders[_i4])(headers));
                             var req = transport({
                                 method: "POST",
                                 url: url,
@@ -767,13 +765,10 @@
                     var payload = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {};
                     if (Object(belter_src.isBrowser)()) {
                         prefix && (event = prefix + "_" + event);
-                        payload = _extends({}, payload, {
+                        for (var logPayload = _extends({}, Object(belter_src.objFilter)(payload), {
                             timestamp: Date.now().toString()
-                        });
-                        for (var _i6 = 0, _length6 = null == payloadBuilders ? 0 : payloadBuilders.length; _i6 < _length6; _i6++) {
-                            var builder = payloadBuilders[_i6];
-                            Object(belter_src.extend)(payload, builder(payload));
-                        }
+                        }), _i6 = 0, _length6 = null == payloadBuilders ? 0 : payloadBuilders.length; _i6 < _length6; _i6++) extendIfDefined(logPayload, (0, 
+                        payloadBuilders[_i6])(logPayload));
                         !function(level, event, payload) {
                             events.push({
                                 level: level,
@@ -781,8 +776,8 @@
                                 payload: payload
                             });
                             -1 !== AUTO_FLUSH_LEVEL.indexOf(level) && flush();
-                        }(level, event, payload);
-                        print(level, event, payload);
+                        }(level, event, logPayload);
+                        print(level, event, logPayload);
                     }
                 }
                 Object(belter_src.safeInterval)(flush, flushInterval);
@@ -802,12 +797,10 @@
                     track: function() {
                         var payload = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {};
                         if (Object(belter_src.isBrowser)()) {
-                            for (var _i8 = 0, _length8 = null == trackingBuilders ? 0 : trackingBuilders.length; _i8 < _length8; _i8++) {
-                                var builder = trackingBuilders[_i8];
-                                Object(belter_src.extend)(payload, builder(payload));
-                            }
-                            print(LOG_LEVEL.DEBUG, "track", payload);
-                            tracking.push(payload);
+                            for (var trackingPayload = Object(belter_src.objFilter)(payload), _i8 = 0, _length8 = null == trackingBuilders ? 0 : trackingBuilders.length; _i8 < _length8; _i8++) extendIfDefined(trackingPayload, (0, 
+                            trackingBuilders[_i8])(trackingPayload));
+                            print(LOG_LEVEL.DEBUG, "track", trackingPayload);
+                            tracking.push(trackingPayload);
                         }
                     },
                     flush: flush,
