@@ -1,12 +1,12 @@
 /* @flow */
 
 import { ZalgoPromise } from 'zalgo-promise/src';
-import { request, extend, isBrowser, promiseDebounce, noop, safeInterval } from 'belter/src';
+import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
 import { LOG_LEVEL } from './constants';
 
-type Transport = ({ url : string, method : string, headers : { [string] : string }, json : Object }) => ZalgoPromise<void>;
+type Transport = ({ url : string, method : string, headers : Payload, json : Object }) => ZalgoPromise<void>;
 
 type LoggerOptions = {
     url : string,
@@ -16,11 +16,12 @@ type LoggerOptions = {
     flushInterval? : number
 };
 
+type ClientPayload = { [string]: ?string };
 type Payload = { [string] : string };
-type Log = (name : string, payload : Payload) => void;
-type Track = (payload : Payload) => void;
+type Log = (name : string, payload? : ClientPayload) => void;
+type Track = (payload : ClientPayload) => void;
 
-type Builder = ({ [string] : string }) => Payload;
+type Builder = (Payload) => ClientPayload;
 type AddBuilder = (Builder) => void;
 
 type LoggerType = {
@@ -44,6 +45,14 @@ type LoggerType = {
 
 function httpTransport({ url, method, headers, json } : { url : string, method : string, headers : { [string] : string }, json : Object }) : ZalgoPromise<void> {
     return request({ url, method, headers, json }).then(noop);
+}
+
+function extendIfDefined(target : { [string] : string }, source : { [string] : ?string }) {
+    for (let key in source) {
+        if (source.hasOwnProperty(key) && source[key]) {
+            target[key] = source[key];
+        }
+    }
 }
 
 export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL } : LoggerOptions) : LoggerType {
@@ -103,12 +112,12 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
             let meta = {};
             for (let builder of metaBuilders) {
-                extend(meta, builder(meta));
+                extendIfDefined(meta, builder(meta));
             }
 
             let headers = {};
             for (let builder of headerBuilders) {
-                extend(headers, builder(headers));
+                extendIfDefined(headers, builder(headers));
             }
 
             let req = transport({
@@ -154,17 +163,17 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             event = `${ prefix }_${ event }`;
         }
 
-        payload = {
-            ...payload,
+        let logPayload : Payload = {
+            ...objFilter(payload),
             timestamp: Date.now().toString()
         };
 
         for (let builder of payloadBuilders) {
-            extend(payload, builder(payload));
+            extendIfDefined(logPayload, builder(logPayload));
         }
 
-        enqueue(level, event, payload);
-        print(level, event, payload);
+        enqueue(level, event, logPayload);
+        print(level, event, logPayload);
     }
 
     function addPayloadBuilder(builder) {
@@ -204,13 +213,14 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             return;
         }
 
+        let trackingPayload : Payload = objFilter(payload);
+
         for (let builder of trackingBuilders) {
-            extend(payload, builder(payload));
+            extendIfDefined(trackingPayload, builder(trackingPayload));
         }
 
-        print(LOG_LEVEL.DEBUG, 'track', payload);
-
-        tracking.push(payload);
+        print(LOG_LEVEL.DEBUG, 'track', trackingPayload);
+        tracking.push(trackingPayload);
     }
 
     function setTransport(newTransport : Transport) {
