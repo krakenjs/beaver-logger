@@ -213,7 +213,9 @@ export function Logger(_ref2) {
         transport = newTransport;
     }
 
-    safeInterval(flush, flushInterval);
+    if (isBrowser()) {
+        safeInterval(flush, flushInterval);
+    }
 
     return {
         debug: debug,

@@ -780,7 +780,7 @@
                         print(level, event, logPayload);
                     }
                 }
-                Object(belter_src.safeInterval)(flush, flushInterval);
+                Object(belter_src.isBrowser)() && Object(belter_src.safeInterval)(flush, flushInterval);
                 return {
                     debug: function(event, payload) {
                         log(LOG_LEVEL.DEBUG, event, payload);
