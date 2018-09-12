@@ -16,7 +16,7 @@ type LoggerOptions = {
     flushInterval? : number
 };
 
-type ClientPayload = { [string]: ?string };
+type ClientPayload = { [string] : ?string };
 type Payload = { [string] : string };
 type Log = (name : string, payload? : ClientPayload) => void;
 type Track = (payload : ClientPayload) => void;
@@ -24,7 +24,7 @@ type Track = (payload : ClientPayload) => void;
 type Builder = (Payload) => ClientPayload;
 type AddBuilder = (Builder) => void;
 
-type LoggerType = {
+export type LoggerType = {
     debug : Log,
     info : Log,
     warn : Log,
@@ -124,7 +124,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                 method: 'POST',
                 url,
                 headers,
-                json: {
+                json:   {
                     events,
                     meta,
                     tracking
