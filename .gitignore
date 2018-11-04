@@ -8,3 +8,4 @@ plato-reports
 checkstyle.xml
 xunit.xml
 flow-typed
+.DS_Store
