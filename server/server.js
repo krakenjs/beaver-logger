@@ -27,7 +27,7 @@ type Meta = { [string] : string };
 let defaultLogger : Logger = {
     log(req, level, name, payload) {
         let date = payload.timestamp
-            ? new Date(payload.timestamp).toString()
+            ? new Date(parseInt(payload.timestamp)).toString()
             : new Date().toString();
 
         let str = [
