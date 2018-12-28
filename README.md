@@ -114,7 +114,6 @@ Configuration
 Full configuration options:
 
 ```javascript
-```javascript
 var $logger = beaver.Logger({
 
     // Url to send logs to
