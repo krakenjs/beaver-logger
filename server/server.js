@@ -24,7 +24,7 @@ type Tracking = { [string] : string };
 
 type Meta = { [string] : string };
 
-let defaultLogger : Logger = {
+export let defaultLogger : Logger = {
     log(req, level, name, payload) {
         let date = payload.timestamp
             ? new Date(payload.timestamp).toString()
