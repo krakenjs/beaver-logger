@@ -18,11 +18,11 @@ type LoggerOptions = {
 
 type ClientPayload = { [string] : ?string };
 type Payload = { [string] : string };
-type Log = (name : string, payload? : ClientPayload) => void;
-type Track = (payload : ClientPayload) => void;
+type Log = (name : string, payload? : ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
+type Track = (payload : ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 
 type Builder = (Payload) => ClientPayload;
-type AddBuilder = (Builder) => void;
+type AddBuilder = (Builder) => LoggerType; // eslint-disable-line no-use-before-define
 
 export type LoggerType = {
     debug : Log,
@@ -40,7 +40,7 @@ export type LoggerType = {
     addTrackingBuilder : AddBuilder,
     addHeaderBuilder : AddBuilder,
 
-    setTransport : (Transport) => void
+    setTransport : (Transport) => LoggerType
 };
 
 function httpTransport({ url, method, headers, json } : { url : string, method : string, headers : { [string] : string }, json : Object }) : ZalgoPromise<void> {
@@ -153,10 +153,10 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         }
     }
 
-    function log(level : $Values<typeof LOG_LEVEL>, event : string, payload = {}) {
+    function log(level : $Values<typeof LOG_LEVEL>, event : string, payload = {}) : LoggerType {
 
         if (!isBrowser()) {
-            return;
+            return logger; // eslint-disable-line no-use-before-define
         }
 
         if (prefix) {
@@ -174,43 +174,50 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
         enqueue(level, event, logPayload);
         print(level, event, logPayload);
+
+        return logger; // eslint-disable-line no-use-before-define
     }
 
-    function addPayloadBuilder(builder) {
-        payloadBuilders.push(builder);
+    function addBuilder(builders, builder) : LoggerType {
+        builders.push(builder);
+        return logger; // eslint-disable-line no-use-before-define
     }
 
-    function addMetaBuilder(builder) {
-        metaBuilders.push(builder);
+    function addPayloadBuilder(builder) : LoggerType {
+        return addBuilder(payloadBuilders, builder);
     }
 
-    function addTrackingBuilder(builder) {
-        trackingBuilders.push(builder);
+    function addMetaBuilder(builder) : LoggerType {
+        return addBuilder(metaBuilders, builder);
     }
 
-    function addHeaderBuilder(builder) {
-        headerBuilders.push(builder);
+    function addTrackingBuilder(builder) : LoggerType {
+        return addBuilder(trackingBuilders, builder);
     }
 
-    function debug(event, payload) {
-        log(LOG_LEVEL.DEBUG, event, payload);
+    function addHeaderBuilder(builder) : LoggerType {
+        return addBuilder(headerBuilders, builder);
     }
 
-    function info(event, payload) {
-        log(LOG_LEVEL.INFO, event, payload);
+    function debug(event, payload) : LoggerType {
+        return log(LOG_LEVEL.DEBUG, event, payload);
     }
 
-    function warn(event, payload) {
-        log(LOG_LEVEL.WARN, event, payload);
+    function info(event, payload) : LoggerType {
+        return log(LOG_LEVEL.INFO, event, payload);
     }
 
-    function error(event, payload) {
-        log(LOG_LEVEL.ERROR, event, payload);
+    function warn(event, payload) : LoggerType {
+        return log(LOG_LEVEL.WARN, event, payload);
     }
 
-    function track(payload = {}) {
+    function error(event, payload) : LoggerType {
+        return log(LOG_LEVEL.ERROR, event, payload);
+    }
+
+    function track(payload = {}) : LoggerType {
         if (!isBrowser()) {
-            return;
+            return logger; // eslint-disable-line no-use-before-define
         }
 
         let trackingPayload : Payload = objFilter(payload);
@@ -221,17 +228,20 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
         print(LOG_LEVEL.DEBUG, 'track', trackingPayload);
         tracking.push(trackingPayload);
+
+        return logger; // eslint-disable-line no-use-before-define
     }
 
-    function setTransport(newTransport : Transport) {
+    function setTransport(newTransport : Transport) : LoggerType {
         transport = newTransport;
+        return logger; // eslint-disable-line no-use-before-define
     }
 
     if (isBrowser()) {
         safeInterval(flush, flushInterval);
     }
 
-    return {
+    const logger = {
         debug,
         info,
         warn,
@@ -245,4 +255,6 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         addHeaderBuilder,
         setTransport
     };
+
+    return logger;
 }
