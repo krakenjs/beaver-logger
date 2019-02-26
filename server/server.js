@@ -83,10 +83,11 @@ export function log(req : ExpressRequest, logger : Logger, logs : { events : Arr
                 return;
             }
 
-            event.level = event.level || LOG_LEVEL.INFO;
-            event.payload = event.payload || {};
+            const name = event.event.replace(/_*[^a-zA-Z0-9_]+_*/g, '_');
+            const level = event.level || LOG_LEVEL.INFO;
+            const payload = event.payload || {};
 
-            return logger.log(req, event.level, event.event, event.payload);
+            return logger.log(req, level, name, payload);
         });
     }
 
