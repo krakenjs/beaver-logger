@@ -1186,64 +1186,70 @@
                 var flush = Object(belter_src.promiseDebounce)(immediateFlush);
                 function log(level, event) {
                     var payload = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {};
-                    if (Object(belter_src.isBrowser)()) {
-                        prefix && (event = prefix + "_" + event);
-                        for (var logPayload = _extends({}, Object(belter_src.objFilter)(payload), {
-                            timestamp: Date.now().toString()
-                        }), _i6 = 0, _length6 = null == payloadBuilders ? 0 : payloadBuilders.length; _i6 < _length6; _i6++) extendIfDefined(logPayload, (0, 
-                        payloadBuilders[_i6])(logPayload));
-                        !function(level, event, payload) {
-                            events.push({
-                                level: level,
-                                event: event,
-                                payload: payload
-                            });
-                            -1 !== AUTO_FLUSH_LEVEL.indexOf(level) && flush();
-                        }(level, event, logPayload);
-                        print(level, event, logPayload);
-                    }
+                    if (!Object(belter_src.isBrowser)()) return logger;
+                    prefix && (event = prefix + "_" + event);
+                    for (var logPayload = _extends({}, Object(belter_src.objFilter)(payload), {
+                        timestamp: Date.now().toString()
+                    }), _i6 = 0, _length6 = null == payloadBuilders ? 0 : payloadBuilders.length; _i6 < _length6; _i6++) extendIfDefined(logPayload, (0, 
+                    payloadBuilders[_i6])(logPayload));
+                    !function(level, event, payload) {
+                        events.push({
+                            level: level,
+                            event: event,
+                            payload: payload
+                        });
+                        -1 !== AUTO_FLUSH_LEVEL.indexOf(level) && flush();
+                    }(level, event, logPayload);
+                    print(level, event, logPayload);
+                    return logger;
+                }
+                function addBuilder(builders, builder) {
+                    builders.push(builder);
+                    return logger;
                 }
                 Object(belter_src.isBrowser)() && Object(belter_src.safeInterval)(flush, flushInterval);
-                return {
+                var logger = {
                     debug: function(event, payload) {
-                        log(LOG_LEVEL.DEBUG, event, payload);
+                        return log(LOG_LEVEL.DEBUG, event, payload);
                     },
                     info: function(event, payload) {
-                        log(LOG_LEVEL.INFO, event, payload);
+                        return log(LOG_LEVEL.INFO, event, payload);
                     },
                     warn: function(event, payload) {
-                        log(LOG_LEVEL.WARN, event, payload);
+                        return log(LOG_LEVEL.WARN, event, payload);
                     },
                     error: function(event, payload) {
-                        log(LOG_LEVEL.ERROR, event, payload);
+                        return log(LOG_LEVEL.ERROR, event, payload);
                     },
                     track: function() {
                         var payload = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {};
-                        if (Object(belter_src.isBrowser)()) {
-                            for (var trackingPayload = Object(belter_src.objFilter)(payload), _i8 = 0, _length8 = null == trackingBuilders ? 0 : trackingBuilders.length; _i8 < _length8; _i8++) extendIfDefined(trackingPayload, (0, 
-                            trackingBuilders[_i8])(trackingPayload));
-                            print(LOG_LEVEL.DEBUG, "track", trackingPayload);
-                            tracking.push(trackingPayload);
-                        }
+                        if (!Object(belter_src.isBrowser)()) return logger;
+                        for (var trackingPayload = Object(belter_src.objFilter)(payload), _i8 = 0, _length8 = null == trackingBuilders ? 0 : trackingBuilders.length; _i8 < _length8; _i8++) extendIfDefined(trackingPayload, (0, 
+                        trackingBuilders[_i8])(trackingPayload));
+                        print(LOG_LEVEL.DEBUG, "track", trackingPayload);
+                        tracking.push(trackingPayload);
+                        return logger;
                     },
                     flush: flush,
                     immediateFlush: immediateFlush,
                     addPayloadBuilder: function(builder) {
-                        payloadBuilders.push(builder);
+                        return addBuilder(payloadBuilders, builder);
                     },
                     addMetaBuilder: function(builder) {
-                        metaBuilders.push(builder);
+                        return addBuilder(metaBuilders, builder);
                     },
                     addTrackingBuilder: function(builder) {
-                        trackingBuilders.push(builder);
+                        return addBuilder(trackingBuilders, builder);
                     },
                     addHeaderBuilder: function(builder) {
-                        headerBuilders.push(builder);
+                        return addBuilder(headerBuilders, builder);
                     },
                     setTransport: function(newTransport) {
                         transport = newTransport;
+                        return logger;
                     }
                 };
+                return logger;
             }
             __webpack_require__.d(__webpack_exports__, "Logger", function() {
                 return Logger;

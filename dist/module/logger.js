@@ -4,7 +4,10 @@ import { ZalgoPromise } from 'zalgo-promise/src';
 import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
-import { LOG_LEVEL } from './constants';
+import { LOG_LEVEL } from './constants'; // eslint-disable-line no-use-before-define
+// eslint-disable-line no-use-before-define
+
+// eslint-disable-line no-use-before-define
 
 function httpTransport(_ref) {
     var url = _ref.url,
@@ -139,7 +142,7 @@ export function Logger(_ref2) {
 
 
         if (!isBrowser()) {
-            return;
+            return logger; // eslint-disable-line no-use-before-define
         }
 
         if (prefix) {
@@ -157,45 +160,52 @@ export function Logger(_ref2) {
 
         enqueue(level, event, logPayload);
         print(level, event, logPayload);
+
+        return logger; // eslint-disable-line no-use-before-define
+    }
+
+    function addBuilder(builders, builder) {
+        builders.push(builder);
+        return logger; // eslint-disable-line no-use-before-define
     }
 
     function addPayloadBuilder(builder) {
-        payloadBuilders.push(builder);
+        return addBuilder(payloadBuilders, builder);
     }
 
     function addMetaBuilder(builder) {
-        metaBuilders.push(builder);
+        return addBuilder(metaBuilders, builder);
     }
 
     function addTrackingBuilder(builder) {
-        trackingBuilders.push(builder);
+        return addBuilder(trackingBuilders, builder);
     }
 
     function addHeaderBuilder(builder) {
-        headerBuilders.push(builder);
+        return addBuilder(headerBuilders, builder);
     }
 
     function debug(event, payload) {
-        log(LOG_LEVEL.DEBUG, event, payload);
+        return log(LOG_LEVEL.DEBUG, event, payload);
     }
 
     function info(event, payload) {
-        log(LOG_LEVEL.INFO, event, payload);
+        return log(LOG_LEVEL.INFO, event, payload);
     }
 
     function warn(event, payload) {
-        log(LOG_LEVEL.WARN, event, payload);
+        return log(LOG_LEVEL.WARN, event, payload);
     }
 
     function error(event, payload) {
-        log(LOG_LEVEL.ERROR, event, payload);
+        return log(LOG_LEVEL.ERROR, event, payload);
     }
 
     function track() {
         var payload = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
         if (!isBrowser()) {
-            return;
+            return logger; // eslint-disable-line no-use-before-define
         }
 
         var trackingPayload = objFilter(payload);
@@ -207,17 +217,20 @@ export function Logger(_ref2) {
 
         print(LOG_LEVEL.DEBUG, 'track', trackingPayload);
         tracking.push(trackingPayload);
+
+        return logger; // eslint-disable-line no-use-before-define
     }
 
     function setTransport(newTransport) {
         transport = newTransport;
+        return logger; // eslint-disable-line no-use-before-define
     }
 
     if (isBrowser()) {
         safeInterval(flush, flushInterval);
     }
 
-    return {
+    var logger = {
         debug: debug,
         info: info,
         warn: warn,
@@ -231,4 +244,6 @@ export function Logger(_ref2) {
         addHeaderBuilder: addHeaderBuilder,
         setTransport: setTransport
     };
+
+    return logger;
 }
