@@ -47,7 +47,7 @@ export function Logger(_ref2) {
 
     function print(level, event, payload) {
 
-        if (!isBrowser() || !window.console || !window.console.log || window.location.protocol === PROTOCOL.FILE) {
+        if (!isBrowser() || !window.console || !window.console.log) {
             return;
         }
 
@@ -82,7 +82,7 @@ export function Logger(_ref2) {
 
     function immediateFlush() {
         return ZalgoPromise['try'](function () {
-            if (!isBrowser()) {
+            if (!isBrowser() || window.location.protocol === PROTOCOL.FILE) {
                 return;
             }
 

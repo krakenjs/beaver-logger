@@ -693,7 +693,7 @@
             function Logger(_ref2) {
                 var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? FLUSH_INTERVAL : _ref2$flushInterval, events = [], tracking = [], payloadBuilders = [], metaBuilders = [], trackingBuilders = [], headerBuilders = [];
                 function print(level, event, payload) {
-                    if (dom_isBrowser() && window.console && window.console.log && window.location.protocol !== constants_PROTOCOL.FILE) {
+                    if (dom_isBrowser() && window.console && window.console.log) {
                         var consoleLogLevel = logLevel;
                         window.LOG_LEVEL && -1 !== LOG_LEVEL_PRIORITY.indexOf(window.LOG_LEVEL) && (consoleLogLevel = window.LOG_LEVEL);
                         if (!(LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(consoleLogLevel))) {
@@ -708,7 +708,7 @@
                 }
                 function immediateFlush() {
                     return promise_ZalgoPromise.try(function() {
-                        if (dom_isBrowser() && (events.length || tracking.length)) {
+                        if (dom_isBrowser() && window.location.protocol !== constants_PROTOCOL.FILE && (events.length || tracking.length)) {
                             for (var meta = {}, _i2 = 0, _length2 = null == metaBuilders ? 0 : metaBuilders.length; _i2 < _length2; _i2++) extendIfDefined(meta, (0, 
                             metaBuilders[_i2])(meta));
                             for (var headers = {}, _i4 = 0, _length4 = null == headerBuilders ? 0 : headerBuilders.length; _i4 < _length4; _i4++) extendIfDefined(headers, (0, 
