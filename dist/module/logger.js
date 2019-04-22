@@ -4,7 +4,7 @@ import { ZalgoPromise } from 'zalgo-promise/src';
 import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
-import { LOG_LEVEL } from './constants'; // eslint-disable-line no-use-before-define
+import { LOG_LEVEL, PROTOCOL } from './constants'; // eslint-disable-line no-use-before-define
 // eslint-disable-line no-use-before-define
 
 // eslint-disable-line no-use-before-define
@@ -47,7 +47,7 @@ export function Logger(_ref2) {
 
     function print(level, event, payload) {
 
-        if (!isBrowser() || !window.console || !window.console.log) {
+        if (!isBrowser() || !window.console || !window.console.log || window.location.protocol === PROTOCOL.FILE) {
             return;
         }
 

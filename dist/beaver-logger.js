@@ -618,6 +618,8 @@
                 INFO: "info",
                 WARN: "warn",
                 ERROR: "error"
+            }, constants_PROTOCOL = {
+                FILE: "file:"
             }, AUTO_FLUSH_LEVEL = [ LOG_LEVEL.WARN, LOG_LEVEL.ERROR ], LOG_LEVEL_PRIORITY = [ LOG_LEVEL.ERROR, LOG_LEVEL.WARN, LOG_LEVEL.INFO, LOG_LEVEL.DEBUG ], FLUSH_INTERVAL = 6e4, DEFAULT_LOG_LEVEL = LOG_LEVEL.WARN, logger__extends = Object.assign || function(target) {
                 for (var i = 1; i < arguments.length; i++) {
                     var source = arguments[i];
@@ -691,7 +693,7 @@
             function Logger(_ref2) {
                 var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? FLUSH_INTERVAL : _ref2$flushInterval, events = [], tracking = [], payloadBuilders = [], metaBuilders = [], trackingBuilders = [], headerBuilders = [];
                 function print(level, event, payload) {
-                    if (dom_isBrowser() && window.console && window.console.log) {
+                    if (dom_isBrowser() && window.console && window.console.log && window.location.protocol !== constants_PROTOCOL.FILE) {
                         var consoleLogLevel = logLevel;
                         window.LOG_LEVEL && -1 !== LOG_LEVEL_PRIORITY.indexOf(window.LOG_LEVEL) && (consoleLogLevel = window.LOG_LEVEL);
                         if (!(LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(consoleLogLevel))) {
@@ -821,6 +823,9 @@
             });
             __webpack_require__.d(__webpack_exports__, "LOG_LEVEL", function() {
                 return LOG_LEVEL;
+            });
+            __webpack_require__.d(__webpack_exports__, "PROTOCOL", function() {
+                return constants_PROTOCOL;
             });
         }
     });

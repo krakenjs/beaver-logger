@@ -4,3 +4,7 @@ export var LOG_LEVEL = {
     WARN: 'warn',
     ERROR: 'error'
 };
+
+export var PROTOCOL = {
+    FILE: 'file:'
+};
