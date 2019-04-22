@@ -196,12 +196,12 @@ export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors 
         try {
             handleRequest(req, logger);
             res.status(200)
-                .header('content-type' : 'application/json')
+                .header('content-type', 'application/json')
                 .json({});
         } catch (err) {
             console.error(err.stack || err.toString());
             res.status(500)
-                .header('content-type' : 'application/json')
+                .header('content-type', 'application/json')
                 .json({});
         }
     });
