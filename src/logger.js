@@ -67,7 +67,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
     function print(level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload) {
 
-        if (!isBrowser() || !window.console || !window.console.log || window.location.protocol === PROTOCOL.FILE) {
+        if (!isBrowser() || !window.console || !window.console.log) {
             return;
         }
 
@@ -102,7 +102,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
     function immediateFlush() : ZalgoPromise<void> {
         return ZalgoPromise.try(() => {
-            if (!isBrowser()) {
+            if (!isBrowser() || window.location.protocol === PROTOCOL.FILE) {
                 return;
             }
 
