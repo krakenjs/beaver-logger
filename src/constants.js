@@ -6,3 +6,7 @@ export const LOG_LEVEL = {
     WARN:  ('warn' : 'warn'),
     ERROR: ('error' : 'error')
 };
+
+export const PROTOCOL = {
+    FILE: 'file:'
+};

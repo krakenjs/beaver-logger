@@ -4,7 +4,7 @@ import { ZalgoPromise } from 'zalgo-promise/src';
 import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
-import { LOG_LEVEL } from './constants';
+import { LOG_LEVEL, PROTOCOL } from './constants';
 
 type Transport = ({ url : string, method : string, headers : Payload, json : Object }) => ZalgoPromise<void>;
 
@@ -67,7 +67,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
     function print(level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload) {
 
-        if (!isBrowser() || !window.console || !window.console.log) {
+        if (!isBrowser() || !window.console || !window.console.log || window.location.protocol === PROTOCOL.FILE) {
             return;
         }
 
