@@ -1410,12 +1410,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (_config.config.logUnload) {
 	        window.addEventListener('beforeunload', function () {
 	            (0, _logger.info)('window_beforeunload');
-	            (0, _logger.immediateFlush)({ fireBeacon: true });
+	            (0, _logger.immediateFlush)({ fireAndForget: true, fireBeacon: true });
 	        });
 
 	        window.addEventListener('unload', function () {
 	            (0, _logger.info)('window_unload');
-	            (0, _logger.immediateFlush)({ fireBeacon: true });
+	            (0, _logger.immediateFlush)({ fireAndForget: true, fireBeacon: true });
 	        });
 	    }
 
