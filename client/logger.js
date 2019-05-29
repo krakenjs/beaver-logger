@@ -69,7 +69,7 @@ export function print(level, event, payload) {
     }
 }
 
-export function immediateFlush({ fireAndForget = false } = {}) {
+export function immediateFlush({ fireAndForget = false, fireBeacon = false } = {}) {
 
     if (typeof window === 'undefined') {
         return;
@@ -113,7 +113,8 @@ export function immediateFlush({ fireAndForget = false } = {}) {
         meta,
         tracking
     }, {
-        fireAndForget
+        fireAndForget,
+        fireBeacon
     });
 
     buffer = [];

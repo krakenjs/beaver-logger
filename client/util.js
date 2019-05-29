@@ -30,7 +30,7 @@ export function isSameDomain(url) {
     return match[0] === `${window.location.protocol}//${window.location.host}`;
 }
 
-export function ajax(method, url, headers={}, data={}, { fireAndForget = false } = {}) {
+export function ajax(method, url, headers={}, data={}, { fireAndForget = false, fireBeacon = false } = {}) {
 
     return new ZalgoPromise(resolve => {
         let XRequest = window.XMLHttpRequest || window.ActiveXObject;
@@ -67,7 +67,9 @@ export function ajax(method, url, headers={}, data={}, { fireAndForget = false }
                 }
             };
         }
-
+        if (navigator && navigator.sendBeacon && fireBeacon) {
+            navigator.sendBeacon(url, JSON.stringify(data).replace(/&/g, '%26'));
+        }
         req.send(JSON.stringify(data).replace(/&/g, '%26'));
     });
 }

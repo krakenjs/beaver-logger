@@ -246,7 +246,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function immediateFlush() {
 	    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	        _ref$fireAndForget = _ref.fireAndForget,
-	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
+	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget,
+	        _ref$fireBeacon = _ref.fireBeacon,
+	        fireBeacon = _ref$fireBeacon === undefined ? false : _ref$fireBeacon;
 
 	    if (typeof window === 'undefined') {
 	        return;
@@ -316,7 +318,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        meta: meta,
 	        tracking: tracking
 	    }, {
-	        fireAndForget: fireAndForget
+	        fireAndForget: fireAndForget,
+	        fireBeacon: fireBeacon
 	    });
 
 	    exports.buffer = buffer = [];
@@ -543,7 +546,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var _ref = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {},
 	        _ref$fireAndForget = _ref.fireAndForget,
-	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
+	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget,
+	        _ref$fireBeacon = _ref.fireBeacon,
+	        fireBeacon = _ref$fireBeacon === undefined ? false : _ref$fireBeacon;
 
 	    return new _src.ZalgoPromise(function (resolve) {
 	        var XRequest = window.XMLHttpRequest || window.ActiveXObject;
@@ -580,7 +585,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            };
 	        }
-
+			if (navigator && navigator.sendBeacon && fireBeacon) {
+				navigator.sendBeacon(url, JSON.stringify(data).replace(/&/g, '%26'));
+			}
 	        req.send(JSON.stringify(data).replace(/&/g, '%26'));
 	    });
 	}
@@ -1403,12 +1410,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (_config.config.logUnload) {
 	        window.addEventListener('beforeunload', function () {
 	            (0, _logger.info)('window_beforeunload');
-	            (0, _logger.immediateFlush)({ fireAndForget: true });
+	            (0, _logger.immediateFlush)({ fireBeacon: true });
 	        });
 
 	        window.addEventListener('unload', function () {
 	            (0, _logger.info)('window_unload');
-	            (0, _logger.immediateFlush)({ fireAndForget: true });
+	            (0, _logger.immediateFlush)({ fireBeacon: true });
 	        });
 	    }
 

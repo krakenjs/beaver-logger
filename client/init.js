@@ -26,12 +26,12 @@ export function init(conf) {
     if (config.logUnload) {
         window.addEventListener('beforeunload', () => {
             info('window_beforeunload');
-            immediateFlush({ fireAndForget: true });
+            immediateFlush({ fireBeacon: true });
         });
 
         window.addEventListener('unload', () => {
             info('window_unload');
-            immediateFlush({ fireAndForget: true });
+            immediateFlush({ fireBeacon: true });
         });
     }
 
