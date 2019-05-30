@@ -7,7 +7,6 @@ var Server = require('karma').Server;
 var argv = require('yargs').argv;
 
 gulp.task('test', ['lint', 'karma']);
-// gulp.task('test', ['lint']);
 gulp.task('build', ['test', 'webpack', 'webpack-min']);
 
 var FILE_NAME = 'beaver-logger';
