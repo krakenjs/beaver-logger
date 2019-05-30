@@ -69,6 +69,6 @@
     "yargs": "^4.7.1"
   },
   "dependencies": {
-    "zalgo-promise": "^1.0.38"
+    "zalgo-promise": "^1.0.31"
   }
 }

@@ -77,6 +77,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
 	exports['default'] = INTERFACE;
+	// global.__DEBUG__ = false;
 
 /***/ }),
 /* 1 */
@@ -706,7 +707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _exceptions = __webpack_require__(7);
 
-	var _flush = __webpack_require__(8);
+	var _global = __webpack_require__(8);
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -730,8 +731,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var rejected = false;
 	            var isAsync = false;
 
-	            (0, _flush.startActive)();
-
 	            try {
 	                handler(function (res) {
 	                    if (isAsync) {
@@ -749,12 +748,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                });
 	            } catch (err) {
-	                (0, _flush.endActive)();
 	                this.reject(err);
 	                return;
 	            }
-
-	            (0, _flush.endActive)();
 
 	            isAsync = true;
 
@@ -763,14 +759,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.resolve(_result);
 	            } else if (rejected) {
 	                this.reject(_error);
-	            }
-	        }
-
-	        if (__DEBUG__) {
-	            try {
-	                throw new Error('ZalgoPromise');
-	            } catch (err) {
-	                this.stack = err.stack;
 	            }
 	        }
 	    }
@@ -816,7 +804,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!this.errorHandled) {
 	                setTimeout(function () {
 	                    if (!_this2.errorHandled) {
-	                        (0, _exceptions.dispatchPossiblyUnhandledError)(error, _this2);
+	                        (0, _exceptions.dispatchPossiblyUnhandledError)(error);
 	                    }
 	                }, 1);
 	            }
@@ -830,8 +818,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function asyncReject(error) {
 	            this.errorHandled = true;
 	            this.reject(error);
-	            return this;
 	        }
+
+	        // eslint-disable-next-line complexity
+
 	    }, {
 	        key: 'dispatch',
 	        value: function dispatch() {
@@ -852,7 +842,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            this.dispatching = true;
-	            (0, _flush.startActive)();
+	            (0, _global.getGlobal)().activeCount += 1;
 
 	            var _loop = function _loop(i) {
 	                var _handlers$i = handlers[i],
@@ -925,7 +915,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            handlers.length = 0;
 	            this.dispatching = false;
-	            (0, _flush.endActive)();
+	            (0, _global.getGlobal)().activeCount -= 1;
+
+	            if ((0, _global.getGlobal)().activeCount === 0) {
+	                ZalgoPromise.flushQueue();
+	            }
 	        }
 	    }, {
 	        key: 'then',
@@ -1010,7 +1004,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                throw new TypeError('Could not find Promise');
 	            }
 	            // $FlowFixMe
-	            return Promise.resolve(this); // eslint-disable-line compat/compat
+	            return Promise.resolve(this);
 	        }
 	    }], [{
 	        key: 'resolve',
@@ -1033,11 +1027,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'reject',
 	        value: function reject(error) {
 	            return new ZalgoPromise().reject(error);
-	        }
-	    }, {
-	        key: 'asyncReject',
-	        value: function asyncReject(error) {
-	            return new ZalgoPromise().asyncReject(error);
 	        }
 	    }, {
 	        key: 'all',
@@ -1126,17 +1115,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var result = void 0;
 
-	            (0, _flush.startActive)();
-
 	            try {
 	                // $FlowFixMe
 	                result = method.apply(context, args || []);
 	            } catch (err) {
-	                (0, _flush.endActive)();
 	                return ZalgoPromise.reject(err);
 	            }
-
-	            (0, _flush.endActive)();
 
 	            return ZalgoPromise.resolve(result);
 	        }
@@ -1160,7 +1144,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'flush',
 	        value: function flush() {
-	            return (0, _flush.awaitActive)(ZalgoPromise);
+	            var promise = new ZalgoPromise();
+	            (0, _global.getGlobal)().flushPromises.push(promise);
+
+	            if ((0, _global.getGlobal)().activeCount === 0) {
+	                ZalgoPromise.flushQueue();
+	            }
+
+	            return promise;
+	        }
+	    }, {
+	        key: 'flushQueue',
+	        value: function flushQueue() {
+	            var promisesToFlush = (0, _global.getGlobal)().flushPromises;
+	            (0, _global.getGlobal)().flushPromises = [];
+
+	            for (var _iterator = promisesToFlush, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+	                var _ref;
+
+	                if (_isArray) {
+	                    if (_i >= _iterator.length) break;
+	                    _ref = _iterator[_i++];
+	                } else {
+	                    _i = _iterator.next();
+	                    if (_i.done) break;
+	                    _ref = _i.value;
+	                }
+
+	                var _promise = _ref;
+
+	                _promise.resolve();
+	            }
 	        }
 	    }]);
 
@@ -1219,7 +1233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1229,40 +1243,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.dispatchPossiblyUnhandledError = dispatchPossiblyUnhandledError;
 	exports.onPossiblyUnhandledException = onPossiblyUnhandledException;
 
+	var _global = __webpack_require__(8);
 
-	var dispatchedErrors = [];
+	function dispatchPossiblyUnhandledError(err) {
 
-	var possiblyUnhandledPromiseHandlers = [];
-
-	function dispatchPossiblyUnhandledError(err, promise) {
-
-	    if (dispatchedErrors.indexOf(err) !== -1) {
+	    if ((0, _global.getGlobal)().dispatchedErrors.indexOf(err) !== -1) {
 	        return;
 	    }
 
-	    dispatchedErrors.push(err);
+	    (0, _global.getGlobal)().dispatchedErrors.push(err);
 
 	    setTimeout(function () {
-	        if (__DEBUG__) {
-	            // $FlowFixMe
-	            throw new Error((err.stack || err.toString()) + '\n\nFrom promise:\n\n' + promise.stack);
-	        }
-
 	        throw err;
 	    }, 1);
 
-	    for (var j = 0; j < possiblyUnhandledPromiseHandlers.length; j++) {
-	        // $FlowFixMe
-	        possiblyUnhandledPromiseHandlers[j](err, promise);
+	    for (var j = 0; j < (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.length; j++) {
+	        (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers[j](err);
 	    }
 	}
 
 	function onPossiblyUnhandledException(handler) {
-	    possiblyUnhandledPromiseHandlers.push(handler);
+	    (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.push(handler);
 
 	    return {
 	        cancel: function cancel() {
-	            possiblyUnhandledPromiseHandlers.splice(possiblyUnhandledPromiseHandlers.indexOf(handler), 1);
+	            (0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.splice((0, _global.getGlobal)().possiblyUnhandledPromiseHandlers.indexOf(handler), 1);
 	        }
 	    };
 	}
@@ -1271,43 +1276,33 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ (function(module, exports) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.startActive = startActive;
-	exports.endActive = endActive;
-	exports.awaitActive = awaitActive;
+	exports.getGlobal = getGlobal;
+	function getGlobal() {
 
+	    var glob = void 0;
 
-	var activeCount = 0;
-
-	var flushPromise = void 0;
-
-	function flushActive() {
-	    if (!activeCount && flushPromise) {
-	        var promise = flushPromise;
-	        flushPromise = null;
-	        promise.resolve();
+	    if (typeof window !== 'undefined') {
+	        glob = window;
+	    } else if (typeof global !== 'undefined') {
+	        glob = global;
+	    } else {
+	        throw new TypeError('Can not find global');
 	    }
-	}
 
-	function startActive() {
-	    activeCount += 1;
-	}
+	    var zalgoGlobal = glob.__zalgopromise__ = glob.__zalgopromise__ || {};
+	    zalgoGlobal.flushPromises = zalgoGlobal.flushPromises || [];
+	    zalgoGlobal.activeCount = zalgoGlobal.activeCount || 0;
+	    zalgoGlobal.possiblyUnhandledPromiseHandlers = zalgoGlobal.possiblyUnhandledPromiseHandlers || [];
+	    zalgoGlobal.dispatchedErrors = zalgoGlobal.dispatchedErrors || [];
 
-	function endActive() {
-	    activeCount -= 1;
-	    flushActive();
+	    return zalgoGlobal;
 	}
-
-	function awaitActive(Zalgo) {
-	    // eslint-disable-line no-undef
-	    var promise = flushPromise = flushPromise || new Zalgo();
-	    flushActive();
-	    return promise;
-	}
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
 /* 9 */
