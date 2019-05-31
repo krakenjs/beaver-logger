@@ -1,6 +1,6 @@
 
 import { ZalgoPromise } from 'zalgo-promise/src';
-
+import param from 'jquery-param';
 export function extend(dest, src, over=true) {
     dest = dest || {};
     src  = src  || {};
@@ -68,7 +68,7 @@ export function ajax(method, url, headers={}, data={}, { fireAndForget = false, 
             };
         }
         if (window.navigator && window.navigator.sendBeacon && fireBeacon) {
-            window.navigator.sendBeacon(url, JSON.stringify(data).replace(/&/g, '%26'));
+            window.navigator.sendBeacon(url, param(data).replace(/&/g, '%26'));
         }
         req.send(JSON.stringify(data).replace(/&/g, '%26'));
     });
