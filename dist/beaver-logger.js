@@ -100,7 +100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _init = __webpack_require__(13);
+	var _init = __webpack_require__(11);
 
 	Object.keys(_init).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -112,7 +112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _transitions = __webpack_require__(15);
+	var _transitions = __webpack_require__(13);
 
 	Object.keys(_transitions).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -124,7 +124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _builders = __webpack_require__(11);
+	var _builders = __webpack_require__(9);
 
 	Object.keys(_builders).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -136,7 +136,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	});
 
-	var _config = __webpack_require__(12);
+	var _config = __webpack_require__(10);
 
 	Object.keys(_config).forEach(function (key) {
 	  if (key === "default" || key === "__esModule") return;
@@ -171,9 +171,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _util = __webpack_require__(3);
 
-	var _builders = __webpack_require__(11);
+	var _builders = __webpack_require__(9);
 
-	var _config = __webpack_require__(12);
+	var _config = __webpack_require__(10);
 
 	var buffer = exports.buffer = [];
 	var tracking = exports.tracking = [];
@@ -246,9 +246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function immediateFlush() {
 	    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
 	        _ref$fireAndForget = _ref.fireAndForget,
-	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget,
-	        _ref$fireBeacon = _ref.fireBeacon,
-	        fireBeacon = _ref$fireBeacon === undefined ? false : _ref$fireBeacon;
+	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
 
 	    if (typeof window === 'undefined') {
 	        return;
@@ -318,8 +316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        meta: meta,
 	        tracking: tracking
 	    }, {
-	        fireAndForget: fireAndForget,
-	        fireBeacon: fireBeacon
+	        fireAndForget: fireAndForget
 	    });
 
 	    exports.buffer = buffer = [];
@@ -509,12 +506,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _src = __webpack_require__(4);
 
-	var _jqueryParam = __webpack_require__(9);
-
-	var _jqueryParam2 = _interopRequireDefault(_jqueryParam);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 	function extend(dest, src) {
 	    var over = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
@@ -552,9 +543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var _ref = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {},
 	        _ref$fireAndForget = _ref.fireAndForget,
-	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget,
-	        _ref$fireBeacon = _ref.fireBeacon,
-	        fireBeacon = _ref$fireBeacon === undefined ? false : _ref$fireBeacon;
+	        fireAndForget = _ref$fireAndForget === undefined ? false : _ref$fireAndForget;
 
 	    return new _src.ZalgoPromise(function (resolve) {
 	        var XRequest = window.XMLHttpRequest || window.ActiveXObject;
@@ -591,9 +580,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            };
 	        }
-	        if (window.navigator && window.navigator.sendBeacon && fireBeacon) {
-	            window.navigator.sendBeacon(url, (0, _jqueryParam2['default'])(data).replace(/&/g, '%26'));
-	        }
+
 	        req.send(JSON.stringify(data).replace(/&/g, '%26'));
 	    });
 	}
@@ -901,6 +888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    } else {
 	                        // $FlowFixMe
 	                        result.then(function (res) {
+	                            // eslint-disable-line promise/catch-or-return
 	                            promise.resolve(res);
 	                        }, function (err) {
 	                            promise.reject(err);
@@ -959,18 +947,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }, {
 	        key: 'finally',
-	        value: function _finally(onFinally) {
-
-	            if (onFinally && typeof onFinally !== 'function' && !onFinally.call) {
-	                throw new Error('Promise.finally expected a function');
-	            }
-
+	        value: function _finally(handler) {
 	            return this.then(function (result) {
-	                return ZalgoPromise['try'](onFinally).then(function () {
+	                return ZalgoPromise['try'](handler).then(function () {
 	                    return result;
 	                });
 	            }, function (err) {
-	                return ZalgoPromise['try'](onFinally).then(function () {
+	                return ZalgoPromise['try'](handler).then(function () {
 	                    throw err;
 	                });
 	            });
@@ -1036,7 +1019,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'all',
 	        value: function all(promises) {
-	            // eslint-disable-line no-undef
 
 	            var promise = new ZalgoPromise();
 	            var count = promises.length;
@@ -1063,6 +1045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 
 	                ZalgoPromise.resolve(prom).then(function (result) {
+	                    // eslint-disable-line promise/catch-or-return
 	                    results[i] = result;
 	                    count -= 1;
 	                    if (count === 0) {
@@ -1088,7 +1071,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'hash',
 	        value: function hash(promises) {
-	            // eslint-disable-line no-undef
 	            var result = {};
 
 	            return ZalgoPromise.all(Object.keys(promises).map(function (key) {
@@ -1113,10 +1095,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'try',
 	        value: function _try(method, context, args) {
-
-	            if (method && typeof method !== 'function' && !method.call) {
-	                throw new Error('Promise.try expected a function');
-	            }
 
 	            var result = void 0;
 
@@ -1311,86 +1289,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {'use strict';
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-	/**
-	 * @preserve jquery-param (c) 2015 KNOWLEDGECODE | MIT
-	 */
-	(function (global) {
-	    'use strict';
-
-	    var param = function param(a) {
-	        var s = [];
-	        var add = function add(k, v) {
-	            v = typeof v === 'function' ? v() : v;
-	            v = v === null ? '' : v === undefined ? '' : v;
-	            s[s.length] = encodeURIComponent(k) + '=' + encodeURIComponent(v);
-	        };
-	        var buildParams = function buildParams(prefix, obj) {
-	            var i, len, key;
-
-	            if (prefix) {
-	                if (Array.isArray(obj)) {
-	                    for (i = 0, len = obj.length; i < len; i++) {
-	                        buildParams(prefix + '[' + (_typeof(obj[i]) === 'object' && obj[i] ? i : '') + ']', obj[i]);
-	                    }
-	                } else if (String(obj) === '[object Object]') {
-	                    for (key in obj) {
-	                        buildParams(prefix + '[' + key + ']', obj[key]);
-	                    }
-	                } else {
-	                    add(prefix, obj);
-	                }
-	            } else if (Array.isArray(obj)) {
-	                for (i = 0, len = obj.length; i < len; i++) {
-	                    add(obj[i].name, obj[i].value);
-	                }
-	            } else {
-	                for (key in obj) {
-	                    buildParams(key, obj[key]);
-	                }
-	            }
-	            return s;
-	        };
-
-	        return buildParams('', a).join('&');
-	    };
-
-	    if (( false ? 'undefined' : _typeof(module)) === 'object' && _typeof(module.exports) === 'object') {
-	        module.exports = param;
-	    } else if (true) {
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	            return param;
-	        }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	    } else {
-	        global.param = param;
-	    }
-	})(undefined);
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module)))
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-	"use strict";
-
-	module.exports = function (module) {
-		if (!module.webpackPolyfill) {
-			module.deprecate = function () {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
-	};
-
-/***/ }),
-/* 11 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1424,7 +1322,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -1465,7 +1363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var logLevels = exports.logLevels = ['error', 'warn', 'info', 'debug'];
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1475,11 +1373,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.init = init;
 
-	var _config = __webpack_require__(12);
+	var _config = __webpack_require__(10);
 
 	var _util = __webpack_require__(3);
 
-	var _performance = __webpack_require__(14);
+	var _performance = __webpack_require__(12);
 
 	var _logger = __webpack_require__(2);
 
@@ -1505,12 +1403,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (_config.config.logUnload) {
 	        window.addEventListener('beforeunload', function () {
 	            (0, _logger.info)('window_beforeunload');
-	            (0, _logger.immediateFlush)({ fireAndForget: true, fireBeacon: true });
+	            (0, _logger.immediateFlush)({ fireAndForget: true });
 	        });
 
 	        window.addEventListener('unload', function () {
 	            (0, _logger.info)('window_unload');
-	            (0, _logger.immediateFlush)({ fireAndForget: true, fireBeacon: true });
+	            (0, _logger.immediateFlush)({ fireAndForget: true });
 	        });
 	    }
 
@@ -1527,7 +1425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1541,11 +1439,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.initHeartBeat = initHeartBeat;
 	exports.initPerformance = initPerformance;
 
-	var _config = __webpack_require__(12);
+	var _config = __webpack_require__(10);
 
 	var _logger = __webpack_require__(2);
 
-	var _builders = __webpack_require__(11);
+	var _builders = __webpack_require__(9);
 
 	var _util = __webpack_require__(3);
 
@@ -1679,7 +1577,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1691,15 +1589,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.endTransition = endTransition;
 	exports.transition = transition;
 
-	var _performance = __webpack_require__(14);
+	var _performance = __webpack_require__(12);
 
 	var _logger = __webpack_require__(2);
 
-	var _builders = __webpack_require__(11);
+	var _builders = __webpack_require__(9);
 
 	var _util = __webpack_require__(3);
 
-	var _config = __webpack_require__(12);
+	var _config = __webpack_require__(10);
 
 	var windowID = (0, _util.uniqueID)();
 	var pageID = (0, _util.uniqueID)();
