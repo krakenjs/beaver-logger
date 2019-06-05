@@ -40,9 +40,9 @@ var WEBPACK_CONFIG = {
   },
   bail: true,
   plugins: [
-      new webpack.DefinePlugin({
-          __DEBUG__: true
-      })
+    new webpack.DefinePlugin({
+        __DEBUG__: false
+    })
   ]
 };
 
@@ -54,6 +54,9 @@ var WEBPACK_CONFIG_MIN = Object.assign({}, WEBPACK_CONFIG, {
     library: MODULE_NAME
   },
   plugins: [
+    new webpack.DefinePlugin({
+      __DEBUG__: false
+    }),
     new webpack.optimize.UglifyJsPlugin({
       test: /\.js$/,
       exclude: /(node_modules|bower_components)/,
