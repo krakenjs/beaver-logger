@@ -143,6 +143,8 @@ module.exports.expressEndpoint = function expressEndpoint(options) {
         res.header('Access-Control-Allow-Origin', '*');
       }
 
+      res.header('content-type', 'application/json');
+
       var corsRequestHeaders = req.headers['access-control-request-headers'];
 
       if (corsRequestHeaders) {
@@ -157,15 +159,15 @@ module.exports.expressEndpoint = function expressEndpoint(options) {
     }
 
     if (req.method.toLowerCase === 'options') {
-      return res.status(200).send();
+      return res.status(200).send('{}');
     }
 
     try {
       handleRequest(req, options.logger);
-      res.status(200).send();
+      res.status(200).send('{}');
     } catch (err) {
       console.error(err.stack || err.toString());
-      res.status(500).send();
+      res.status(500).send('{}');
     }
   });
 
