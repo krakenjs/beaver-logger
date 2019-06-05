@@ -38,7 +38,12 @@ var WEBPACK_CONFIG = {
     umdNamedDefine: true,
     library: MODULE_NAME
   },
-  bail: true
+  bail: true,
+  plugins: [
+      new webpack.DefinePlugin({
+          __DEBUG__: true
+      })
+  ]
 };
 
 var WEBPACK_CONFIG_MIN = Object.assign({}, WEBPACK_CONFIG, {
