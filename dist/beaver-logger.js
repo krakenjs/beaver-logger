@@ -759,7 +759,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 
-	        if (true) {
+	        if (false) {
 	            try {
 	                throw new Error('ZalgoPromise');
 	            } catch (err) {
@@ -1237,7 +1237,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    dispatchedErrors.push(err);
 
 	    setTimeout(function () {
-	        if (true) {
+	        if (false) {
 	            // $FlowFixMe
 	            throw new Error((err.stack || err.toString()) + '\n\nFrom promise:\n\n' + promise.stack);
 	        }
