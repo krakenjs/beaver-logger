@@ -591,8 +591,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            };
 	        }
-	        if (window.navigator && window.navigator.sendBeacon && window.decodeURIComponent && fireBeacon) {
-	            window.navigator.sendBeacon(url, window.decodeURIComponent((0, _jqueryParam2['default'])(data)));
+	        if (window.navigator && window.navigator.sendBeacon && fireBeacon) {
+	            window.navigator.sendBeacon(url, (0, _jqueryParam2['default'])(data));
 	        }
 	        req.send(JSON.stringify(data).replace(/&/g, '%26'));
 	    });
