@@ -67,8 +67,8 @@ export function ajax(method, url, headers={}, data={}, { fireAndForget = false, 
                 }
             };
         }
-        if (window.navigator && window.navigator.sendBeacon && fireBeacon) {
-            window.navigator.sendBeacon(url, param(data).replace(/&/g, '%26'));
+        if (window.navigator && window.navigator.sendBeacon && window.decodeURIComponent && fireBeacon) {
+            window.navigator.sendBeacon(url, window.decodeURIComponent(param(data)));
         }
         req.send(JSON.stringify(data).replace(/&/g, '%26'));
     });
