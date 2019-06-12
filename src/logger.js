@@ -49,7 +49,7 @@ function httpTransport({ url, method, headers, json } : { url : string, method :
 
 function extendIfDefined(target : { [string] : string }, source : { [string] : ?string }) {
     for (let key in source) {
-        if (source.hasOwnProperty(key) && source[key]) {
+        if (source.hasOwnProperty(key) && source[key] && !target[key]) {
             target[key] = source[key];
         }
     }
