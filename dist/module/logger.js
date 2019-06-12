@@ -20,7 +20,7 @@ function httpTransport(_ref) {
 
 function extendIfDefined(target, source) {
     for (var key in source) {
-        if (source.hasOwnProperty(key) && source[key]) {
+        if (source.hasOwnProperty(key) && source[key] && !target[key]) {
             target[key] = source[key];
         }
     }

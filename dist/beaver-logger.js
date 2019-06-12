@@ -345,7 +345,8 @@
                 if (!protocol) throw new Error("Can not read window protocol");
                 if (protocol === PROTOCOL.FILE) return PROTOCOL.FILE + "//";
                 if (protocol === PROTOCOL.ABOUT) {
-                    var parent = function(win) {
+                    var parent = function() {
+                        var win = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : window;
                         if (win) try {
                             if (win.parent && win.parent !== win) return win.parent;
                         } catch (err) {}
@@ -456,7 +457,7 @@
                     if (err && err.message === IE_WIN_ACCESS_ERROR) return !0;
                 }
                 try {
-                    obj && obj.__cross_domain_utils_window_check__;
+                    if (obj && "__unlikely_value__" === obj.__cross_domain_utils_window_check__) return !1;
                 } catch (err) {
                     return !0;
                 }
@@ -523,20 +524,20 @@
                     } catch (err) {
                         delete this.weakmap;
                     }
-                    if (this.isSafeToReadWrite(key)) {
+                    if (this.isSafeToReadWrite(key)) try {
                         var name = this.name, entry = key[name];
                         entry && entry[0] === key ? entry[1] = value : defineProperty(key, name, {
                             value: [ key, value ],
                             writable: !0
                         });
-                    } else {
-                        this._cleanupClosedWindows();
-                        var keys = this.keys, values = this.values, index = util_safeIndexOf(keys, key);
-                        if (-1 === index) {
-                            keys.push(key);
-                            values.push(value);
-                        } else values[index] = value;
-                    }
+                        return;
+                    } catch (err) {}
+                    this._cleanupClosedWindows();
+                    var keys = this.keys, values = this.values, index = util_safeIndexOf(keys, key);
+                    if (-1 === index) {
+                        keys.push(key);
+                        values.push(value);
+                    } else values[index] = value;
                 };
                 CrossDomainSafeWeakMap.prototype.get = function(key) {
                     if (!key) throw new Error("WeakMap expected key");
@@ -546,14 +547,13 @@
                     } catch (err) {
                         delete this.weakmap;
                     }
-                    if (!this.isSafeToReadWrite(key)) {
-                        this._cleanupClosedWindows();
-                        var index = util_safeIndexOf(this.keys, key);
-                        if (-1 === index) return;
-                        return this.values[index];
-                    }
-                    var entry = key[this.name];
-                    if (entry && entry[0] === key) return entry[1];
+                    if (this.isSafeToReadWrite(key)) try {
+                        var entry = key[this.name];
+                        return entry && entry[0] === key ? entry[1] : void 0;
+                    } catch (err) {}
+                    this._cleanupClosedWindows();
+                    var index = util_safeIndexOf(this.keys, key);
+                    if (-1 !== index) return this.values[index];
                 };
                 CrossDomainSafeWeakMap.prototype.delete = function(key) {
                     if (!key) throw new Error("WeakMap expected key");
@@ -563,16 +563,15 @@
                     } catch (err) {
                         delete this.weakmap;
                     }
-                    if (this.isSafeToReadWrite(key)) {
+                    if (this.isSafeToReadWrite(key)) try {
                         var entry = key[this.name];
                         entry && entry[0] === key && (entry[0] = entry[1] = void 0);
-                    } else {
-                        this._cleanupClosedWindows();
-                        var keys = this.keys, index = util_safeIndexOf(keys, key);
-                        if (-1 !== index) {
-                            keys.splice(index, 1);
-                            this.values.splice(index, 1);
-                        }
+                    } catch (err) {}
+                    this._cleanupClosedWindows();
+                    var keys = this.keys, index = util_safeIndexOf(keys, key);
+                    if (-1 !== index) {
+                        keys.splice(index, 1);
+                        this.values.splice(index, 1);
                     }
                 };
                 CrossDomainSafeWeakMap.prototype.has = function(key) {
@@ -583,10 +582,10 @@
                     } catch (err) {
                         delete this.weakmap;
                     }
-                    if (this.isSafeToReadWrite(key)) {
+                    if (this.isSafeToReadWrite(key)) try {
                         var entry = key[this.name];
                         return !(!entry || entry[0] !== key);
-                    }
+                    } catch (err) {}
                     this._cleanupClosedWindows();
                     return -1 !== util_safeIndexOf(this.keys, key);
                 };
@@ -688,7 +687,7 @@
                 }).then(src_util_noop);
             }
             function extendIfDefined(target, source) {
-                for (var key in source) source.hasOwnProperty(key) && source[key] && (target[key] = source[key]);
+                for (var key in source) source.hasOwnProperty(key) && source[key] && !target[key] && (target[key] = source[key]);
             }
             function Logger(_ref2) {
                 var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? FLUSH_INTERVAL : _ref2$flushInterval, events = [], tracking = [], payloadBuilders = [], metaBuilders = [], trackingBuilders = [], headerBuilders = [];
