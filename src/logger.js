@@ -6,25 +6,25 @@ import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } fr
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
 
+type Payload = { [string] : string };
 type Transport = ({ url : string, method : string, headers : Payload, json : Object }) => ZalgoPromise<void>;
 
-type LoggerOptions = {
+type LoggerOptions = {|
     url : string,
     prefix? : string,
     logLevel? : $Values<typeof LOG_LEVEL>,
     transport? : Transport,
     flushInterval? : number
-};
+|};
 
 type ClientPayload = { [string] : ?string };
-type Payload = { [string] : string };
 type Log = (name : string, payload? : ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 type Track = (payload : ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 
 type Builder = (Payload) => ClientPayload;
 type AddBuilder = (Builder) => LoggerType; // eslint-disable-line no-use-before-define
 
-export type LoggerType = {
+export type LoggerType = {|
     debug : Log,
     info : Log,
     warn : Log,
@@ -41,14 +41,14 @@ export type LoggerType = {
     addHeaderBuilder : AddBuilder,
 
     setTransport : (Transport) => LoggerType
-};
+|};
 
 function httpTransport({ url, method, headers, json } : { url : string, method : string, headers : { [string] : string }, json : Object }) : ZalgoPromise<void> {
     return request({ url, method, headers, json }).then(noop);
 }
 
 function extendIfDefined(target : { [string] : string }, source : { [string] : ?string }) {
-    for (let key in source) {
+    for (const key in source) {
         if (source.hasOwnProperty(key) && source[key] && !target[key]) {
             target[key] = source[key];
         }
@@ -60,10 +60,10 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
     let events : Array<{ level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload }> = [];
     let tracking : Array<Payload> = [];
 
-    let payloadBuilders : Array<Builder> = [];
-    let metaBuilders : Array<Builder> = [];
-    let trackingBuilders : Array<Builder> = [];
-    let headerBuilders : Array<Builder> = [];
+    const payloadBuilders : Array<Builder> = [];
+    const metaBuilders : Array<Builder> = [];
+    const trackingBuilders : Array<Builder> = [];
+    const headerBuilders : Array<Builder> = [];
 
     function print(level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload) {
 
@@ -81,7 +81,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             return;
         }
 
-        let args = [ event ];
+        const args = [ event ];
 
         args.push(payload);
 
@@ -110,17 +110,17 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                 return;
             }
 
-            let meta = {};
-            for (let builder of metaBuilders) {
+            const meta = {};
+            for (const builder of metaBuilders) {
                 extendIfDefined(meta, builder(meta));
             }
 
-            let headers = {};
-            for (let builder of headerBuilders) {
+            const headers = {};
+            for (const builder of headerBuilders) {
                 extendIfDefined(headers, builder(headers));
             }
 
-            let req = transport({
+            const req = transport({
                 method: 'POST',
                 url,
                 headers,
@@ -138,7 +138,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         });
     }
 
-    let flush = promiseDebounce(immediateFlush);
+    const flush = promiseDebounce(immediateFlush);
 
     function enqueue(level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload) {
 
@@ -163,12 +163,12 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             event = `${ prefix }_${ event }`;
         }
 
-        let logPayload : Payload = {
+        const logPayload : Payload = {
             ...objFilter(payload),
             timestamp: Date.now().toString()
         };
 
-        for (let builder of payloadBuilders) {
+        for (const builder of payloadBuilders) {
             extendIfDefined(logPayload, builder(logPayload));
         }
 
@@ -220,9 +220,9 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             return logger; // eslint-disable-line no-use-before-define
         }
 
-        let trackingPayload : Payload = objFilter(payload);
+        const trackingPayload : Payload = objFilter(payload);
 
-        for (let builder of trackingBuilders) {
+        for (const builder of trackingBuilders) {
             extendIfDefined(trackingPayload, builder(trackingPayload));
         }
 

@@ -5,8 +5,8 @@
   "main": "dist/beaver-logger.js",
   "scripts": {
     "setup": "npm install && npm run flow-typed",
-    "lint": "eslint client/ server/ test/ *.js",
-    "flow-typed": "flow-typed install && flow-typed install express@4",
+    "lint": "eslint src/ server/ test/ *.js",
+    "flow-typed": "rm -rf ./flow-typed && flow-typed install && flow-typed install express@4",
     "flow": "flow",
     "karma": "cross-env NODE_ENV=test babel-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/karma start",
     "babel": "babel src/ --out-dir dist/module",
@@ -48,7 +48,7 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "flow-bin": "^0.100.0",
-    "grumbler-scripts": "^2.0.56",
+    "grumbler-scripts": "^3",
     "mocha": "^3.5.3",
     "sync-browser-mocks": "^1.0.44"
   },

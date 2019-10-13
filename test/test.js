@@ -10,7 +10,7 @@ describe('beaver-logger tests', () => {
 
     it('should log something and flush it to the buffer', () => {
 
-        let $logger = Logger({
+        const $logger = Logger({
             url: '/test/api/log'
         });
 
@@ -18,11 +18,11 @@ describe('beaver-logger tests', () => {
             foo: 'bar'
         });
 
-        let logEndpoint = $mockEndpoint.register({
+        const logEndpoint = $mockEndpoint.register({
             method:  'POST',
             uri:     '/test/api/log',
             handler: (req) => {
-                let hasLog = req.data.events.some(event => event.event === 'hello_world' && event.level === 'info');
+                const hasLog = req.data.events.some(event => event.event === 'hello_world' && event.level === 'info');
 
                 if (!hasLog) {
                     throw new Error('Expected posted payload to contain logged log');
