@@ -4651,7 +4651,7 @@ function Logger(_ref) {
   var headerBuilders = [];
 
   function print(level, event, payload) {
-    if ( false || !dom_isBrowser() || !window.console || !window.console.log) {
+    if (true) {
       return;
     }
 
@@ -4705,9 +4705,9 @@ function Logger(_ref) {
 
   function immediateFlush() {
     if (!dom_isBrowser() || window.location.protocol === constants_PROTOCOL.FILE || !events.length && !tracking.length) {
-      if (false) {} else {
-        return promise_ZalgoPromise.resolve();
-      }
+      if (true) {
+        return;
+      } else {}
     }
 
     var _buildPayloads = buildPayloads(),
@@ -4723,17 +4723,17 @@ function Logger(_ref) {
     events = [];
     tracking = [];
 
-    if (false) {} else {
-      return request({
+    if (true) {
+      simpleRequest({
         method: method,
         url: url,
         headers: headers,
         json: json
-      }).then(src_util_noop);
-    }
+      });
+    } else {}
   }
 
-  var flush =  false ? undefined : promiseDebounce(immediateFlush);
+  var flush =  true ? immediateFlush : undefined;
 
   function enqueue(level, event, payload) {
     events.push({
@@ -4861,4 +4861,4 @@ function Logger(_ref) {
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=beaver-logger.js.map
+//# sourceMappingURL=beaver-logger.lite.js.map
