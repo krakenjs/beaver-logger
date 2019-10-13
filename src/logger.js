@@ -5,15 +5,14 @@ import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } fr
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
+import { simpleRequest } from './util';
 
 type Payload = { [string] : string };
-type Transport = ({ url : string, method : string, headers : Payload, json : Object }) => ZalgoPromise<void>;
 
 type LoggerOptions = {|
     url : string,
     prefix? : string,
     logLevel? : $Values<typeof LOG_LEVEL>,
-    transport? : Transport,
     flushInterval? : number
 |};
 
@@ -32,20 +31,14 @@ export type LoggerType = {|
 
     track : Track,
 
-    flush : () => ZalgoPromise<void>,
-    immediateFlush : () => ZalgoPromise<void>,
+    flush : () => (void | ZalgoPromise<void>),
+    immediateFlush : () => (void | ZalgoPromise<void>),
 
     addPayloadBuilder : AddBuilder,
     addMetaBuilder : AddBuilder,
     addTrackingBuilder : AddBuilder,
-    addHeaderBuilder : AddBuilder,
-
-    setTransport : (Transport) => LoggerType
+    addHeaderBuilder : AddBuilder
 |};
-
-function httpTransport({ url, method, headers, json } : { url : string, method : string, headers : { [string] : string }, json : Object }) : ZalgoPromise<void> {
-    return request({ url, method, headers, json }).then(noop);
-}
 
 function extendIfDefined(target : { [string] : string }, source : { [string] : ?string }) {
     for (const key in source) {
@@ -55,7 +48,7 @@ function extendIfDefined(target : { [string] : string }, source : { [string] : ?
     }
 }
 
-export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL } : LoggerOptions) : LoggerType {
+export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, flushInterval = FLUSH_INTERVAL } : LoggerOptions) : LoggerType {
 
     let events : Array<{ level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload }> = [];
     let tracking : Array<Payload> = [];
@@ -66,8 +59,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
     const headerBuilders : Array<Builder> = [];
 
     function print(level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload) {
-
-        if (!isBrowser() || !window.console || !window.console.log) {
+        if (__BEAVER_LOGGER__.__LITE_MODE__ || !isBrowser() || !window.console || !window.console.log) {
             return;
         }
 
@@ -100,48 +92,48 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         }
     }
 
-    function immediateFlush() : ZalgoPromise<void> {
-        return ZalgoPromise.try(() => {
-            if (!isBrowser() || window.location.protocol === PROTOCOL.FILE) {
-                return;
-            }
+    function buildPayloads() : {| meta : Payload, headers : Payload |} {
+        const meta = {};
+        for (const builder of metaBuilders) {
+            extendIfDefined(meta, builder(meta));
+        }
 
-            if (!events.length && !tracking.length) {
-                return;
-            }
+        const headers = {};
+        for (const builder of headerBuilders) {
+            extendIfDefined(headers, builder(headers));
+        }
 
-            const meta = {};
-            for (const builder of metaBuilders) {
-                extendIfDefined(meta, builder(meta));
-            }
-
-            const headers = {};
-            for (const builder of headerBuilders) {
-                extendIfDefined(headers, builder(headers));
-            }
-
-            const req = transport({
-                method: 'POST',
-                url,
-                headers,
-                json:   {
-                    events,
-                    meta,
-                    tracking
-                }
-            });
-
-            events = [];
-            tracking = [];
-
-            return req.then(noop);
-        });
+        return { meta, headers };
     }
 
-    const flush = promiseDebounce(immediateFlush);
+    function immediateFlush() : void | ZalgoPromise<void> {
+        if (!isBrowser() || window.location.protocol === PROTOCOL.FILE || (!events.length && !tracking.length)) {
+            if (__BEAVER_LOGGER__.__LITE_MODE__) {
+                return;
+            } else {
+                return ZalgoPromise.resolve();
+            }
+        }
+
+        const { meta, headers } = buildPayloads();
+        const json = { events,  meta, tracking };
+        const method = 'POST';
+
+        events = [];
+        tracking = [];
+
+        if (__BEAVER_LOGGER__.__LITE_MODE__) {
+            simpleRequest({ method, url, headers, json });
+        } else {
+            return request({ method, url, headers, json }).then(noop);
+        }
+    }
+
+    const flush = __BEAVER_LOGGER__.__LITE_MODE__
+        ? immediateFlush
+        : promiseDebounce(immediateFlush);
 
     function enqueue(level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload) {
-
         events.push({
             level,
             event,
@@ -154,7 +146,6 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
     }
 
     function log(level : $Values<typeof LOG_LEVEL>, event : string, payload = {}) : LoggerType {
-
         if (!isBrowser()) {
             return logger; // eslint-disable-line no-use-before-define
         }
@@ -232,11 +223,6 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         return logger; // eslint-disable-line no-use-before-define
     }
 
-    function setTransport(newTransport : Transport) : LoggerType {
-        transport = newTransport;
-        return logger; // eslint-disable-line no-use-before-define
-    }
-
     if (isBrowser()) {
         safeInterval(flush, flushInterval);
     }
@@ -252,8 +238,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         addPayloadBuilder,
         addMetaBuilder,
         addTrackingBuilder,
-        addHeaderBuilder,
-        setTransport
+        addHeaderBuilder
     };
 
     return logger;

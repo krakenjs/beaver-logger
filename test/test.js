@@ -34,6 +34,7 @@ describe('beaver-logger tests', () => {
 
         logEndpoint.expectCalls();
 
+        // $FlowFixMe
         return $logger.flush().then(() => {
             logEndpoint.done();
         });
