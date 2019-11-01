@@ -1,7 +1,7 @@
 /* @flow */
 
 import { ZalgoPromise } from 'zalgo-promise/src';
-import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
+import { request, isBrowser, isElectron, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
@@ -107,7 +107,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, flushInterva
     }
 
     function immediateFlush() : void | ZalgoPromise<void> {
-        if (!isBrowser() || window.location.protocol === PROTOCOL.FILE || (!events.length && !tracking.length)) {
+        if (!isBrowser() || (!isElectron() && window.location.protocol === PROTOCOL.FILE) || (!events.length && !tracking.length)) {
             if (__BEAVER_LOGGER__.__LITE_MODE__) {
                 return;
             } else {
