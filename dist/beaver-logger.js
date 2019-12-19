@@ -4638,23 +4638,6 @@ var AUTO_FLUSH_LEVEL = [LOG_LEVEL.WARN, LOG_LEVEL.ERROR];
 var LOG_LEVEL_PRIORITY = [LOG_LEVEL.ERROR, LOG_LEVEL.WARN, LOG_LEVEL.INFO, LOG_LEVEL.DEBUG];
 var FLUSH_INTERVAL = 60 * 1000;
 var DEFAULT_LOG_LEVEL =  false ? undefined : LOG_LEVEL.WARN;
-// CONCATENATED MODULE: ./src/util.js
-function simpleRequest(_ref) {
-  var _ref$method = _ref.method,
-      method = _ref$method === void 0 ? 'GET' : _ref$method,
-      url = _ref.url,
-      headers = _ref.headers,
-      json = _ref.json;
-  var req = new XMLHttpRequest();
-  req.open(method, url);
-
-  for (var _i2 = 0, _Object$keys2 = Object.keys(headers); _i2 < _Object$keys2.length; _i2++) {
-    var header = _Object$keys2[_i2];
-    req.setRequestHeader(header, headers[header]);
-  }
-
-  req.send(JSON.stringify(json));
-}
 // CONCATENATED MODULE: ./src/logger.js
 
 
@@ -4662,6 +4645,18 @@ function simpleRequest(_ref) {
 
 
 
+function httpTransport(_ref) {
+  var url = _ref.url,
+      method = _ref.method,
+      headers = _ref.headers,
+      json = _ref.json;
+  return request({
+    url: url,
+    method: method,
+    headers: headers,
+    json: json
+  }).then(src_util_noop);
+}
 
 function extendIfDefined(target, source) {
   for (var key in source) {
@@ -4671,13 +4666,15 @@ function extendIfDefined(target, source) {
   }
 }
 
-function Logger(_ref) {
-  var url = _ref.url,
-      prefix = _ref.prefix,
-      _ref$logLevel = _ref.logLevel,
-      logLevel = _ref$logLevel === void 0 ? DEFAULT_LOG_LEVEL : _ref$logLevel,
-      _ref$flushInterval = _ref.flushInterval,
-      flushInterval = _ref$flushInterval === void 0 ? FLUSH_INTERVAL : _ref$flushInterval;
+function Logger(_ref2) {
+  var url = _ref2.url,
+      prefix = _ref2.prefix,
+      _ref2$logLevel = _ref2.logLevel,
+      logLevel = _ref2$logLevel === void 0 ? DEFAULT_LOG_LEVEL : _ref2$logLevel,
+      _ref2$transport = _ref2.transport,
+      transport = _ref2$transport === void 0 ? httpTransport : _ref2$transport,
+      _ref2$flushInterval = _ref2.flushInterval,
+      flushInterval = _ref2$flushInterval === void 0 ? FLUSH_INTERVAL : _ref2$flushInterval;
   var events = [];
   var tracking = [];
   var payloadBuilders = [];
@@ -4686,7 +4683,7 @@ function Logger(_ref) {
   var headerBuilders = [];
 
   function print(level, event, payload) {
-    if ( false || !dom_isBrowser() || !window.console || !window.console.log) {
+    if (!dom_isBrowser() || !window.console || !window.console.log) {
       return;
     }
 
@@ -4711,58 +4708,47 @@ function Logger(_ref) {
     }
   }
 
-  function buildPayloads() {
-    var meta = {};
-
-    for (var _i2 = 0; _i2 < metaBuilders.length; _i2++) {
-      var builder = metaBuilders[_i2];
-      extendIfDefined(meta, builder(meta));
-    }
-
-    var headers = {};
-
-    for (var _i4 = 0; _i4 < headerBuilders.length; _i4++) {
-      var _builder = headerBuilders[_i4];
-      extendIfDefined(headers, _builder(headers));
-    }
-
-    return {
-      meta: meta,
-      headers: headers
-    };
-  }
-
   function immediateFlush() {
-    if (!dom_isBrowser() || window.location.protocol === constants_PROTOCOL.FILE || !events.length && !tracking.length) {
-      if (false) {} else {
-        return promise_ZalgoPromise.resolve();
+    return promise_ZalgoPromise.try(function () {
+      if (!dom_isBrowser() || window.location.protocol === constants_PROTOCOL.FILE) {
+        return;
       }
-    }
 
-    var _buildPayloads = buildPayloads(),
-        meta = _buildPayloads.meta,
-        headers = _buildPayloads.headers;
+      if (!events.length && !tracking.length) {
+        return;
+      }
 
-    var json = {
-      events: events,
-      meta: meta,
-      tracking: tracking
-    };
-    var method = 'POST';
-    events = [];
-    tracking = [];
+      var meta = {};
 
-    if (false) {} else {
-      return request({
-        method: method,
+      for (var _i2 = 0; _i2 < metaBuilders.length; _i2++) {
+        var builder = metaBuilders[_i2];
+        extendIfDefined(meta, builder(meta));
+      }
+
+      var headers = {};
+
+      for (var _i4 = 0; _i4 < headerBuilders.length; _i4++) {
+        var _builder = headerBuilders[_i4];
+        extendIfDefined(headers, _builder(headers));
+      }
+
+      var req = transport({
+        method: 'POST',
         url: url,
         headers: headers,
-        json: json
-      }).then(src_util_noop);
-    }
+        json: {
+          events: events,
+          meta: meta,
+          tracking: tracking
+        }
+      });
+      events = [];
+      tracking = [];
+      return req.then(src_util_noop);
+    });
   }
 
-  var flush =  false ? undefined : promiseDebounce(immediateFlush);
+  var flush = promiseDebounce(immediateFlush);
 
   function enqueue(level, event, payload) {
     events.push({
@@ -4861,6 +4847,11 @@ function Logger(_ref) {
     return logger; // eslint-disable-line no-use-before-define
   }
 
+  function setTransport(newTransport) {
+    transport = newTransport;
+    return logger; // eslint-disable-line no-use-before-define
+  }
+
   if (dom_isBrowser()) {
     safeInterval(flush, flushInterval);
   }
@@ -4876,7 +4867,8 @@ function Logger(_ref) {
     addPayloadBuilder: addPayloadBuilder,
     addMetaBuilder: addMetaBuilder,
     addTrackingBuilder: addTrackingBuilder,
-    addHeaderBuilder: addHeaderBuilder
+    addHeaderBuilder: addHeaderBuilder,
+    setTransport: setTransport
   };
   return logger;
 }

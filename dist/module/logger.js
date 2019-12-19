@@ -1,51 +1,56 @@
-"use strict";
+import _extends from "@babel/runtime/helpers/esm/extends";
+import { ZalgoPromise } from 'zalgo-promise/src';
+import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
+import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
+import { LOG_LEVEL, PROTOCOL } from './constants';
 
-exports.__esModule = true;
-exports.Logger = Logger;
-
-var _src = require("zalgo-promise/src");
-
-var _src2 = require("belter/src");
-
-var _config = require("./config");
-
-var _constants = require("./constants");
-
-var _util = require("./util");
-
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function httpTransport(_ref) {
+  var url = _ref.url,
+      method = _ref.method,
+      headers = _ref.headers,
+      json = _ref.json;
+  return request({
+    url: url,
+    method: method,
+    headers: headers,
+    json: json
+  }).then(noop);
+}
 
 function extendIfDefined(target, source) {
-  for (const key in source) {
+  for (var key in source) {
     if (source.hasOwnProperty(key) && source[key] && !target[key]) {
       target[key] = source[key];
     }
   }
 }
 
-function Logger({
-  url,
-  prefix,
-  logLevel = _config.DEFAULT_LOG_LEVEL,
-  flushInterval = _config.FLUSH_INTERVAL
-}) {
-  let events = [];
-  let tracking = [];
-  const payloadBuilders = [];
-  const metaBuilders = [];
-  const trackingBuilders = [];
-  const headerBuilders = [];
+export function Logger(_ref2) {
+  var url = _ref2.url,
+      prefix = _ref2.prefix,
+      _ref2$logLevel = _ref2.logLevel,
+      logLevel = _ref2$logLevel === void 0 ? DEFAULT_LOG_LEVEL : _ref2$logLevel,
+      _ref2$transport = _ref2.transport,
+      transport = _ref2$transport === void 0 ? httpTransport : _ref2$transport,
+      _ref2$flushInterval = _ref2.flushInterval,
+      flushInterval = _ref2$flushInterval === void 0 ? FLUSH_INTERVAL : _ref2$flushInterval;
+  var events = [];
+  var tracking = [];
+  var payloadBuilders = [];
+  var metaBuilders = [];
+  var trackingBuilders = [];
+  var headerBuilders = [];
 
   function print(level, event, payload) {
-    if (__BEAVER_LOGGER__.__LITE_MODE__ || !(0, _src2.isBrowser)() || !window.console || !window.console.log) {
+    if (!isBrowser() || !window.console || !window.console.log) {
       return;
     }
 
-    if (_config.LOG_LEVEL_PRIORITY.indexOf(level) > _config.LOG_LEVEL_PRIORITY.indexOf(logLevel)) {
+    if (LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel)) {
       return;
     }
 
-    const args = [event];
+    var args = [event];
     args.push(payload);
 
     if (payload.error || payload.warning) {
@@ -62,92 +67,79 @@ function Logger({
     }
   }
 
-  function buildPayloads() {
-    const meta = {};
-
-    for (const builder of metaBuilders) {
-      extendIfDefined(meta, builder(meta));
-    }
-
-    const headers = {};
-
-    for (const builder of headerBuilders) {
-      extendIfDefined(headers, builder(headers));
-    }
-
-    return {
-      meta,
-      headers
-    };
-  }
-
   function immediateFlush() {
-    if (!(0, _src2.isBrowser)() || window.location.protocol === _constants.PROTOCOL.FILE || !events.length && !tracking.length) {
-      if (__BEAVER_LOGGER__.__LITE_MODE__) {
+    return ZalgoPromise.try(function () {
+      if (!isBrowser() || window.location.protocol === PROTOCOL.FILE) {
         return;
-      } else {
-        return _src.ZalgoPromise.resolve();
       }
-    }
 
-    const {
-      meta,
-      headers
-    } = buildPayloads();
-    const json = {
-      events,
-      meta,
-      tracking
-    };
-    const method = 'POST';
-    events = [];
-    tracking = [];
+      if (!events.length && !tracking.length) {
+        return;
+      }
 
-    if (__BEAVER_LOGGER__.__LITE_MODE__) {
-      (0, _util.simpleRequest)({
-        method,
-        url,
-        headers,
-        json
+      var meta = {};
+
+      for (var _i2 = 0; _i2 < metaBuilders.length; _i2++) {
+        var builder = metaBuilders[_i2];
+        extendIfDefined(meta, builder(meta));
+      }
+
+      var headers = {};
+
+      for (var _i4 = 0; _i4 < headerBuilders.length; _i4++) {
+        var _builder = headerBuilders[_i4];
+        extendIfDefined(headers, _builder(headers));
+      }
+
+      var req = transport({
+        method: 'POST',
+        url: url,
+        headers: headers,
+        json: {
+          events: events,
+          meta: meta,
+          tracking: tracking
+        }
       });
-    } else {
-      return (0, _src2.request)({
-        method,
-        url,
-        headers,
-        json
-      }).then(_src2.noop);
-    }
+      events = [];
+      tracking = [];
+      return req.then(noop);
+    });
   }
 
-  const flush = __BEAVER_LOGGER__.__LITE_MODE__ ? immediateFlush : (0, _src2.promiseDebounce)(immediateFlush);
+  var flush = promiseDebounce(immediateFlush);
 
   function enqueue(level, event, payload) {
     events.push({
-      level,
-      event,
-      payload
+      level: level,
+      event: event,
+      payload: payload
     });
 
-    if (_config.AUTO_FLUSH_LEVEL.indexOf(level) !== -1) {
+    if (AUTO_FLUSH_LEVEL.indexOf(level) !== -1) {
       flush();
     }
   }
 
-  function log(level, event, payload = {}) {
-    if (!(0, _src2.isBrowser)()) {
+  function log(level, event, payload) {
+    if (payload === void 0) {
+      payload = {};
+    }
+
+    if (!isBrowser()) {
       return logger; // eslint-disable-line no-use-before-define
     }
 
     if (prefix) {
-      event = `${prefix}_${event}`;
+      event = prefix + "_" + event;
     }
 
-    const logPayload = _extends({}, (0, _src2.objFilter)(payload), {
+    var logPayload = _extends({}, objFilter(payload), {
       timestamp: Date.now().toString()
     });
 
-    for (const builder of payloadBuilders) {
+    for (var _i6 = 0; _i6 < payloadBuilders.length; _i6++) {
+      var builder = payloadBuilders[_i6];
       extendIfDefined(logPayload, builder(logPayload));
     }
 
@@ -178,53 +170,64 @@ function Logger({
   }
 
   function debug(event, payload) {
-    return log(_constants.LOG_LEVEL.DEBUG, event, payload);
+    return log(LOG_LEVEL.DEBUG, event, payload);
   }
 
   function info(event, payload) {
-    return log(_constants.LOG_LEVEL.INFO, event, payload);
+    return log(LOG_LEVEL.INFO, event, payload);
   }
 
   function warn(event, payload) {
-    return log(_constants.LOG_LEVEL.WARN, event, payload);
+    return log(LOG_LEVEL.WARN, event, payload);
   }
 
   function error(event, payload) {
-    return log(_constants.LOG_LEVEL.ERROR, event, payload);
+    return log(LOG_LEVEL.ERROR, event, payload);
   }
 
-  function track(payload = {}) {
-    if (!(0, _src2.isBrowser)()) {
+  function track(payload) {
+    if (payload === void 0) {
+      payload = {};
+    }
+
+    if (!isBrowser()) {
       return logger; // eslint-disable-line no-use-before-define
     }
 
-    const trackingPayload = (0, _src2.objFilter)(payload);
+    var trackingPayload = objFilter(payload);
 
-    for (const builder of trackingBuilders) {
+    for (var _i8 = 0; _i8 < trackingBuilders.length; _i8++) {
+      var builder = trackingBuilders[_i8];
       extendIfDefined(trackingPayload, builder(trackingPayload));
     }
 
-    print(_constants.LOG_LEVEL.DEBUG, 'track', trackingPayload);
+    print(LOG_LEVEL.DEBUG, 'track', trackingPayload);
     tracking.push(trackingPayload);
     return logger; // eslint-disable-line no-use-before-define
   }
 
-  if ((0, _src2.isBrowser)()) {
-    (0, _src2.safeInterval)(flush, flushInterval);
+  function setTransport(newTransport) {
+    transport = newTransport;
+    return logger; // eslint-disable-line no-use-before-define
   }
 
-  const logger = {
-    debug,
-    info,
-    warn,
-    error,
-    track,
-    flush,
-    immediateFlush,
-    addPayloadBuilder,
-    addMetaBuilder,
-    addTrackingBuilder,
-    addHeaderBuilder
+  if (isBrowser()) {
+    safeInterval(flush, flushInterval);
+  }
+
+  var logger = {
+    debug: debug,
+    info: info,
+    warn: warn,
+    error: error,
+    track: track,
+    flush: flush,
+    immediateFlush: immediateFlush,
+    addPayloadBuilder: addPayloadBuilder,
+    addMetaBuilder: addMetaBuilder,
+    addTrackingBuilder: addTrackingBuilder,
+    addHeaderBuilder: addHeaderBuilder,
+    setTransport: setTransport
   };
   return logger;
 }
