@@ -180,7 +180,8 @@ function sendCorsHeaders(req : ExpressRequest, res : ExpressResponse) {
 }
 
 export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors = false } : ExpressEndpointOptions = {}) : mixed {
-    
+
+    // $FlowFixMe
     const app = require('express')();
 
     app.all(uri, (req : ExpressRequest, res : ExpressResponse) => {
