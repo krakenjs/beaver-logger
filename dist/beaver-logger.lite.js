@@ -783,6 +783,20 @@ function supportsPopups(ua) {
 
   return !(isIosWebview(ua) || isAndroidWebview(ua) || isOperaMini(ua) || isFirefoxIOS(ua) || isEdgeIOS(ua) || isFacebookWebView(ua) || isQQBrowser(ua) || isElectron() || isMacOsCna() || isStandAlone());
 }
+function isChrome(ua) {
+  if (ua === void 0) {
+    ua = getUserAgent();
+  }
+
+  return /Chrome|Chromium|CriOS/.test(ua);
+}
+function isSafari(ua) {
+  if (ua === void 0) {
+    ua = getUserAgent();
+  }
+
+  return /Safari/.test(ua) && !isChrome(ua);
+}
 // CONCATENATED MODULE: ./node_modules/cross-domain-utils/src/util.js
 function isRegex(item) {
   return Object.prototype.toString.call(item) === '[object RegExp]';
@@ -1796,6 +1810,19 @@ function closeWindow(win) {
   } catch (err) {// pass
   }
 }
+function getFrameForWindow(win) {
+  if (isSameDomain(win)) {
+    return assertSameDomain(win).frameElement;
+  }
+
+  for (var _i21 = 0, _document$querySelect2 = document.querySelectorAll('iframe'); _i21 < _document$querySelect2.length; _i21++) {
+    var frame = _document$querySelect2[_i21];
+
+    if (frame && frame.contentWindow && frame.contentWindow === win) {
+      return frame;
+    }
+  }
+}
 // CONCATENATED MODULE: ./node_modules/cross-domain-utils/src/types.js
 // export something to force webpack to see this as an ES module
 var TYPES = true;
@@ -2229,14 +2256,18 @@ function memoize(method, options) {
   };
 
   return setFunctionName(memoizedFunction, getFunctionName(method) + "::memoized");
+}
+function promiseIdentity(item) {
+  // $FlowFixMe
+  return promise_ZalgoPromise.resolve(item);
 } // eslint-disable-next-line flowtype/no-weak-types
 
 function memoizePromise(method) {
   var cache = {}; // eslint-disable-next-line flowtype/no-weak-types
 
   function memoizedPromiseFunction() {
-    var _this2 = this,
-        _arguments = arguments;
+    var _arguments = arguments,
+        _this2 = this;
 
     for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
       args[_key2] = arguments[_key2];
@@ -2449,8 +2480,8 @@ function patchMethod(obj, name, handler) {
   var original = obj[name];
 
   obj[name] = function patchedMethod() {
-    var _this3 = this,
-        _arguments2 = arguments;
+    var _arguments2 = arguments,
+        _this3 = this;
 
     return handler({
       context: this,
@@ -2733,6 +2764,9 @@ function eventEmitter() {
       }
 
       return this.trigger.apply(this, [eventName].concat(args));
+    },
+    reset: function reset() {
+      handlers = {};
     }
   };
 }
@@ -2983,8 +3017,8 @@ function debounce(method, time) {
   var timeout;
 
   var debounceWrapper = function debounceWrapper() {
-    var _this4 = this,
-        _arguments3 = arguments;
+    var _arguments3 = arguments,
+        _this4 = this;
 
     clearTimeout(timeout);
     timeout = setTimeout(function () {
@@ -4200,14 +4234,15 @@ function experiment(_ref) {
         return this;
       }
 
-      if (isEventUnique(name + "_" + treatment)) {
+      if (isEventUnique(name + "_" + treatment + "_" + JSON.stringify(payload))) {
         logTreatment({
           name: name,
-          treatment: treatment
+          treatment: treatment,
+          payload: payload
         });
       }
 
-      if (isEventUnique(name + "_" + treatment + "_" + checkpoint)) {
+      if (isEventUnique(name + "_" + treatment + "_" + checkpoint + "_" + JSON.stringify(payload))) {
         logCheckpoint({
           name: name,
           treatment: treatment,
@@ -4453,7 +4488,7 @@ function wrapPromise(method, _temp) {
   var expected = [];
   var promises = [];
   var timer = setTimeout(function () {
-    if (expected) {
+    if (expected.length) {
       promises.push(promise_ZalgoPromise.asyncReject(new Error("Expected " + expected[0] + " to be called")));
     }
   }, timeout);
@@ -4602,7 +4637,7 @@ var constants_PROTOCOL = {
 var AUTO_FLUSH_LEVEL = [LOG_LEVEL.WARN, LOG_LEVEL.ERROR];
 var LOG_LEVEL_PRIORITY = [LOG_LEVEL.ERROR, LOG_LEVEL.WARN, LOG_LEVEL.INFO, LOG_LEVEL.DEBUG];
 var FLUSH_INTERVAL = 60 * 1000;
-var DEFAULT_LOG_LEVEL = LOG_LEVEL.WARN;
+var DEFAULT_LOG_LEVEL =  false ? undefined : LOG_LEVEL.WARN;
 // CONCATENATED MODULE: ./src/util.js
 function simpleRequest(_ref) {
   var _ref$method = _ref.method,
@@ -4655,13 +4690,7 @@ function Logger(_ref) {
       return;
     }
 
-    var consoleLogLevel = logLevel;
-
-    if (window.LOG_LEVEL && LOG_LEVEL_PRIORITY.indexOf(window.LOG_LEVEL) !== -1) {
-      consoleLogLevel = window.LOG_LEVEL;
-    }
-
-    if (LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(consoleLogLevel)) {
+    if (LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel)) {
       return;
     }
 
