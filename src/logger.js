@@ -63,13 +63,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, flushInterva
             return;
         }
 
-        let consoleLogLevel = logLevel;
-
-        if (window.LOG_LEVEL && LOG_LEVEL_PRIORITY.indexOf(window.LOG_LEVEL) !== -1) {
-            consoleLogLevel = window.LOG_LEVEL;
-        }
-
-        if (LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(consoleLogLevel)) {
+        if (LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel)) {
             return;
         }
 
