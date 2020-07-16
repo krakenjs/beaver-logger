@@ -71,7 +71,7 @@ export const defaultLogger : Logger = {
     }
 };
 
-export function log(req : ExpressRequest, logger : Logger, logs : { events : $ReadOnlyArray<Event>, tracking? : $ReadOnlyArray<Tracking>, meta? : Meta }) {
+export function log(req : ExpressRequest, logger : Logger, logs : {| events : $ReadOnlyArray<Event>, tracking? : $ReadOnlyArray<Tracking>, meta? : Meta |}) {
 
     const events   = logs.events   || [];
     const tracking = logs.tracking || [];
