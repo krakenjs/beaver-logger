@@ -15,7 +15,8 @@ describe('beaver-logger tests', () => {
         });
 
         $logger.info('hello_world', {
-            foo: 'bar'
+            foo: 'bar',
+            bar: true
         });
 
         const logEndpoint = $mockEndpoint.register({

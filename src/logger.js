@@ -6,8 +6,8 @@ import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } fr
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
 
-type Payload = { [string] : string };
-type Transport = ({ url : string, method : string, headers : Payload, json : Object }) => ZalgoPromise<void>;
+type Payload = { [string] : string | boolean };
+type Transport = ({| url : string, method : string, headers : { [string] : string }, json : Object |}) => ZalgoPromise<void>;
 
 type LoggerOptions = {|
     url : string,
@@ -17,7 +17,7 @@ type LoggerOptions = {|
     flushInterval? : number
 |};
 
-type ClientPayload = { [string] : ?string };
+type ClientPayload = { [string] : ?string | ?boolean };
 type Log = (name : string, payload? : ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 type Track = (payload : ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 
@@ -43,11 +43,11 @@ export type LoggerType = {|
     setTransport : (Transport) => LoggerType
 |};
 
-function httpTransport({ url, method, headers, json } : { url : string, method : string, headers : { [string] : string }, json : Object }) : ZalgoPromise<void> {
+function httpTransport({ url, method, headers, json } : {| url : string, method : string, headers : { [string] : string }, json : Object |}) : ZalgoPromise<void> {
     return request({ url, method, headers, json }).then(noop);
 }
 
-function extendIfDefined(target : { [string] : string }, source : { [string] : ?string }) {
+function extendIfDefined(target : { [string] : string | boolean }, source : { [string] : ?string | ?boolean }) {
     for (const key in source) {
         if (source.hasOwnProperty(key) && source[key] && !target[key]) {
             target[key] = source[key];
@@ -57,7 +57,7 @@ function extendIfDefined(target : { [string] : string }, source : { [string] : ?
 
 export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL } : LoggerOptions) : LoggerType {
 
-    let events : Array<{ level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload }> = [];
+    let events : Array<{| level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload |}> = [];
     let tracking : Array<Payload> = [];
 
     const payloadBuilders : Array<Builder> = [];
