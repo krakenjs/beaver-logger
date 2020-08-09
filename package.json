@@ -20,7 +20,7 @@
     "release:major": "./publish.sh major",
     "clean": "rimraf dist coverage",
     "reinstall": "rimraf flow-typed && rimraf node_modules && npm install && flow-typed install",
-    "prepublish": "in-publish && npm run babel-server || not-in-publish",
+    "prepublishOnly": "npm run babel-server",
     "postpublish": "git checkout server"
   },
   "repository": {
