@@ -43,8 +43,14 @@ export type LoggerType = {|
     setTransport : (Transport) => LoggerType
 |};
 
-function httpTransport({ url, method, headers, json, async } : {| url : string, method : string, headers : { [string] : string }, json : Object, async : boolean |}) : ZalgoPromise<void> {
-    return request({ url, method, headers, json, async }).then(noop);
+function httpTransport({ url, method, headers, json } : {| url : string, method : string, headers : { [string] : string }, json : Object |}) : ZalgoPromise<void> {
+    if (window.navigator.sendBeacon) {
+        return new ZalgoPromise((resolve) => {
+            resolve(window.navigator.sendBeacon(url, json));
+        });
+    } else {
+        return request({ url, method, headers, json }).then(noop);
+    }
 }
 
 function extendIfDefined(target : { [string] : string | boolean }, source : { [string] : ?string | ?boolean }) {
