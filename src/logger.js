@@ -43,8 +43,8 @@ export type LoggerType = {|
     setTransport : (Transport) => LoggerType
 |};
 
-function httpTransport({ url, method, headers, json } : {| url : string, method : string, headers : { [string] : string }, json : Object |}) : ZalgoPromise<void> {
-    return request({ url, method, headers, json }).then(noop);
+function httpTransport({ url, method, headers, json, async } : {| url : string, method : string, headers : { [string] : string }, json : Object, async : boolean |}) : ZalgoPromise<void> {
+    return request({ url, method, headers, json, async }).then(noop);
 }
 
 function extendIfDefined(target : { [string] : string | boolean }, source : { [string] : ?string | ?boolean }) {
@@ -234,6 +234,18 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
     if (isBrowser()) {
         safeInterval(flush, flushInterval);
     }
+
+    window.addEventListener('beforeunload', () => {
+        if (events && events.length) {
+            immediateFlush();
+        }
+    });
+
+    window.addEventListener('unload', () => {
+        if (events && events.length) {
+            immediateFlush();
+        }
+    });
 
     const logger = {
         debug,
