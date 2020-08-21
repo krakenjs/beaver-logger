@@ -44,7 +44,8 @@ export type LoggerType = {|
 |};
 
 function httpTransport({ url, method, headers, json } : {| url : string, method : string, headers : { [string] : string }, json : Object |}) : ZalgoPromise<void> {
-    if (window.navigator.sendBeacon && headers && !headers.length) {
+    const hasHeaders = headers && headers.length;
+    if (window.navigator.sendBeacon && !hasHeaders) {
         return new ZalgoPromise(resolve => {
             resolve(window.navigator.sendBeacon(url, json));
         });
