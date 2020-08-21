@@ -44,10 +44,9 @@ export type LoggerType = {|
 |};
 
 function httpTransport({ url, method, headers, json } : {| url : string, method : string, headers : { [string] : string }, json : Object |}) : ZalgoPromise<void> {
-    if (window.navigator.sendBeacon) {
+    if (window.navigator.sendBeacon && headers && !headers.length) {
         return new ZalgoPromise(resolve => {
-            const blob = new Blob([ JSON.stringify(json) ], headers);
-            resolve(window.navigator.sendBeacon(url, blob));
+            resolve(window.navigator.sendBeacon(url, json));
         });
     } else {
         return request({ url, method, headers, json }).then(noop);
@@ -243,15 +242,11 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
     }
 
     window.addEventListener('beforeunload', () => {
-        if (events && events.length) {
-            immediateFlush();
-        }
+        immediateFlush();
     });
 
     window.addEventListener('unload', () => {
-        if (events && events.length) {
-            immediateFlush();
-        }
+        immediateFlush();
     });
 
     const logger = {
