@@ -177,6 +177,11 @@ function sendCorsHeaders(req : ExpressRequest, res : ExpressResponse) {
     if (corsRequestMethod) {
         res.header(HTTP_HEADER.ACCESS_CONTROL_ALLOW_METHODS, corsRequestMethod);
     }
+
+    const corsRequestCredentialsMode = req.cookies && req.cookies.length ? true : false;
+    if (corsRequestCredentialsMode) {
+        res.header(HTTP_HEADER.ACCESS_CONTROL_ALLOW_CREDENTIALS, 'true');
+    }
 }
 
 export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors = false } : ExpressEndpointOptions = {}) : mixed {
