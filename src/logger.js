@@ -121,7 +121,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                 extendIfDefined(headers, builder(headers));
             }
 
-            const req = transport({
+            const res = transport({
                 method: 'POST',
                 url,
                 headers,
@@ -135,7 +135,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             events = [];
             tracking = [];
 
-            return req.then(noop);
+            return res.then(noop);
         });
     }
 

@@ -65,12 +65,19 @@ describe('beaver-logger tests', () => {
             }
         });
 
-        logEndpoint.expectCalls();
-        return $logger.flush().then((result) => {
-            if (result) {
-                throw new Error('Result from calling sendBeacon() should have been false.');
-            } else {
+        let sendBeaconCalled = false;
+
+        // eslint-disable-next-line eslint-comments/disable-enable-pair
+        /* eslint-disable compat/compat */
+        window.navigator.sendBeacon = () => {
+            sendBeaconCalled = true;
+        };
+
+        return $logger.flush().then(() => {
+            if (sendBeaconCalled) {
                 logEndpoint.done();
+            } else {
+                throw new Error('Result from calling sendBeacon() should have been false.');
             }
         });
     });
