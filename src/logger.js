@@ -47,7 +47,7 @@ function httpTransport({ url, method, headers, json } : {| url : string, method 
     const hasHeaders = headers && headers.length;
     if (window.navigator.sendBeacon && !hasHeaders) {
         return new ZalgoPromise(resolve => {
-            resolve(window.navigator.sendBeacon(url, json));
+            resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
         });
     } else {
         return request({ url, method, headers, json }).then(noop);
