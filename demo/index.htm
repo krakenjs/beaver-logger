@@ -1,9 +1,10 @@
 
+<!-- Client-side logger -->
 <script src="../dist/beaver-logger.js"></script>
 
 <script>
     var $logger = beaver.Logger({
-        url: 'https://www.some-logging-endpoint.com/log'
+        url: 'http://localhost:3000/api/log' // server-side local build
     });
 
     $logger.info('hello_world');

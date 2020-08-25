@@ -128,7 +128,6 @@ export function handleRequest(req : ExpressRequest, logger : Logger) {
     if (method.toLowerCase() === 'post') {
         const { events, tracking, meta } = body;
         log(req, logger, { events, tracking, meta });
-
     } else {
         const { event, level = LOG_LEVEL.INFO, ...payload } = query;
 
@@ -178,16 +177,16 @@ function sendCorsHeaders(req : ExpressRequest, res : ExpressResponse) {
         res.header(HTTP_HEADER.ACCESS_CONTROL_ALLOW_METHODS, corsRequestMethod);
     }
 
-    const corsRequestCredentialsMode = req.cookies && req.cookies.length ? true : false;
-    if (corsRequestCredentialsMode) {
-        res.header(HTTP_HEADER.ACCESS_CONTROL_ALLOW_CREDENTIALS, 'true');
-    }
+    res.header(HTTP_HEADER.ACCESS_CONTROL_ALLOW_CREDENTIALS, 'true');
 }
 
 export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors = false } : ExpressEndpointOptions = {}) : mixed {
 
     // $FlowFixMe
     const app = require('express')();
+    const bodyParser = require('body-parser');
+    app.use(bodyParser.text({ type: 'text/plain' }));
+    app.use(bodyParser.json());
 
     app.all(uri, (req : ExpressRequest, res : ExpressResponse) => {
         if (enableCors) {
@@ -196,6 +195,10 @@ export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors 
 
         if (req.method.toLowerCase() === HTTP_METHOD.OPTIONS) {
             return res.status(200).send();
+        }
+
+        if (req.method.toLowerCase() === HTTP_METHOD.POST && !req.body) {
+            return res.status(400).send(req);
         }
 
         try {
