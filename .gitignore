@@ -1,7 +1,7 @@
 logs
 components
 node_modules
-demo/beaver-logger/*
+demo/beaver-logger
 .idea/*
 coverage/
 plato-reports
