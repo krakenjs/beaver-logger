@@ -185,6 +185,7 @@ export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors 
     // $FlowFixMe
     const app = require('express')();
     const bodyParser = require('body-parser');
+    
     app.use(bodyParser.text({ type: 'text/plain' }));
     app.use(bodyParser.json());
 
