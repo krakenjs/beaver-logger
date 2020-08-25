@@ -4,6 +4,7 @@
 .*/node_modules/npm
 .*/node_modules/eslint-plugin-compat
 .*/node_modules/jsonlint
+.*/demo
 .*/dist/module
 [include]
 [libs]
