@@ -5,7 +5,6 @@
 .*/node_modules/eslint-plugin-compat
 .*/node_modules/jsonlint
 .*/dist/module
-.*/demo/*
 [include]
 [libs]
 flow-typed
