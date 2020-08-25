@@ -1,7 +1,7 @@
 /* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable flowtype/require-valid-file-annotation */
 /* eslint-disable no-console */
 /* eslint-disable import/no-commonjs */
-/* @flow */
 
 const app = require('express')();
 
