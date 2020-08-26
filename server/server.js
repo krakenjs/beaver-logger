@@ -199,7 +199,7 @@ export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors 
         }
 
         if (req.method.toLowerCase() === HTTP_METHOD.POST && !req.body) {
-            return res.status(400).send(req);
+            return res.status(400).send();
         }
 
         try {
