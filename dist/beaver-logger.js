@@ -329,17 +329,11 @@
             };
             ZalgoPromise.hash = function(promises) {
                 var result = {};
-                var awaitPromises = [];
-                var _loop = function(key) {
-                    if (promises.hasOwnProperty(key)) {
-                        var value = promises[key];
-                        utils_isPromise(value) ? awaitPromises.push(value.then((function(res) {
-                            result[key] = res;
-                        }))) : result[key] = value;
-                    }
-                };
-                for (var key in promises) _loop(key);
-                return ZalgoPromise.all(awaitPromises).then((function() {
+                return ZalgoPromise.all(Object.keys(promises).map((function(key) {
+                    return ZalgoPromise.resolve(promises[key]).then((function(value) {
+                        result[key] = value;
+                    }));
+                }))).then((function() {
                     return result;
                 }));
             };
@@ -411,11 +405,7 @@
         var LOG_LEVEL_PRIORITY = [ LOG_LEVEL.ERROR, LOG_LEVEL.WARN, LOG_LEVEL.INFO, LOG_LEVEL.DEBUG ];
         var DEFAULT_LOG_LEVEL = LOG_LEVEL.WARN;
         function httpTransport(_ref) {
-            var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json;
-            var hasHeaders = headers && Object.keys(headers).length;
-            return window.navigator.sendBeacon && !hasHeaders ? new promise_ZalgoPromise((function(resolve) {
-                resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
-            })) : function(_ref) {
+            return function(_ref) {
                 var url = _ref.url, _ref$method = _ref.method, method = void 0 === _ref$method ? "get" : _ref$method, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers, json = _ref.json, data = _ref.data, body = _ref.body, _ref$win = _ref.win, win = void 0 === _ref$win ? window : _ref$win, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 0 : _ref$timeout;
                 return new promise_ZalgoPromise((function(resolve, reject) {
                     if (json && data || json && body || data && json) throw new Error("Only options.json or options.data or options.body should be passed");
@@ -474,10 +464,10 @@
                     xhr.send(body);
                 }));
             }({
-                url: url,
-                method: method,
-                headers: headers,
-                json: json
+                url: _ref.url,
+                method: _ref.method,
+                headers: _ref.headers,
+                json: _ref.json
             }).then(src_util_noop);
         }
         function extendIfDefined(target, source) {
@@ -509,7 +499,7 @@
                         var headers = {};
                         for (var _i4 = 0; _i4 < headerBuilders.length; _i4++) extendIfDefined(headers, (0, 
                         headerBuilders[_i4])(headers));
-                        var res = transport({
+                        var req = transport({
                             method: "POST",
                             url: url,
                             headers: headers,
@@ -521,7 +511,7 @@
                         });
                         events = [];
                         tracking = [];
-                        return res.then(src_util_noop);
+                        return req.then(src_util_noop);
                     }
                 }));
             }
@@ -583,12 +573,6 @@
                 }), time);
             }());
             var method, time;
-            window.addEventListener("beforeunload", (function() {
-                immediateFlush();
-            }));
-            window.addEventListener("unload", (function() {
-                immediateFlush();
-            }));
             var logger = {
                 debug: function(event, payload) {
                     return log(LOG_LEVEL.DEBUG, event, payload);
