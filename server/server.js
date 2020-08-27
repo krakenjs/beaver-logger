@@ -193,7 +193,7 @@ export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors 
             try {
                 req.body = JSON.parse(req.body);
             } catch (e) {
-                // pass should already be valid JSON from client logger
+                // should already be valid JSON from client logger
             }
         }
 
