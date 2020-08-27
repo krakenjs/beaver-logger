@@ -81,4 +81,49 @@ describe('beaver-logger tests', () => {
             }
         });
     });
+
+    it('should not log using sendBeacon if custom headers are passed', () => {
+        const $logger = Logger({
+            url: '/test/api/log'
+        });
+        $logger.addHeaderBuilder(() => {
+            return {
+                'x-custom-header': 'hunter2'
+            };
+        });
+
+        $logger.info('hello_world', {
+            foo: 'bar',
+            bar: true
+        });
+
+        const logEndpoint = $mockEndpoint.register({
+            method:  'POST',
+            uri:     '/test/api/log',
+            handler: (req) => {
+                const hasLog = req.data.events.some(event => event.event === 'hello_world' && event.level === 'info');
+
+                if (!hasLog) {
+                    throw new Error('Expected posted payload to contain logged log');
+                }
+
+                return {};
+            }
+        });
+
+        let sendBeaconCalled = false;
+
+        window.navigator.sendBeacon = () => {
+            sendBeaconCalled = true;
+        };
+
+        logEndpoint.expectCalls();
+        return $logger.flush().then(() => {
+            if (sendBeaconCalled) {
+                throw new Error('Result from calling sendBeacon() should have been false.');
+            } else {
+                logEndpoint.done();
+            }
+        });
+    });
 });
