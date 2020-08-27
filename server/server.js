@@ -186,10 +186,17 @@ export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors 
     const app = require('express')();
     const bodyParser = require('body-parser');
     
-    app.use(bodyParser.text({ type: 'text/plain' }));
-    app.use(bodyParser.json());
+    bodyParser.text();
 
     app.all(uri, (req : ExpressRequest, res : ExpressResponse) => {
+        if (typeof req.body === 'string') {
+            try {
+                req.body = JSON.parse(req.body);
+            } catch (e) {
+                // pass should already be valid JSON from client logger
+            }
+        }
+        
         if (enableCors) {
             sendCorsHeaders(req, res);
         }
