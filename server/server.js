@@ -187,6 +187,7 @@ export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors 
     const bodyParser = require('body-parser');
     
     app.use(bodyParser.text());
+    app.use(bodyParser.json());
 
     app.all(uri, (req : ExpressRequest, res : ExpressResponse) => {
         if (typeof req.body === 'string') {
