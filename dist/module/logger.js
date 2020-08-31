@@ -9,12 +9,20 @@ function httpTransport(_ref) {
       method = _ref.method,
       headers = _ref.headers,
       json = _ref.json;
-  return request({
-    url: url,
-    method: method,
-    headers: headers,
-    json: json
-  }).then(noop);
+  var hasHeaders = headers && Object.keys(headers).length;
+
+  if (window.navigator.sendBeacon && !hasHeaders) {
+    return new ZalgoPromise(function (resolve) {
+      resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
+    });
+  } else {
+    return request({
+      url: url,
+      method: method,
+      headers: headers,
+      json: json
+    }).then(noop);
+  }
 }
 
 function extendIfDefined(target, source) {
@@ -91,7 +99,7 @@ export function Logger(_ref2) {
         extendIfDefined(headers, _builder(headers));
       }
 
-      var req = transport({
+      var res = transport({
         method: 'POST',
         url: url,
         headers: headers,
@@ -103,7 +111,7 @@ export function Logger(_ref2) {
       });
       events = [];
       tracking = [];
-      return req.then(noop);
+      return res.then(noop);
     });
   }
 
@@ -215,6 +223,12 @@ export function Logger(_ref2) {
     safeInterval(flush, flushInterval);
   }
 
+  window.addEventListener('beforeunload', function () {
+    immediateFlush();
+  });
+  window.addEventListener('unload', function () {
+    immediateFlush();
+  });
   var logger = {
     debug: debug,
     info: info,
