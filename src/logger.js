@@ -44,7 +44,14 @@ export type LoggerType = {|
 |};
 
 function httpTransport({ url, method, headers, json } : {| url : string, method : string, headers : { [string] : string }, json : Object |}) : ZalgoPromise<void> {
-    return request({ url, method, headers, json }).then(noop);
+    const hasHeaders = headers && Object.keys(headers).length;
+    if (window.navigator.sendBeacon && !hasHeaders) {
+        return new ZalgoPromise(resolve => {
+            resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
+        });
+    } else {
+        return request({ url, method, headers, json }).then(noop);
+    }
 }
 
 function extendIfDefined(target : { [string] : string | boolean }, source : { [string] : ?string | ?boolean }) {
@@ -114,7 +121,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                 extendIfDefined(headers, builder(headers));
             }
 
-            const req = transport({
+            const res = transport({
                 method: 'POST',
                 url,
                 headers,
@@ -128,7 +135,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             events = [];
             tracking = [];
 
-            return req.then(noop);
+            return res.then(noop);
         });
     }
 
@@ -234,6 +241,14 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
     if (isBrowser()) {
         safeInterval(flush, flushInterval);
     }
+
+    window.addEventListener('beforeunload', () => {
+        immediateFlush();
+    });
+
+    window.addEventListener('unload', () => {
+        immediateFlush();
+    });
 
     const logger = {
         debug,
