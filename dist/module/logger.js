@@ -8,10 +8,12 @@ function httpTransport(_ref) {
   var url = _ref.url,
       method = _ref.method,
       headers = _ref.headers,
-      json = _ref.json;
+      json = _ref.json,
+      _ref$enableSendBeacon = _ref.enableSendBeacon,
+      enableSendBeacon = _ref$enableSendBeacon === void 0 ? false : _ref$enableSendBeacon;
   var hasHeaders = headers && Object.keys(headers).length;
 
-  if (window.navigator.sendBeacon && !hasHeaders) {
+  if (window.navigator.sendBeacon && !hasHeaders && enableSendBeacon) {
     return new ZalgoPromise(function (resolve) {
       resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
     });
@@ -41,7 +43,9 @@ export function Logger(_ref2) {
       _ref2$transport = _ref2.transport,
       transport = _ref2$transport === void 0 ? httpTransport : _ref2$transport,
       _ref2$flushInterval = _ref2.flushInterval,
-      flushInterval = _ref2$flushInterval === void 0 ? FLUSH_INTERVAL : _ref2$flushInterval;
+      flushInterval = _ref2$flushInterval === void 0 ? FLUSH_INTERVAL : _ref2$flushInterval,
+      _ref2$enableSendBeaco = _ref2.enableSendBeacon,
+      enableSendBeacon = _ref2$enableSendBeaco === void 0 ? false : _ref2$enableSendBeaco;
   var events = [];
   var tracking = [];
   var payloadBuilders = [];
@@ -107,7 +111,8 @@ export function Logger(_ref2) {
           events: events,
           meta: meta,
           tracking: tracking
-        }
+        },
+        enableSendBeacon: enableSendBeacon
       });
       events = [];
       tracking = [];
