@@ -6,15 +6,24 @@ import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } fr
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
 
+type TransportOptions = {|
+    url : string,
+    method : string,
+    headers : { [string] : string },
+    json : Object,
+    enableSendBeacon : boolean
+|};
+
 type Payload = { [string] : string | boolean };
-type Transport = ({| url : string, method : string, headers : { [string] : string }, json : Object |}) => ZalgoPromise<void>;
+type Transport = (TransportOptions) => ZalgoPromise<void>;
 
 type LoggerOptions = {|
     url : string,
     prefix? : string,
     logLevel? : $Values<typeof LOG_LEVEL>,
     transport? : Transport,
-    flushInterval? : number
+    flushInterval? : number,
+    enableSendBeacon? : boolean
 |};
 
 type ClientPayload = { [string] : ?string | ?boolean };
@@ -43,9 +52,9 @@ export type LoggerType = {|
     setTransport : (Transport) => LoggerType
 |};
 
-function httpTransport({ url, method, headers, json } : {| url : string, method : string, headers : { [string] : string }, json : Object |}) : ZalgoPromise<void> {
+function httpTransport({ url, method, headers, json, enableSendBeacon = false } : TransportOptions) : ZalgoPromise<void> {
     const hasHeaders = headers && Object.keys(headers).length;
-    if (window.navigator.sendBeacon && !hasHeaders) {
+    if (window.navigator.sendBeacon && !hasHeaders && enableSendBeacon) {
         return new ZalgoPromise(resolve => {
             resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
         });
@@ -62,7 +71,7 @@ function extendIfDefined(target : { [string] : string | boolean }, source : { [s
     }
 }
 
-export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL } : LoggerOptions) : LoggerType {
+export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false } : LoggerOptions) : LoggerType {
 
     let events : Array<{| level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload |}> = [];
     let tracking : Array<Payload> = [];
@@ -129,7 +138,8 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                     events,
                     meta,
                     tracking
-                }
+                },
+                enableSendBeacon
             });
 
             events = [];

@@ -43,7 +43,8 @@ describe('beaver-logger tests', () => {
 
     it('should log something and flush it to the buffer using sendBeacon', () => {
         const $logger = Logger({
-            url: '/test/api/log'
+            url:              '/test/api/log',
+            enableSendBeacon: true
         });
 
         $logger.info('hello_world', {
@@ -84,7 +85,8 @@ describe('beaver-logger tests', () => {
 
     it('should not log using sendBeacon if custom headers are passed', () => {
         const $logger = Logger({
-            url: '/test/api/log'
+            url:              '/test/api/log',
+            enableSendBeacon: true
         });
         $logger.addHeaderBuilder(() => {
             return {
