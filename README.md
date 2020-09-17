@@ -126,7 +126,10 @@ var $logger = beaver.Logger({
     logLevel: beaver.LOG_LEVEL.WARN,
 
     // Interval to flush logs to server
-    flushInterval: 60 * 1000
+    flushInterval: 60 * 1000,
+
+    // Use sendBeacon if supported rather than XHR to send logs; defaults to false
+    enableSendBeacon: true,
 });
 ```
 

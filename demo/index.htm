@@ -4,7 +4,8 @@
 
 <script>
     var $logger = beaver.Logger({
-        url: 'http://localhost:3000/api/log' // server-side local build
+        url: 'http://localhost:3000/api/log', // server-side local build
+        enableSendBeacon: true
     });
     // $logger.addHeaderBuilder(() => {
     //         return {
