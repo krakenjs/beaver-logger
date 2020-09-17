@@ -54,9 +54,10 @@ export type LoggerType = {|
 
 function httpTransport({ url, method, headers, json, enableSendBeacon = false } : TransportOptions) : ZalgoPromise<void> {
     const hasHeaders = headers && Object.keys(headers).length;
-    if (window.navigator.sendBeacon && !hasHeaders && enableSendBeacon) {
+    if (window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && Blob) {
         return new ZalgoPromise(resolve => {
-            resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
+            const blob = new Blob([ JSON.stringify(json) ], { type: 'application/json' });
+            resolve(window.navigator.sendBeacon(url, blob));
         });
     } else {
         return request({ url, method, headers, json }).then(noop);

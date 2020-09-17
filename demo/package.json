@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "beaver-logger": "^4.0.18",
     "express": "^4.17.1"
   },
   "devDependencies": {}

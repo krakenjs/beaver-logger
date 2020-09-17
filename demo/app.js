@@ -5,12 +5,15 @@
 
 const app = require('express')();
 
+const clientLogger = require('../dist/beaver-logger.js');
+
 const beaverLogger = require('./beaver-logger/server.js');
 
 const port = 3000;
 
 app.use(beaverLogger.expressEndpoint({
     uri:        '/api/log',
+    logger:     clientLogger,
     enableCors: true
 }));
 
