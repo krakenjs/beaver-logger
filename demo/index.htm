@@ -7,13 +7,8 @@
         url: 'http://localhost:3000/api/log', // server-side local build
         enableSendBeacon: true
     });
-    // $logger.addHeaderBuilder(() => {
-    //         return {
-    //             'x-custom-header': 'hunter2'
-    //         };
-    //     });
 
-    $logger.info('hello_world');
+    $logger.info('hello_world', { "events": [ { "level": "info", "event": "foobar" } ] });
 
     $logger.flush();
 </script>

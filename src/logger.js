@@ -54,9 +54,10 @@ export type LoggerType = {|
 
 function httpTransport({ url, method, headers, json, enableSendBeacon = false } : TransportOptions) : ZalgoPromise<void> {
     const hasHeaders = headers && Object.keys(headers).length;
-    if (window.navigator.sendBeacon && !hasHeaders && enableSendBeacon) {
+    if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
         return new ZalgoPromise(resolve => {
-            resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
+            const blob = new Blob([ JSON.stringify(json) ], { type: 'application/json' });
+            resolve(window.navigator.sendBeacon(url, blob));
         });
     } else {
         return request({ url, method, headers, json }).then(noop);
@@ -252,13 +253,15 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         safeInterval(flush, flushInterval);
     }
 
-    window.addEventListener('beforeunload', () => {
-        immediateFlush();
-    });
+    if (typeof window === 'object') {
+        window.addEventListener('beforeunload', () => {
+            immediateFlush();
+        });
 
-    window.addEventListener('unload', () => {
-        immediateFlush();
-    });
+        window.addEventListener('unload', () => {
+            immediateFlush();
+        });
+    }
 
     const logger = {
         debug,
