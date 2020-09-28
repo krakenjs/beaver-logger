@@ -13,9 +13,12 @@ function httpTransport(_ref) {
       enableSendBeacon = _ref$enableSendBeacon === void 0 ? false : _ref$enableSendBeacon;
   var hasHeaders = headers && Object.keys(headers).length;
 
-  if (window.navigator.sendBeacon && !hasHeaders && enableSendBeacon) {
+  if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
     return new ZalgoPromise(function (resolve) {
-      resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
+      var blob = new Blob([JSON.stringify(json)], {
+        type: 'application/json'
+      });
+      resolve(window.navigator.sendBeacon(url, blob));
     });
   } else {
     return request({
@@ -228,12 +231,15 @@ export function Logger(_ref2) {
     safeInterval(flush, flushInterval);
   }
 
-  window.addEventListener('beforeunload', function () {
-    immediateFlush();
-  });
-  window.addEventListener('unload', function () {
-    immediateFlush();
-  });
+  if (typeof window === 'object') {
+    window.addEventListener('beforeunload', function () {
+      immediateFlush();
+    });
+    window.addEventListener('unload', function () {
+      immediateFlush();
+    });
+  }
+
   var logger = {
     debug: debug,
     info: info,

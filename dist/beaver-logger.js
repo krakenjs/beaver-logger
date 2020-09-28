@@ -750,6 +750,23 @@
             for (var key in obj) obj.hasOwnProperty(key) && result.push(obj[key]);
             return result;
         }));
+        function isDocumentReady() {
+            return Boolean(document.body) && "complete" === document.readyState;
+        }
+        function isDocumentInteractive() {
+            return Boolean(document.body) && "interactive" === document.readyState;
+        }
+        memoize((function() {
+            return new promise_ZalgoPromise((function(resolve) {
+                if (isDocumentReady() || isDocumentInteractive()) return resolve();
+                var interval = setInterval((function() {
+                    if (isDocumentReady() || isDocumentInteractive()) {
+                        clearInterval(interval);
+                        return resolve();
+                    }
+                }), 10);
+            }));
+        }));
         function dom_isBrowser() {
             return "undefined" != typeof window;
         }
@@ -770,8 +787,11 @@
         function httpTransport(_ref) {
             var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
             var hasHeaders = headers && Object.keys(headers).length;
-            return window.navigator.sendBeacon && !hasHeaders && enableSendBeacon ? new promise_ZalgoPromise((function(resolve) {
-                resolve(window.navigator.sendBeacon(url, JSON.stringify(json)));
+            return window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob ? new promise_ZalgoPromise((function(resolve) {
+                var blob = new Blob([ JSON.stringify(json) ], {
+                    type: "application/json"
+                });
+                resolve(window.navigator.sendBeacon(url, blob));
             })) : function(_ref) {
                 var url = _ref.url, _ref$method = _ref.method, method = void 0 === _ref$method ? "get" : _ref$method, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers, json = _ref.json, data = _ref.data, body = _ref.body, _ref$win = _ref.win, win = void 0 === _ref$win ? window : _ref$win, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 0 : _ref$timeout;
                 return new promise_ZalgoPromise((function(resolve, reject) {
@@ -933,12 +953,14 @@
                 }), time);
             }());
             var method, time;
-            window.addEventListener("beforeunload", (function() {
-                immediateFlush();
-            }));
-            window.addEventListener("unload", (function() {
-                immediateFlush();
-            }));
+            if ("object" == typeof window) {
+                window.addEventListener("beforeunload", (function() {
+                    immediateFlush();
+                }));
+                window.addEventListener("unload", (function() {
+                    immediateFlush();
+                }));
+            }
             var logger = {
                 debug: function(event, payload) {
                     return log(LOG_LEVEL.DEBUG, event, payload);
