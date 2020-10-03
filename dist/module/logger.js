@@ -48,7 +48,9 @@ export function Logger(_ref2) {
       _ref2$flushInterval = _ref2.flushInterval,
       flushInterval = _ref2$flushInterval === void 0 ? FLUSH_INTERVAL : _ref2$flushInterval,
       _ref2$enableSendBeaco = _ref2.enableSendBeacon,
-      enableSendBeacon = _ref2$enableSendBeaco === void 0 ? false : _ref2$enableSendBeaco;
+      enableSendBeacon = _ref2$enableSendBeaco === void 0 ? false : _ref2$enableSendBeaco,
+      _ref2$enableBrowserLo = _ref2.enableBrowserLogging,
+      enableBrowserLogging = _ref2$enableBrowserLo === void 0 ? true : _ref2$enableBrowserLo;
   var events = [];
   var tracking = [];
   var payloadBuilders = [];
@@ -57,7 +59,7 @@ export function Logger(_ref2) {
   var headerBuilders = [];
 
   function print(level, event, payload) {
-    if (!isBrowser() || !window.console || !window.console.log) {
+    if (!isBrowser() || !window.console || !window.console.log || !enableBrowserLogging) {
       return;
     }
 
