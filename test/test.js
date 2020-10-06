@@ -155,14 +155,15 @@ describe('beaver-logger tests', () => {
             }
         });
 
+        let apiCallsFired = true;
         logEndpoint.expectCalls();
         return $logger.flush().then(() => {
             try {
-                logEndpoint.done(); // will throw is not API calls received by logEndpoint
+                logEndpoint.done(); // will throw if no API calls received by logEndpoint
             } catch (e) {
-                // pass
+                apiCallsFired = false;
             }
-            if (handlerCalled) {
+            if (handlerCalled || apiCallsFired) {
                 throw new Error('Expected no API calls to be fired');
             }
 
