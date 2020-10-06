@@ -129,7 +129,7 @@ describe('beaver-logger tests', () => {
         });
     });
 
-    it('should not send event to server if enableServerLogging is false', () => {
+    it('should not send event to server if disableServerLogging is true', () => {
         const $logger = Logger({
             url:                  '/test/api/log',
             disableServerLogging: true
