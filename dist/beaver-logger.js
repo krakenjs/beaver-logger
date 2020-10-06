@@ -902,7 +902,7 @@
             for (var key in source) source.hasOwnProperty(key) && source[key] && !target[key] && (target[key] = source[key]);
         }
         function Logger(_ref2) {
-            var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? 6e4 : _ref2$flushInterval, _ref2$enableSendBeaco = _ref2.enableSendBeacon, enableSendBeacon = void 0 !== _ref2$enableSendBeaco && _ref2$enableSendBeaco, _ref2$enableBrowserLo = _ref2.enableBrowserLogging, enableBrowserLogging = void 0 === _ref2$enableBrowserLo || _ref2$enableBrowserLo;
+            var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? 6e4 : _ref2$flushInterval, _ref2$enableSendBeaco = _ref2.enableSendBeacon, enableSendBeacon = void 0 !== _ref2$enableSendBeaco && _ref2$enableSendBeaco;
             var events = [];
             var tracking = [];
             var payloadBuilders = [];
@@ -910,7 +910,7 @@
             var trackingBuilders = [];
             var headerBuilders = [];
             function print(level, event, payload) {
-                if (dom_isBrowser() && window.console && window.console.log && enableBrowserLogging && !(LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel))) {
+                if (dom_isBrowser() && window.console && window.console.log && !(LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel))) {
                     var args = [ event ];
                     args.push(payload);
                     (payload.error || payload.warning) && args.push("\n\n", payload.error || payload.warning);
