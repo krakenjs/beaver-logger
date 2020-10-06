@@ -24,7 +24,7 @@ type LoggerOptions = {|
     transport? : Transport,
     flushInterval? : number,
     enableSendBeacon? : boolean,
-    enableBrowserLogging? : boolean
+    disableBrowserLogging? : boolean
 |};
 
 type ClientPayload = { [string] : ?string | ?boolean };
@@ -73,7 +73,7 @@ function extendIfDefined(target : { [string] : string | boolean }, source : { [s
     }
 }
 
-export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false, enableBrowserLogging = true } : LoggerOptions) : LoggerType {
+export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false, disableBrowserLogging = false } : LoggerOptions) : LoggerType {
 
     let events : Array<{| level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload |}> = [];
     let tracking : Array<Payload> = [];
@@ -85,7 +85,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
     function print(level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload) {
 
-        if (!isBrowser() || !window.console || !window.console.log || !enableBrowserLogging) {
+        if (!isBrowser() || !window.console || !window.console.log || disableBrowserLogging) {
             return;
         }
 

@@ -146,8 +146,8 @@ describe('beaver-logger tests', () => {
         window.console.debug = mockConsole;
 
         const $logger = Logger({
-            url:                  '/test/api/log',
-            enableBrowserLogging: false
+            url:                   '/test/api/log',
+            disableBrowserLogging: true
         });
 
         $logger.info('test_info', {
