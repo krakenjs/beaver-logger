@@ -113,7 +113,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
     function immediateFlush() : ZalgoPromise<void> {
         return ZalgoPromise.try(() => {
-            if (!isBrowser() || window.location.protocol === PROTOCOL.FILE) {
+            if (!isBrowser() || !window.location || window.location.protocol === PROTOCOL.FILE) {
                 return;
             }
 
