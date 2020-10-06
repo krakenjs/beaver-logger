@@ -128,4 +128,47 @@ describe('beaver-logger tests', () => {
             }
         });
     });
+
+    it('should not send event to server if enableServerLogging is false', () => {
+        const $logger = Logger({
+            url:                  '/test/api/log',
+            disableServerLogging: true
+        });
+
+        const browserConsoleLogs = [];
+
+        window.console.info = (args) => browserConsoleLogs.push(args);
+
+        $logger.info('browser_only_log', {
+            foo: 'bar',
+            bar: true
+        });
+
+        let handlerCalled = false;
+
+        const logEndpoint = $mockEndpoint.register({
+            method:  'POST',
+            uri:     '/test/api/log',
+            handler: () => {
+                handlerCalled = true;
+                return {};
+            }
+        });
+
+        logEndpoint.expectCalls();
+        return $logger.flush().then(() => {
+            try {
+                logEndpoint.done(); // will throw is not API calls received by logEndpoint
+            } catch (e) {
+                // pass
+            }
+            if (handlerCalled) {
+                throw new Error('Expected no API calls to be fired');
+            }
+
+            if (!browserConsoleLogs.includes('browser_only_log')) {
+                throw new Error('Expected events to be logged on browser');
+            }
+        });
+    });
 });

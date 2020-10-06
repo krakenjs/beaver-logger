@@ -23,7 +23,8 @@ type LoggerOptions = {|
     logLevel? : $Values<typeof LOG_LEVEL>,
     transport? : Transport,
     flushInterval? : number,
-    enableSendBeacon? : boolean
+    enableSendBeacon? : boolean,
+    disableServerLogging? : boolean
 |};
 
 type ClientPayload = { [string] : ?string | ?boolean };
@@ -72,7 +73,7 @@ function extendIfDefined(target : { [string] : string | boolean }, source : { [s
     }
 }
 
-export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false } : LoggerOptions) : LoggerType {
+export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false, disableServerLogging = false } : LoggerOptions) : LoggerType {
 
     let events : Array<{| level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload |}> = [];
     let tracking : Array<Payload> = [];
@@ -153,6 +154,10 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
     const flush = promiseDebounce(immediateFlush);
 
     function enqueue(level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload) {
+
+        if (disableServerLogging) {
+            return;
+        }
 
         events.push({
             level,
