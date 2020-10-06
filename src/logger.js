@@ -232,7 +232,10 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             return logger; // eslint-disable-line no-use-before-define
         }
 
-        const trackingPayload : Payload = objFilter(payload);
+        const trackingPayload : Payload = {
+            ...objFilter(payload),
+            timestamp: Date.now().toString()
+        };
 
         for (const builder of trackingBuilders) {
             extendIfDefined(trackingPayload, builder(trackingPayload));
