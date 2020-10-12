@@ -234,7 +234,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
 
         const trackingPayload : Payload = {
             ...objFilter(payload),
-            timestamp: Date.now().toString()
+            t: Date.now().toString()
         };
 
         for (const builder of trackingBuilders) {
