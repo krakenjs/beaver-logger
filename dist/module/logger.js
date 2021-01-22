@@ -18,7 +18,17 @@ function httpTransport(_ref) {
       var blob = new Blob([JSON.stringify(json)], {
         type: 'application/json'
       });
-      resolve(window.navigator.sendBeacon(url, blob));
+
+      try {
+        resolve(window.navigator.sendBeacon(url, blob));
+      } catch (e) {
+        return request({
+          url: url,
+          method: method,
+          headers: headers,
+          json: json
+        }).then(noop);
+      }
     });
   } else {
     return request({
