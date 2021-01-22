@@ -48,7 +48,7 @@
   ],
   "readmeFilename": "README.md",
   "devDependencies": {
-    "flow-bin": "^0.135.0",
+    "flow-bin": "0.135.0",
     "grumbler-scripts": "^3",
     "mocha": "^3.5.3",
     "sync-browser-mocks": "^1.0.44"
