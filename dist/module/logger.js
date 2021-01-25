@@ -11,33 +11,26 @@ function httpTransport(_ref) {
       json = _ref.json,
       _ref$enableSendBeacon = _ref.enableSendBeacon,
       enableSendBeacon = _ref$enableSendBeacon === void 0 ? false : _ref$enableSendBeacon;
-  var hasHeaders = headers && Object.keys(headers).length;
+  return ZalgoPromise.try(function () {
+    var hasHeaders = headers && Object.keys(headers).length;
 
-  if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
-    return new ZalgoPromise(function (resolve) {
-      var blob = new Blob([JSON.stringify(json)], {
-        type: 'application/json'
-      });
-
+    if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
       try {
-        resolve(window.navigator.sendBeacon(url, blob));
-      } catch (e) {
-        return request({
-          url: url,
-          method: method,
-          headers: headers,
-          json: json
-        }).then(noop);
+        var blob = new Blob([JSON.stringify(json)], {
+          type: 'application/json'
+        });
+        return window.navigator.sendBeacon(url, blob);
+      } catch (e) {// pass
       }
-    });
-  } else {
+    }
+
     return request({
       url: url,
       method: method,
       headers: headers,
       json: json
-    }).then(noop);
-  }
+    });
+  }).then(noop);
 }
 
 function extendIfDefined(target, source) {
