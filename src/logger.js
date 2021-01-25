@@ -53,19 +53,19 @@ export type LoggerType = {|
 |};
 
 function httpTransport({ url, method, headers, json, enableSendBeacon = false } : TransportOptions) : ZalgoPromise<void> {
-    const hasHeaders = headers && Object.keys(headers).length;
-    if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
-        return new ZalgoPromise(resolve => {
-            const blob = new Blob([ JSON.stringify(json) ], { type: 'application/json' });
+    return ZalgoPromise.try(() => {
+        const hasHeaders = headers && Object.keys(headers).length;
+        if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
             try {
-                resolve(window.navigator.sendBeacon(url, blob));
+                const blob = new Blob([ JSON.stringify(json) ], { type: 'application/json' });
+                return window.navigator.sendBeacon(url, blob);
             } catch (e) {
-                return request({ url, method, headers, json }).then(noop);
+                // pass
             }
-        });
-    } else {
-        return request({ url, method, headers, json }).then(noop);
-    }
+        }
+
+        return request({ url, method, headers, json });
+    }).then(noop);
 }
 
 function extendIfDefined(target : { [string] : string | boolean }, source : { [string] : ?string | ?boolean }) {
