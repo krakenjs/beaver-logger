@@ -185,6 +185,13 @@ export function expressEndpoint({ uri = '/', logger = defaultLogger, enableCors 
     // $FlowFixMe
     const app = require('express')();
 
+    app.on('mount', parent => {
+        // $FlowFixMe
+        app.settings = Object.create(parent.settings);
+        // $FlowFixMe
+        app.kraken = parent.kraken || parent.config;
+    });
+
     app.all(uri, (req : ExpressRequest, res : ExpressResponse) => {
         if (enableCors) {
             sendCorsHeaders(req, res);
