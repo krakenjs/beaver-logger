@@ -8,10 +8,12 @@ import { LOG_LEVEL, HTTP_HEADER, HTTP_METHOD, WILDCARD } from './constants';
 type ExpressRequest = express$Request; // eslint-disable-line no-undef
 type ExpressResponse = express$Response; // eslint-disable-line no-undef
 
+type Payload = { [string] : string };
+
 type Logger = {|
-    log : (req : ExpressRequest, level : $Values<typeof LOG_LEVEL>, name : string, payload : { [string] : string }) => void,
-    track : (req : ExpressRequest, payload : { [string] : string }) => void,
-    meta : (req : ExpressRequest, meta : { [string] : string }) => void
+    log : (req : ExpressRequest, level : $Values<typeof LOG_LEVEL>, name : string, payload : Payload, meta? : Payload) => void,
+    track : (req : ExpressRequest, payload : Payload, meta? : Payload) => void,
+    meta : (req : ExpressRequest, meta : Payload) => void
 |};
 
 type Event = {|
@@ -77,6 +79,10 @@ export function log(req : ExpressRequest, logger : Logger, logs : {| events : $R
     const tracking = logs.tracking || [];
     const meta     = logs.meta     || {};
 
+    if (logger.meta) {
+        logger.meta(req, meta);
+    }
+
     if (logger.log) {
         events.forEach((event) => {
             if (!event.event) {
@@ -87,17 +93,13 @@ export function log(req : ExpressRequest, logger : Logger, logs : {| events : $R
             const level = event.level || LOG_LEVEL.INFO;
             const payload = event.payload || {};
 
-            return logger.log(req, level, name, payload);
+            return logger.log(req, level, name, payload, meta);
         });
-    }
-
-    if (logger.meta) {
-        logger.meta(req, meta);
     }
 
     if (logger.track) {
         tracking.forEach(track => {
-            logger.track(req, track);
+            logger.track(req, track, meta);
         });
     }
 }
