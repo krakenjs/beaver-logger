@@ -130,6 +130,9 @@ var $logger = beaver.Logger({
 
     // Use sendBeacon if supported rather than XHR to send logs; defaults to false
     enableSendBeacon: true,
+
+    // Disable logs to be displayed in the browser console
+    disableBrowserLogging: true
 });
 ```
 
