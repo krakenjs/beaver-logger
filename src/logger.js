@@ -3,7 +3,7 @@
 import { ZalgoPromise } from 'zalgo-promise/src';
 import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 
-import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
+import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
 
 type TransportOptions = {|
@@ -11,7 +11,7 @@ type TransportOptions = {|
     method : string,
     headers : { [string] : string },
     json : Object,
-    enableSendBeacon : boolean
+    enableSendBeacon? : boolean
 |};
 
 type Payload = { [string] : string | boolean };
@@ -23,7 +23,8 @@ type LoggerOptions = {|
     logLevel? : $Values<typeof LOG_LEVEL>,
     transport? : Transport,
     flushInterval? : number,
-    enableSendBeacon? : boolean
+    enableSendBeacon? : boolean,
+    amplitudeApiKey? : string
 |};
 
 type ClientPayload = { [string] : ?string | ?boolean };
@@ -76,7 +77,7 @@ function extendIfDefined(target : { [string] : string | boolean }, source : { [s
     }
 }
 
-export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false } : LoggerOptions) : LoggerType {
+export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, amplitudeApiKey, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false } : LoggerOptions) : LoggerType {
 
     let events : Array<{| level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload |}> = [];
     let tracking : Array<Payload> = [];
@@ -146,6 +147,27 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                 },
                 enableSendBeacon
             });
+
+            if (amplitudeApiKey) {
+                transport({
+                    method:  'POST',
+                    url:     AMPLITUDE_URL,
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    json: {
+                        api_key: amplitudeApiKey,
+                        events:  tracking.map((payload : Payload) => {
+                            // $FlowFixMe
+                            return {
+                                event_type:       payload.transition_name || 'event',
+                                event_properties: payload,
+                                ...payload
+                            };
+                        })
+                    }
+                });
+            }
 
             events = [];
             tracking = [];
