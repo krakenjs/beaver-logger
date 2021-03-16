@@ -956,7 +956,7 @@
                                 tracking: tracking
                             },
                             enableSendBeacon: enableSendBeacon
-                        });
+                        }).catch(src_util_noop);
                         amplitudeApiKey && transport({
                             method: "POST",
                             url: "https://api2.amplitude.com/2/httpapi",
@@ -972,7 +972,7 @@
                                     }, payload);
                                 }))
                             }
-                        });
+                        }).catch(src_util_noop);
                         events = [];
                         tracking = [];
                         return res.then(src_util_noop);

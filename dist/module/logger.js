@@ -120,7 +120,7 @@ export function Logger(_ref2) {
           tracking: tracking
         },
         enableSendBeacon: enableSendBeacon
-      });
+      }).catch(noop);
 
       if (amplitudeApiKey) {
         transport({
@@ -139,7 +139,7 @@ export function Logger(_ref2) {
               }, payload);
             })
           }
-        });
+        }).catch(noop);
       }
 
       events = [];
