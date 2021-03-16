@@ -1,7 +1,7 @@
 import _extends from "@babel/runtime/helpers/esm/extends";
 import { ZalgoPromise } from 'zalgo-promise/src';
 import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
-import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from './config';
+import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
 
 function httpTransport(_ref) {
@@ -48,6 +48,7 @@ export function Logger(_ref2) {
       logLevel = _ref2$logLevel === void 0 ? DEFAULT_LOG_LEVEL : _ref2$logLevel,
       _ref2$transport = _ref2.transport,
       transport = _ref2$transport === void 0 ? httpTransport : _ref2$transport,
+      amplitudeApiKey = _ref2.amplitudeApiKey,
       _ref2$flushInterval = _ref2.flushInterval,
       flushInterval = _ref2$flushInterval === void 0 ? FLUSH_INTERVAL : _ref2$flushInterval,
       _ref2$enableSendBeaco = _ref2.enableSendBeacon,
@@ -120,6 +121,27 @@ export function Logger(_ref2) {
         },
         enableSendBeacon: enableSendBeacon
       });
+
+      if (amplitudeApiKey) {
+        transport({
+          method: 'POST',
+          url: AMPLITUDE_URL,
+          headers: {
+            'content-type': 'application/json'
+          },
+          json: {
+            api_key: amplitudeApiKey,
+            events: tracking.map(function (payload) {
+              // $FlowFixMe
+              return _extends({
+                event_type: payload.transition_name || 'event',
+                event_properties: payload
+              }, payload);
+            })
+          }
+        });
+      }
+
       events = [];
       tracking = [];
       return res.then(noop);
