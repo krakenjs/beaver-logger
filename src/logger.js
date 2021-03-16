@@ -18,7 +18,7 @@ type Payload = { [string] : string | boolean };
 type Transport = (TransportOptions) => ZalgoPromise<void>;
 
 type LoggerOptions = {|
-    url : string,
+    url? : string,
     prefix? : string,
     logLevel? : $Values<typeof LOG_LEVEL>,
     transport? : Transport,
@@ -50,7 +50,8 @@ export type LoggerType = {|
     addTrackingBuilder : AddBuilder,
     addHeaderBuilder : AddBuilder,
 
-    setTransport : (Transport) => LoggerType
+    setTransport : (Transport) => LoggerType,
+    configure : (LoggerOptions) => LoggerType
 |};
 
 function httpTransport({ url, method, headers, json, enableSendBeacon = false } : TransportOptions) : ZalgoPromise<void> {
@@ -136,17 +137,21 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                 extendIfDefined(headers, builder(headers));
             }
 
-            const res = transport({
-                method: 'POST',
-                url,
-                headers,
-                json:   {
-                    events,
-                    meta,
-                    tracking
-                },
-                enableSendBeacon
-            }).catch(noop);
+            let res;
+
+            if (url) {
+                res = transport({
+                    method: 'POST',
+                    url,
+                    headers,
+                    json:   {
+                        events,
+                        meta,
+                        tracking
+                    },
+                    enableSendBeacon
+                }).catch(noop);
+            }
 
             if (amplitudeApiKey) {
                 transport({
@@ -172,7 +177,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             events = [];
             tracking = [];
 
-            return res.then(noop);
+            return ZalgoPromise.resolve(res).then(noop);
         });
     }
 
@@ -275,6 +280,38 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         return logger; // eslint-disable-line no-use-before-define
     }
 
+    function configure(opts : LoggerOptions) : LoggerType {
+        if (opts.url) {
+            url = opts.url;
+        }
+
+        if (opts.prefix) {
+            prefix = opts.prefix;
+        }
+
+        if (opts.logLevel) {
+            logLevel = opts.logLevel;
+        }
+
+        if (opts.transport) {
+            transport = opts.transport;
+        }
+
+        if (opts.amplitudeApiKey) {
+            amplitudeApiKey = opts.amplitudeApiKey;
+        }
+
+        if (opts.flushInterval) {
+            flushInterval = opts.flushInterval;
+        }
+
+        if (opts.enableSendBeacon) {
+            enableSendBeacon = opts.enableSendBeacon;
+        }
+
+        return logger; // eslint-disable-line no-use-before-define
+    }
+
     if (isBrowser()) {
         safeInterval(flush, flushInterval);
     }
@@ -301,7 +338,8 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         addMetaBuilder,
         addTrackingBuilder,
         addHeaderBuilder,
-        setTransport
+        setTransport,
+        configure
     };
 
     return logger;
