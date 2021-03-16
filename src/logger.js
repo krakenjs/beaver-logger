@@ -146,7 +146,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                     tracking
                 },
                 enableSendBeacon
-            });
+            }).catch(noop);
 
             if (amplitudeApiKey) {
                 transport({
@@ -166,7 +166,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                             };
                         })
                     }
-                });
+                }).catch(noop);
             }
 
             events = [];
