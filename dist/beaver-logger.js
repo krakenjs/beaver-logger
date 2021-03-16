@@ -946,7 +946,8 @@
                         var headers = {};
                         for (var _i4 = 0; _i4 < headerBuilders.length; _i4++) extendIfDefined(headers, (0, 
                         headerBuilders[_i4])(headers));
-                        var res = transport({
+                        var res;
+                        url && (res = transport({
                             method: "POST",
                             url: url,
                             headers: headers,
@@ -956,7 +957,7 @@
                                 tracking: tracking
                             },
                             enableSendBeacon: enableSendBeacon
-                        }).catch(src_util_noop);
+                        }).catch(src_util_noop));
                         amplitudeApiKey && transport({
                             method: "POST",
                             url: "https://api2.amplitude.com/2/httpapi",
@@ -975,7 +976,7 @@
                         }).catch(src_util_noop);
                         events = [];
                         tracking = [];
-                        return res.then(src_util_noop);
+                        return promise_ZalgoPromise.resolve(res).then(src_util_noop);
                     }
                 }));
             }
@@ -1076,6 +1077,16 @@
                 },
                 setTransport: function(newTransport) {
                     transport = newTransport;
+                    return logger;
+                },
+                configure: function(opts) {
+                    opts.url && (url = opts.url);
+                    opts.prefix && (prefix = opts.prefix);
+                    opts.logLevel && (logLevel = opts.logLevel);
+                    opts.transport && (transport = opts.transport);
+                    opts.amplitudeApiKey && (amplitudeApiKey = opts.amplitudeApiKey);
+                    opts.flushInterval && (flushInterval = opts.flushInterval);
+                    opts.enableSendBeacon && (enableSendBeacon = opts.enableSendBeacon);
                     return logger;
                 }
             };

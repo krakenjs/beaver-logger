@@ -110,17 +110,21 @@ export function Logger(_ref2) {
         extendIfDefined(headers, _builder(headers));
       }
 
-      var res = transport({
-        method: 'POST',
-        url: url,
-        headers: headers,
-        json: {
-          events: events,
-          meta: meta,
-          tracking: tracking
-        },
-        enableSendBeacon: enableSendBeacon
-      }).catch(noop);
+      var res;
+
+      if (url) {
+        res = transport({
+          method: 'POST',
+          url: url,
+          headers: headers,
+          json: {
+            events: events,
+            meta: meta,
+            tracking: tracking
+          },
+          enableSendBeacon: enableSendBeacon
+        }).catch(noop);
+      }
 
       if (amplitudeApiKey) {
         transport({
@@ -144,7 +148,7 @@ export function Logger(_ref2) {
 
       events = [];
       tracking = [];
-      return res.then(noop);
+      return ZalgoPromise.resolve(res).then(noop);
     });
   }
 
@@ -252,6 +256,38 @@ export function Logger(_ref2) {
     return logger; // eslint-disable-line no-use-before-define
   }
 
+  function configure(opts) {
+    if (opts.url) {
+      url = opts.url;
+    }
+
+    if (opts.prefix) {
+      prefix = opts.prefix;
+    }
+
+    if (opts.logLevel) {
+      logLevel = opts.logLevel;
+    }
+
+    if (opts.transport) {
+      transport = opts.transport;
+    }
+
+    if (opts.amplitudeApiKey) {
+      amplitudeApiKey = opts.amplitudeApiKey;
+    }
+
+    if (opts.flushInterval) {
+      flushInterval = opts.flushInterval;
+    }
+
+    if (opts.enableSendBeacon) {
+      enableSendBeacon = opts.enableSendBeacon;
+    }
+
+    return logger; // eslint-disable-line no-use-before-define
+  }
+
   if (isBrowser()) {
     safeInterval(flush, flushInterval);
   }
@@ -277,7 +313,8 @@ export function Logger(_ref2) {
     addMetaBuilder: addMetaBuilder,
     addTrackingBuilder: addTrackingBuilder,
     addHeaderBuilder: addHeaderBuilder,
-    setTransport: setTransport
+    setTransport: setTransport,
+    configure: configure
   };
   return logger;
 }
