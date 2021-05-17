@@ -1,6 +1,17 @@
 beaver-logger
 ------------
 
+[![build status][build-badge]][build]
+[![code coverage][coverage-badge]][coverage]
+[![npm version][version-badge]][package]
+
+[build-badge]: https://img.shields.io/github/workflow/status/krakenjs/beaver-logger/build?logo=github&style=flat-square
+[build]: https://github.com/krakenjs/beaver-logger/actions?query=workflow%3Abuild
+[coverage-badge]: https://img.shields.io/codecov/c/github/krakenjs/beaver-logger.svg?style=flat-square
+[coverage]: https://codecov.io/github/krakenjs/beaver-logger/
+[version-badge]: https://img.shields.io/npm/v/beaver-logger.svg?style=flat-square
+[package]: https://www.npmjs.com/package/beaver-logger
+
 Front-end logger, which will:
 
 - Buffer your front-end logs and periodically send them to the server side
