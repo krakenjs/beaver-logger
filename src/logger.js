@@ -187,7 +187,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                                 };
                             })
                         }
-                    }).catch(noop);  
+                    }).catch(noop);
                 }
             }
 
