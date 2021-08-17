@@ -156,24 +156,39 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             }
 
             if (amplitudeApiKey) {
-                res = transport({
-                    method:  'POST',
-                    url:     AMPLITUDE_URL,
-                    headers: {
-                        'content-type': 'application/json'
-                    },
-                    json: {
-                        api_key: amplitudeApiKey,
-                        events:  tracking.map((payload : Payload) => {
-                            // $FlowFixMe
-                            return {
-                                event_type:       payload.transition_name || 'event',
-                                event_properties: payload,
-                                ...payload
-                            };
-                        })
-                    }
-                }).catch(noop);
+                const data = {
+                    api_key: amplitudeApiKey,
+                    events:  tracking.map((payload : Payload) => {
+                        // $FlowFixMe
+                        return {
+                            event_type:       payload.transition_name || 'event',
+                            event_properties: payload,
+                            ...payload
+                        };
+                    })
+                };
+                if (window.navigator.sendBeacon(url, data)) {
+                    res = true;
+                } else {
+                    res = transport({
+                        method:  'POST',
+                        url:     AMPLITUDE_URL,
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        json: {
+                            api_key: amplitudeApiKey,
+                            events:  tracking.map((payload : Payload) => {
+                                // $FlowFixMe
+                                return {
+                                    event_type:       payload.transition_name || 'event',
+                                    event_properties: payload,
+                                    ...payload
+                                };
+                            })
+                        }
+                    }).catch(noop);  
+                }
             }
 
             events = [];

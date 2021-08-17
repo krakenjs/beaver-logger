@@ -5,10 +5,12 @@
 <script>
     var $logger = beaver.Logger({
         url: 'http://localhost:3000/api/log', // server-side local build
+        amplitudeApiKey: 'a23fb4dfae56daf7c3212303b53a8527', // test
         enableSendBeacon: true
     });
 
-    $logger.info('hello_world', { "events": [ { "level": "info", "event": "foobar" } ] });
+    $logger.info('hello_world_info', { "events": [ { "level": "info", "event": "foobar", "user_id": "uid_abc123" } ], "user_id": "uid_abc123" });
+    $logger.track({ "level": "info", "event": "foobar", "user_id": "uid_abc123" });
 
     $logger.flush();
 </script>
