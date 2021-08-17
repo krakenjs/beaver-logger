@@ -60,7 +60,9 @@ function httpTransport({ url, method, headers, json, enableSendBeacon = false } 
         if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
             try {
                 const blob = new Blob([ JSON.stringify(json) ], { type: 'application/json' });
-                return window.navigator.sendBeacon(url, blob);
+                if (window.navigator.sendBeacon(url, blob)) {
+                    return;
+                }
             } catch (e) {
                 // pass
             }
@@ -154,7 +156,7 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             }
 
             if (amplitudeApiKey) {
-                transport({
+                res = transport({
                     method:  'POST',
                     url:     AMPLITUDE_URL,
                     headers: {
@@ -322,6 +324,10 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
         });
 
         window.addEventListener('unload', () => {
+            immediateFlush();
+        });
+
+        window.addEventListener('pagehide', () => {
             immediateFlush();
         });
     }
