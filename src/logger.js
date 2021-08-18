@@ -5,8 +5,9 @@ import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } fr
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
+import { canUseSendBeacon, isAmplitude, sendBeacon } from './util';
 
-type TransportOptions = {|
+export type TransportOptions = {|
     url : string,
     method : string,
     headers : { [string] : string },
@@ -56,19 +57,17 @@ export type LoggerType = {|
 
 function httpTransport({ url, method, headers, json, enableSendBeacon = false } : TransportOptions) : ZalgoPromise<void> {
     return ZalgoPromise.try(() => {
-        const hasHeaders = headers && Object.keys(headers).length;
-        if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
-            try {
-                const blob = new Blob([ JSON.stringify(json) ], { type: 'application/json' });
-                if (window.navigator.sendBeacon(url, blob)) {
-                    return;
-                }
-            } catch (e) {
-                // pass
+        let beaconResult = false;
+
+        if (canUseSendBeacon({ headers, enableSendBeacon })) {
+            if (isAmplitude(url)) {
+                beaconResult = sendBeacon({ url, data: json, useBlob: false });
             }
+
+            beaconResult = sendBeacon({ url, data: json, useBlob: true });
         }
 
-        return request({ url, method, headers, json });
+        return beaconResult ?? request({ url, method, headers, json });
     }).then(noop);
 }
 
@@ -167,28 +166,22 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                         };
                     })
                 };
-                if (window.navigator.sendBeacon(url, data)) {
-                    res = true;
-                } else {
-                    res = transport({
-                        method:  'POST',
-                        url:     AMPLITUDE_URL,
-                        headers: {
-                            'content-type': 'application/json'
-                        },
-                        json: {
-                            api_key: amplitudeApiKey,
-                            events:  tracking.map((payload : Payload) => {
-                                // $FlowFixMe
-                                return {
-                                    event_type:       payload.transition_name || 'event',
-                                    event_properties: payload,
-                                    ...payload
-                                };
-                            })
-                        }
-                    }).catch(noop);
-                }
+                transport({
+                    method:  'POST',
+                    url:     AMPLITUDE_URL,
+                    headers: {},
+                    json:    {
+                        api_key: amplitudeApiKey,
+                        events:  tracking.map((payload : Payload) => {
+                            // $FlowFixMe
+                            return {
+                                event_type:       payload.transition_name || 'event',
+                                event_properties: payload,
+                                ...payload
+                            };
+                        })
+                    }
+                }).catch(noop);
             }
 
             events = [];
