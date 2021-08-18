@@ -128,4 +128,48 @@ describe('beaver-logger tests', () => {
             }
         });
     });
+
+    describe('Amplitude', () => {
+        it('should log something and flush it to the buffer using sendBeacon if Amplitude API key is present', () => {
+            const $logger = Logger({
+                url:              'https://api2.amplitude.com/2/httpapi',
+                amplitudeApiKey:  'test_key',
+                enableSendBeacon: true
+            });
+
+            $logger.track({
+                foo:     'bar',
+                bar:     true,
+                user_id: 'abc123'
+            });
+
+            const logEndpoint = $mockEndpoint.register({
+                method:  'POST',
+                uri:     'https://api2.amplitude.com/2/httpapi',
+                handler: (req) => {
+                    const hasLog = req.data.events.some(event => event.foo === 'bar' && event.user_id === 'abc123');
+
+                    if (!hasLog) {
+                        throw new Error('Expected posted payload to contain logged log');
+                    }
+
+                    return {};
+                }
+            });
+
+            let sendBeaconCalled = false;
+
+            window.navigator.sendBeacon = () => {
+                sendBeaconCalled = true;
+            };
+
+            return $logger.flush().then(() => {
+                if (sendBeaconCalled) {
+                    logEndpoint.done();
+                } else {
+                    throw new Error('Result from calling sendBeacon() should have been false.');
+                }
+            });
+        });
+    });
 });
