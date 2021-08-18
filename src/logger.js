@@ -67,7 +67,7 @@ function httpTransport({ url, method, headers, json, enableSendBeacon = false } 
             }
         }
 
-        return beaconResult ?? request({ url, method, headers, json });
+        return beaconResult ? beaconResult : request({ url, method, headers, json });
     }).then(noop);
 }
 
