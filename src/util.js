@@ -32,13 +32,15 @@ const isAmplitude = (url : string) : boolean => {
 
 const sendBeacon = ({ url, data, useBlob = true } : SendBeaconOptions) : boolean => {
     try {
+        const json = JSON.stringify(data);
+
         if (useBlob) {
-            const blob = new Blob([ JSON.stringify(data) ], { type: 'application/json' });
+            const blob = new Blob([ json ], { type: 'application/json' });
             return window.navigator.sendBeacon(url, blob);
         }
         
         // eslint-disable-next-line compat/compat
-        return window.navigator.sendBeacon(url, data);
+        return window.navigator.sendBeacon(url, json);
     } catch (e) {
         return false;
     }

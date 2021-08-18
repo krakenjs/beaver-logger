@@ -62,9 +62,9 @@ function httpTransport({ url, method, headers, json, enableSendBeacon = false } 
         if (canUseSendBeacon({ headers, enableSendBeacon })) {
             if (isAmplitude(url)) {
                 beaconResult = sendBeacon({ url, data: json, useBlob: false });
+            } else {
+                beaconResult = sendBeacon({ url, data: json, useBlob: true });
             }
-
-            beaconResult = sendBeacon({ url, data: json, useBlob: true });
         }
 
         return beaconResult ?? request({ url, method, headers, json });
@@ -155,17 +155,6 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
             }
 
             if (amplitudeApiKey) {
-                const data = {
-                    api_key: amplitudeApiKey,
-                    events:  tracking.map((payload : Payload) => {
-                        // $FlowFixMe
-                        return {
-                            event_type:       payload.transition_name || 'event',
-                            event_properties: payload,
-                            ...payload
-                        };
-                    })
-                };
                 transport({
                     method:  'POST',
                     url:     AMPLITUDE_URL,
@@ -180,7 +169,8 @@ export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = 
                                 ...payload
                             };
                         })
-                    }
+                    },
+                    enableSendBeacon
                 }).catch(noop);
             }
 
