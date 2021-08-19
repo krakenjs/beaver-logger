@@ -3,6 +3,7 @@ import { ZalgoPromise } from 'zalgo-promise/src';
 import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
+import { canUseSendBeacon, isAmplitude, sendBeacon } from './util';
 
 function httpTransport(_ref) {
   var url = _ref.url,
@@ -12,19 +13,28 @@ function httpTransport(_ref) {
       _ref$enableSendBeacon = _ref.enableSendBeacon,
       enableSendBeacon = _ref$enableSendBeacon === void 0 ? false : _ref$enableSendBeacon;
   return ZalgoPromise.try(function () {
-    var hasHeaders = headers && Object.keys(headers).length;
+    var beaconResult = false;
 
-    if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
-      try {
-        var blob = new Blob([JSON.stringify(json)], {
-          type: 'application/json'
+    if (canUseSendBeacon({
+      headers: headers,
+      enableSendBeacon: enableSendBeacon
+    })) {
+      if (isAmplitude(url)) {
+        beaconResult = sendBeacon({
+          url: url,
+          data: json,
+          useBlob: false
         });
-        return window.navigator.sendBeacon(url, blob);
-      } catch (e) {// pass
+      } else {
+        beaconResult = sendBeacon({
+          url: url,
+          data: json,
+          useBlob: true
+        });
       }
     }
 
-    return request({
+    return beaconResult ? beaconResult : request({
       url: url,
       method: method,
       headers: headers,
@@ -130,9 +140,7 @@ export function Logger(_ref2) {
         transport({
           method: 'POST',
           url: AMPLITUDE_URL,
-          headers: {
-            'content-type': 'application/json'
-          },
+          headers: {},
           json: {
             api_key: amplitudeApiKey,
             events: tracking.map(function (payload) {
@@ -142,7 +150,8 @@ export function Logger(_ref2) {
                 event_properties: payload
               }, payload);
             })
-          }
+          },
+          enableSendBeacon: enableSendBeacon
         }).catch(noop);
       }
 
@@ -297,6 +306,9 @@ export function Logger(_ref2) {
       immediateFlush();
     });
     window.addEventListener('unload', function () {
+      immediateFlush();
+    });
+    window.addEventListener('pagehide', function () {
       immediateFlush();
     });
   }
