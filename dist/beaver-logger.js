@@ -74,6 +74,9 @@
         __webpack_require__.d(__webpack_exports__, "canUseSendBeacon", (function() {
             return canUseSendBeacon;
         }));
+        __webpack_require__.d(__webpack_exports__, "extendIfDefined", (function() {
+            return extendIfDefined;
+        }));
         __webpack_require__.d(__webpack_exports__, "isAmplitude", (function() {
             return util_isAmplitude;
         }));
@@ -888,6 +891,9 @@
                 return !1;
             }
         };
+        var extendIfDefined = function(target, source) {
+            for (var key in source) source.hasOwnProperty(key) && source[key] && (target[key] = source[key]);
+        };
         function httpTransport(_ref) {
             var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
             return promise_ZalgoPromise.try((function() {
@@ -969,9 +975,6 @@
                     json: json
                 });
             })).then(src_util_noop);
-        }
-        function extendIfDefined(target, source) {
-            for (var key in source) source.hasOwnProperty(key) && source[key] && !target[key] && (target[key] = source[key]);
         }
         function Logger(_ref2) {
             var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, amplitudeApiKey = _ref2.amplitudeApiKey, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? 6e4 : _ref2$flushInterval, _ref2$enableSendBeaco = _ref2.enableSendBeacon, enableSendBeacon = void 0 !== _ref2$enableSendBeaco && _ref2$enableSendBeaco;

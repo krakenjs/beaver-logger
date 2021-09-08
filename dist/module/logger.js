@@ -3,7 +3,7 @@ import { ZalgoPromise } from 'zalgo-promise/src';
 import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
-import { canUseSendBeacon, isAmplitude, sendBeacon } from './util';
+import { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon } from './util';
 
 function httpTransport(_ref) {
   var url = _ref.url,
@@ -41,14 +41,6 @@ function httpTransport(_ref) {
       json: json
     });
   }).then(noop);
-}
-
-function extendIfDefined(target, source) {
-  for (var key in source) {
-    if (source.hasOwnProperty(key) && source[key] && !target[key]) {
-      target[key] = source[key];
-    }
-  }
 }
 
 export function Logger(_ref2) {

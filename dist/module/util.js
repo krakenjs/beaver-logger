@@ -43,4 +43,12 @@ var sendBeacon = function sendBeacon(_ref2) {
   }
 };
 
-export { canUseSendBeacon, isAmplitude, sendBeacon };
+var extendIfDefined = function extendIfDefined(target, source) {
+  for (var key in source) {
+    if (source.hasOwnProperty(key) && source[key]) {
+      target[key] = source[key];
+    }
+  }
+};
+
+export { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon };
