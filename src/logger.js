@@ -5,7 +5,7 @@ import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } fr
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
-import { canUseSendBeacon, isAmplitude, sendBeacon } from './util';
+import { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon } from './util';
 
 export type TransportOptions = {|
     url : string,
@@ -69,14 +69,6 @@ function httpTransport({ url, method, headers, json, enableSendBeacon = false } 
 
         return beaconResult ? beaconResult : request({ url, method, headers, json });
     }).then(noop);
-}
-
-function extendIfDefined(target : { [string] : string | boolean }, source : { [string] : ?string | ?boolean }) {
-    for (const key in source) {
-        if (source.hasOwnProperty(key) && source[key] && !target[key]) {
-            target[key] = source[key];
-        }
-    }
 }
 
 export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, amplitudeApiKey, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false } : LoggerOptions) : LoggerType {

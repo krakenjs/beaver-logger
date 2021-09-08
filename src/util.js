@@ -46,4 +46,12 @@ const sendBeacon = ({ url, data, useBlob = true } : SendBeaconOptions) : boolean
     }
 };
 
-export { canUseSendBeacon, isAmplitude, sendBeacon };
+const extendIfDefined = (target : { [string] : string | boolean }, source : { [string] : ?string | ?boolean }) => {
+    for (const key in source) {
+        if (source.hasOwnProperty(key) && source[key]) {
+            target[key] = source[key];
+        }
+    }
+};
+
+export { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon };
