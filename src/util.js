@@ -46,9 +46,9 @@ const sendBeacon = ({ url, data, useBlob = true } : SendBeaconOptions) : boolean
     }
 };
 
-const extendIfDefined = (target : { [string] : string | boolean }, source : { [string] : ?string | ?boolean }) => {
+const extendIfDefined = (target : { [string] : ?string | ?boolean }, source : { [string] : ?string | ?boolean }) => {
     for (const key in source) {
-        if (source.hasOwnProperty(key) && source[key]) {
+        if (source.hasOwnProperty(key)) {
             target[key] = source[key];
         }
     }
