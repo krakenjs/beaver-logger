@@ -45,7 +45,7 @@ var sendBeacon = function sendBeacon(_ref2) {
 
 var extendIfDefined = function extendIfDefined(target, source) {
   for (var key in source) {
-    if (source.hasOwnProperty(key) && source[key]) {
+    if (source.hasOwnProperty(key)) {
       target[key] = source[key];
     }
   }

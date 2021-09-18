@@ -892,7 +892,7 @@
             }
         };
         var extendIfDefined = function(target, source) {
-            for (var key in source) source.hasOwnProperty(key) && source[key] && (target[key] = source[key]);
+            for (var key in source) source.hasOwnProperty(key) && (target[key] = source[key]);
         };
         function httpTransport(_ref) {
             var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
