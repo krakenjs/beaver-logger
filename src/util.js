@@ -1,6 +1,7 @@
 /* @flow */
 
 import { AMPLITUDE_URL } from './config';
+import type { Payload } from './types';
 
 type CanUseBeaconOptions = {|
     headers : { [string] : string },
@@ -46,7 +47,7 @@ const sendBeacon = ({ url, data, useBlob = true } : SendBeaconOptions) : boolean
     }
 };
 
-const extendIfDefined = (target : { [string] : ?string | ?boolean }, source : { [string] : ?string | ?boolean }) => {
+const extendIfDefined = (target : Payload, source : Payload) => {
     for (const key in source) {
         if (source.hasOwnProperty(key)) {
             target[key] = source[key];

@@ -6,6 +6,7 @@ import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } fr
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
 import { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon } from './util';
+import type { Payload } from './types';
 
 export type TransportOptions = {|
     url : string,
@@ -15,7 +16,6 @@ export type TransportOptions = {|
     enableSendBeacon? : boolean
 |};
 
-type Payload = { [string] : string | boolean };
 type Transport = (TransportOptions) => ZalgoPromise<void>;
 
 type LoggerOptions = {|
@@ -28,7 +28,7 @@ type LoggerOptions = {|
     amplitudeApiKey? : string
 |};
 
-type ClientPayload = { [string] : ?string | ?boolean };
+type ClientPayload = Payload;
 type Log = (name : string, payload? : ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 type Track = (payload : ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 
