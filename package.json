@@ -1,6 +1,6 @@
 {
   "name": "beaver-logger",
-  "version": "4.0.30",
+  "version": "4.0.31",
   "description": "Client side logger.",
   "main": "dist/beaver-logger.js",
   "scripts": {
