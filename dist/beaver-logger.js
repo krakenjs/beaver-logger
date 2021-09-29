@@ -83,6 +83,9 @@
         __webpack_require__.d(__webpack_exports__, "sendBeacon", (function() {
             return sendBeacon;
         }));
+        __webpack_require__.d(__webpack_exports__, "getHTTPTransport", (function() {
+            return getHTTPTransport;
+        }));
         function _extends() {
             return (_extends = Object.assign || function(target) {
                 for (var i = 1; i < arguments.length; i++) {
@@ -295,6 +298,10 @@
                 if ("undefined" == typeof Promise) throw new TypeError("Could not find Promise");
                 return Promise.resolve(this);
             };
+            _proto.lazy = function() {
+                this.errorHandled = !0;
+                return this;
+            };
             ZalgoPromise.resolve = function(value) {
                 return value instanceof ZalgoPromise ? value : utils_isPromise(value) ? new ZalgoPromise((function(resolve, reject) {
                     return value.then(resolve, reject);
@@ -435,6 +442,30 @@
             var domain = getActualDomain(win);
             return domain && win.mockDomain && 0 === win.mockDomain.indexOf("mock:") ? win.mockDomain : domain;
         }
+        function isSameDomain(win) {
+            if (!function(win) {
+                try {
+                    if (win === window) return !0;
+                } catch (err) {}
+                try {
+                    var desc = Object.getOwnPropertyDescriptor(win, "location");
+                    if (desc && !1 === desc.enumerable) return !1;
+                } catch (err) {}
+                try {
+                    if (isAboutProtocol(win) && canReadFromWindow()) return !0;
+                } catch (err) {}
+                try {
+                    if (getActualDomain(win) === getActualDomain(window)) return !0;
+                } catch (err) {}
+                return !1;
+            }(win)) return !1;
+            try {
+                if (win === window) return !0;
+                if (isAboutProtocol(win) && canReadFromWindow()) return !0;
+                if (getDomain(window) === getDomain(win)) return !0;
+            } catch (err) {}
+            return !1;
+        }
         var iframeWindows = [];
         var iframeFrames = [];
         function isWindowClosed(win, allowMock) {
@@ -454,30 +485,7 @@
             } catch (err) {
                 return !err || err.message !== IE_WIN_ACCESS_ERROR;
             }
-            if (allowMock && function(win) {
-                if (!function(win) {
-                    try {
-                        if (win === window) return !0;
-                    } catch (err) {}
-                    try {
-                        var desc = Object.getOwnPropertyDescriptor(win, "location");
-                        if (desc && !1 === desc.enumerable) return !1;
-                    } catch (err) {}
-                    try {
-                        if (isAboutProtocol(win) && canReadFromWindow()) return !0;
-                    } catch (err) {}
-                    try {
-                        if (getActualDomain(win) === getActualDomain(window)) return !0;
-                    } catch (err) {}
-                    return !1;
-                }(win)) return !1;
-                try {
-                    if (win === window) return !0;
-                    if (isAboutProtocol(win) && canReadFromWindow()) return !0;
-                    if (getDomain(window) === getDomain(win)) return !0;
-                } catch (err) {}
-                return !1;
-            }(win)) try {
+            if (allowMock && isSameDomain(win)) try {
                 if (win.mockclosed) return !0;
             } catch (err) {}
             try {
@@ -877,16 +885,17 @@
             return "https://api2.amplitude.com/2/httpapi" === url;
         };
         var sendBeacon = function(_ref2) {
-            var url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
+            var _ref2$win = _ref2.win, win = void 0 === _ref2$win ? window : _ref2$win, url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
             try {
                 var json = JSON.stringify(data);
+                if (!win.navigator.sendBeacon) throw new Error("No sendBeacon available");
                 if (useBlob) {
                     var blob = new Blob([ json ], {
                         type: "application/json"
                     });
-                    return window.navigator.sendBeacon(url, blob);
+                    return win.navigator.sendBeacon(url, blob);
                 }
-                return window.navigator.sendBeacon(url, json);
+                return win.navigator.sendBeacon(url, json);
             } catch (e) {
                 return !1;
             }
@@ -894,90 +903,100 @@
         var extendIfDefined = function(target, source) {
             for (var key in source) source.hasOwnProperty(key) && (target[key] = source[key]);
         };
-        function httpTransport(_ref) {
-            var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
-            return promise_ZalgoPromise.try((function() {
-                var beaconResult = !1;
-                canUseSendBeacon({
-                    headers: headers,
-                    enableSendBeacon: enableSendBeacon
-                }) && (beaconResult = util_isAmplitude(url) ? sendBeacon({
-                    url: url,
-                    data: json,
-                    useBlob: !1
-                }) : sendBeacon({
-                    url: url,
-                    data: json,
-                    useBlob: !0
-                }));
-                return beaconResult || function(_ref) {
-                    var url = _ref.url, _ref$method = _ref.method, method = void 0 === _ref$method ? "get" : _ref$method, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers, json = _ref.json, data = _ref.data, body = _ref.body, _ref$win = _ref.win, win = void 0 === _ref$win ? window : _ref$win, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 0 : _ref$timeout;
-                    return new promise_ZalgoPromise((function(resolve, reject) {
-                        if (json && data || json && body || data && json) throw new Error("Only options.json or options.data or options.body should be passed");
-                        var normalizedHeaders = {};
-                        for (var _i4 = 0, _Object$keys2 = Object.keys(headers); _i4 < _Object$keys2.length; _i4++) {
-                            var _key2 = _Object$keys2[_i4];
-                            normalizedHeaders[_key2.toLowerCase()] = headers[_key2];
-                        }
-                        json ? normalizedHeaders["content-type"] = normalizedHeaders["content-type"] || "application/json" : (data || body) && (normalizedHeaders["content-type"] = normalizedHeaders["content-type"] || "application/x-www-form-urlencoded; charset=utf-8");
-                        normalizedHeaders.accept = normalizedHeaders.accept || "application/json";
-                        for (var _i6 = 0; _i6 < http_headerBuilders.length; _i6++) {
-                            var builtHeaders = (0, http_headerBuilders[_i6])();
-                            for (var _i8 = 0, _Object$keys4 = Object.keys(builtHeaders); _i8 < _Object$keys4.length; _i8++) {
-                                var _key3 = _Object$keys4[_i8];
-                                normalizedHeaders[_key3.toLowerCase()] = builtHeaders[_key3];
-                            }
-                        }
-                        var xhr = new win.XMLHttpRequest;
-                        xhr.addEventListener("load", (function() {
-                            var responseHeaders = function(rawHeaders) {
-                                void 0 === rawHeaders && (rawHeaders = "");
-                                var result = {};
-                                for (var _i2 = 0, _rawHeaders$trim$spli2 = rawHeaders.trim().split("\n"); _i2 < _rawHeaders$trim$spli2.length; _i2++) {
-                                    var _line$split = _rawHeaders$trim$spli2[_i2].split(":"), _key = _line$split[0], values = _line$split.slice(1);
-                                    result[_key.toLowerCase()] = values.join(":").trim();
-                                }
-                                return result;
-                            }(this.getAllResponseHeaders());
-                            if (!this.status) return reject(new Error("Request to " + method.toLowerCase() + " " + url + " failed: no response status code."));
-                            var contentType = responseHeaders["content-type"];
-                            var isJSON = contentType && (0 === contentType.indexOf("application/json") || 0 === contentType.indexOf("text/json"));
-                            var responseBody = this.responseText;
-                            try {
-                                responseBody = JSON.parse(responseBody);
-                            } catch (err) {
-                                if (isJSON) return reject(new Error("Invalid json: " + this.responseText + "."));
-                            }
-                            return resolve({
-                                status: this.status,
-                                headers: responseHeaders,
-                                body: responseBody
-                            });
-                        }), !1);
-                        xhr.addEventListener("error", (function(evt) {
-                            reject(new Error("Request to " + method.toLowerCase() + " " + url + " failed: " + evt.toString() + "."));
-                        }), !1);
-                        xhr.open(method, url, !0);
-                        for (var _key4 in normalizedHeaders) normalizedHeaders.hasOwnProperty(_key4) && xhr.setRequestHeader(_key4, normalizedHeaders[_key4]);
-                        json ? body = JSON.stringify(json) : data && (body = Object.keys(data).map((function(key) {
-                            return encodeURIComponent(key) + "=" + (data ? encodeURIComponent(data[key]) : "");
-                        })).join("&"));
-                        xhr.timeout = timeout;
-                        xhr.ontimeout = function() {
-                            reject(new Error("Request to " + method.toLowerCase() + " " + url + " has timed out"));
-                        };
-                        xhr.send(body);
+        function getHTTPTransport(httpWin) {
+            void 0 === httpWin && (httpWin = window);
+            var win = isSameDomain(httpWin) ? function(win) {
+                if (!isSameDomain(win)) throw new Error("Expected window to be same domain");
+                return win;
+            }(httpWin) : window;
+            return function(_ref) {
+                var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
+                return promise_ZalgoPromise.try((function() {
+                    var beaconResult = !1;
+                    canUseSendBeacon({
+                        headers: headers,
+                        enableSendBeacon: enableSendBeacon
+                    }) && (beaconResult = util_isAmplitude(url) ? sendBeacon({
+                        win: win,
+                        url: url,
+                        data: json,
+                        useBlob: !1
+                    }) : sendBeacon({
+                        win: win,
+                        url: url,
+                        data: json,
+                        useBlob: !0
                     }));
-                }({
-                    url: url,
-                    method: method,
-                    headers: headers,
-                    json: json
-                });
-            })).then(src_util_noop);
+                    return beaconResult || function(_ref) {
+                        var url = _ref.url, _ref$method = _ref.method, method = void 0 === _ref$method ? "get" : _ref$method, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers, json = _ref.json, data = _ref.data, body = _ref.body, _ref$win = _ref.win, win = void 0 === _ref$win ? window : _ref$win, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 0 : _ref$timeout;
+                        return new promise_ZalgoPromise((function(resolve, reject) {
+                            if (json && data || json && body || data && json) throw new Error("Only options.json or options.data or options.body should be passed");
+                            var normalizedHeaders = {};
+                            for (var _i4 = 0, _Object$keys2 = Object.keys(headers); _i4 < _Object$keys2.length; _i4++) {
+                                var _key2 = _Object$keys2[_i4];
+                                normalizedHeaders[_key2.toLowerCase()] = headers[_key2];
+                            }
+                            json ? normalizedHeaders["content-type"] = normalizedHeaders["content-type"] || "application/json" : (data || body) && (normalizedHeaders["content-type"] = normalizedHeaders["content-type"] || "application/x-www-form-urlencoded; charset=utf-8");
+                            normalizedHeaders.accept = normalizedHeaders.accept || "application/json";
+                            for (var _i6 = 0; _i6 < http_headerBuilders.length; _i6++) {
+                                var builtHeaders = (0, http_headerBuilders[_i6])();
+                                for (var _i8 = 0, _Object$keys4 = Object.keys(builtHeaders); _i8 < _Object$keys4.length; _i8++) {
+                                    var _key3 = _Object$keys4[_i8];
+                                    normalizedHeaders[_key3.toLowerCase()] = builtHeaders[_key3];
+                                }
+                            }
+                            var xhr = new win.XMLHttpRequest;
+                            xhr.addEventListener("load", (function() {
+                                var responseHeaders = function(rawHeaders) {
+                                    void 0 === rawHeaders && (rawHeaders = "");
+                                    var result = {};
+                                    for (var _i2 = 0, _rawHeaders$trim$spli2 = rawHeaders.trim().split("\n"); _i2 < _rawHeaders$trim$spli2.length; _i2++) {
+                                        var _line$split = _rawHeaders$trim$spli2[_i2].split(":"), _key = _line$split[0], values = _line$split.slice(1);
+                                        result[_key.toLowerCase()] = values.join(":").trim();
+                                    }
+                                    return result;
+                                }(this.getAllResponseHeaders());
+                                if (!this.status) return reject(new Error("Request to " + method.toLowerCase() + " " + url + " failed: no response status code."));
+                                var contentType = responseHeaders["content-type"];
+                                var isJSON = contentType && (0 === contentType.indexOf("application/json") || 0 === contentType.indexOf("text/json"));
+                                var responseBody = this.responseText;
+                                try {
+                                    responseBody = JSON.parse(responseBody);
+                                } catch (err) {
+                                    if (isJSON) return reject(new Error("Invalid json: " + this.responseText + "."));
+                                }
+                                return resolve({
+                                    status: this.status,
+                                    headers: responseHeaders,
+                                    body: responseBody
+                                });
+                            }), !1);
+                            xhr.addEventListener("error", (function(evt) {
+                                reject(new Error("Request to " + method.toLowerCase() + " " + url + " failed: " + evt.toString() + "."));
+                            }), !1);
+                            xhr.open(method, url, !0);
+                            for (var _key4 in normalizedHeaders) normalizedHeaders.hasOwnProperty(_key4) && xhr.setRequestHeader(_key4, normalizedHeaders[_key4]);
+                            json ? body = JSON.stringify(json) : data && (body = Object.keys(data).map((function(key) {
+                                return encodeURIComponent(key) + "=" + (data ? encodeURIComponent(data[key]) : "");
+                            })).join("&"));
+                            xhr.timeout = timeout;
+                            xhr.ontimeout = function() {
+                                reject(new Error("Request to " + method.toLowerCase() + " " + url + " has timed out"));
+                            };
+                            xhr.send(body);
+                        }));
+                    }({
+                        win: win,
+                        url: url,
+                        method: method,
+                        headers: headers,
+                        json: json
+                    });
+                })).then(src_util_noop);
+            };
         }
-        function Logger(_ref2) {
-            var url = _ref2.url, prefix = _ref2.prefix, _ref2$logLevel = _ref2.logLevel, logLevel = void 0 === _ref2$logLevel ? DEFAULT_LOG_LEVEL : _ref2$logLevel, _ref2$transport = _ref2.transport, transport = void 0 === _ref2$transport ? httpTransport : _ref2$transport, amplitudeApiKey = _ref2.amplitudeApiKey, _ref2$flushInterval = _ref2.flushInterval, flushInterval = void 0 === _ref2$flushInterval ? 6e4 : _ref2$flushInterval, _ref2$enableSendBeaco = _ref2.enableSendBeacon, enableSendBeacon = void 0 !== _ref2$enableSendBeaco && _ref2$enableSendBeaco;
+        function Logger(_ref) {
+            var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? DEFAULT_LOG_LEVEL : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, amplitudeApiKey = _ref.amplitudeApiKey, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
             var events = [];
             var tracking = [];
             var payloadBuilders = [];

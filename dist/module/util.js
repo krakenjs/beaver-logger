@@ -21,7 +21,9 @@ var isAmplitude = function isAmplitude(url) {
 };
 
 var sendBeacon = function sendBeacon(_ref2) {
-  var url = _ref2.url,
+  var _ref2$win = _ref2.win,
+      win = _ref2$win === void 0 ? window : _ref2$win,
+      url = _ref2.url,
       data = _ref2.data,
       _ref2$useBlob = _ref2.useBlob,
       useBlob = _ref2$useBlob === void 0 ? true : _ref2$useBlob;
@@ -29,15 +31,18 @@ var sendBeacon = function sendBeacon(_ref2) {
   try {
     var json = JSON.stringify(data);
 
+    if (!win.navigator.sendBeacon) {
+      throw new Error("No sendBeacon available");
+    }
+
     if (useBlob) {
       var blob = new Blob([json], {
         type: 'application/json'
       });
-      return window.navigator.sendBeacon(url, blob);
-    } // eslint-disable-next-line compat/compat
+      return win.navigator.sendBeacon(url, blob);
+    }
 
-
-    return window.navigator.sendBeacon(url, json);
+    return win.navigator.sendBeacon(url, json);
   } catch (e) {
     return false;
   }

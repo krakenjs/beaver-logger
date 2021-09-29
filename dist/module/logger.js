@@ -1,60 +1,22 @@
 import _extends from "@babel/runtime/helpers/esm/extends";
 import { ZalgoPromise } from 'zalgo-promise/src';
-import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
+import { isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
-import { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon } from './util';
-
-function httpTransport(_ref) {
+import { extendIfDefined } from './util';
+import { getHTTPTransport } from './http';
+export function Logger(_ref) {
   var url = _ref.url,
-      method = _ref.method,
-      headers = _ref.headers,
-      json = _ref.json,
+      prefix = _ref.prefix,
+      _ref$logLevel = _ref.logLevel,
+      logLevel = _ref$logLevel === void 0 ? DEFAULT_LOG_LEVEL : _ref$logLevel,
+      _ref$transport = _ref.transport,
+      transport = _ref$transport === void 0 ? getHTTPTransport() : _ref$transport,
+      amplitudeApiKey = _ref.amplitudeApiKey,
+      _ref$flushInterval = _ref.flushInterval,
+      flushInterval = _ref$flushInterval === void 0 ? FLUSH_INTERVAL : _ref$flushInterval,
       _ref$enableSendBeacon = _ref.enableSendBeacon,
       enableSendBeacon = _ref$enableSendBeacon === void 0 ? false : _ref$enableSendBeacon;
-  return ZalgoPromise.try(function () {
-    var beaconResult = false;
-
-    if (canUseSendBeacon({
-      headers: headers,
-      enableSendBeacon: enableSendBeacon
-    })) {
-      if (isAmplitude(url)) {
-        beaconResult = sendBeacon({
-          url: url,
-          data: json,
-          useBlob: false
-        });
-      } else {
-        beaconResult = sendBeacon({
-          url: url,
-          data: json,
-          useBlob: true
-        });
-      }
-    }
-
-    return beaconResult ? beaconResult : request({
-      url: url,
-      method: method,
-      headers: headers,
-      json: json
-    });
-  }).then(noop);
-}
-
-export function Logger(_ref2) {
-  var url = _ref2.url,
-      prefix = _ref2.prefix,
-      _ref2$logLevel = _ref2.logLevel,
-      logLevel = _ref2$logLevel === void 0 ? DEFAULT_LOG_LEVEL : _ref2$logLevel,
-      _ref2$transport = _ref2.transport,
-      transport = _ref2$transport === void 0 ? httpTransport : _ref2$transport,
-      amplitudeApiKey = _ref2.amplitudeApiKey,
-      _ref2$flushInterval = _ref2.flushInterval,
-      flushInterval = _ref2$flushInterval === void 0 ? FLUSH_INTERVAL : _ref2$flushInterval,
-      _ref2$enableSendBeaco = _ref2.enableSendBeacon,
-      enableSendBeacon = _ref2$enableSendBeaco === void 0 ? false : _ref2$enableSendBeaco;
   var events = [];
   var tracking = [];
   var payloadBuilders = [];
