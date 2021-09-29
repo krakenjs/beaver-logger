@@ -2,7 +2,7 @@
 
 import { $mockEndpoint, patchXmlHttpRequest } from 'sync-browser-mocks/dist/sync-browser-mocks';
 
-import { Logger } from '../src';
+import { Logger, getHTTPTransport } from '../src';
 
 patchXmlHttpRequest();
 
@@ -125,6 +125,64 @@ describe('beaver-logger tests', () => {
                 throw new Error('Result from calling sendBeacon() should have been false.');
             } else {
                 logEndpoint.done();
+            }
+        });
+    });
+
+    it('should log something using XMLHttpRequest and a custom transport', () => {
+        let XMLHttpRequestCalled = false;
+
+        const win = {
+            ...window,
+            XMLHttpRequest: () => {
+                XMLHttpRequestCalled = true;
+            }
+        };
+
+        const $logger = Logger({
+            url:              '/test/api/log',
+            transport:        getHTTPTransport(win)
+        });
+
+        $logger.info('hello_world', {
+            foo: 'bar',
+            bar: true
+        });
+
+        return $logger.flush().then(() => {
+            if (!XMLHttpRequestCalled) {
+                throw new Error('Expected XMLHttpRequest on custom window to be called.');
+            }
+        });
+    });
+
+    it('should log something using sendBeacon and a custom transport', () => {
+        let sendBeaconCalled = false;
+
+        const win = {
+            ...window,
+            navigator: {
+                ...window.navigator,
+                sendBeacon: () => {
+                    sendBeaconCalled = true;
+                }
+            }
+        };
+
+        const $logger = Logger({
+            url:              '/test/api/log',
+            enableSendBeacon: true,
+            transport:        getHTTPTransport(win)
+        });
+
+        $logger.info('hello_world', {
+            foo: 'bar',
+            bar: true
+        });
+
+        return $logger.flush().then(() => {
+            if (!sendBeaconCalled) {
+                throw new Error('Expected sendBeacon on custom window to be called.');
             }
         });
     });

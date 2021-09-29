@@ -1,17 +1,13 @@
 /* @flow */
 
+import { type SameDomainWindowType } from 'cross-domain-utils/src';
+
 import { AMPLITUDE_URL } from './config';
 import type { Payload } from './types';
 
 type CanUseBeaconOptions = {|
     headers : { [string] : string },
     enableSendBeacon : boolean
-|};
-
-type SendBeaconOptions = {|
-    url : string,
-    data : JSON,
-    useBlob : boolean
 |};
 
 const canUseSendBeacon = ({ headers, enableSendBeacon } : CanUseBeaconOptions) : boolean => {
@@ -31,17 +27,27 @@ const isAmplitude = (url : string) : boolean => {
     return false;
 };
 
-const sendBeacon = ({ url, data, useBlob = true } : SendBeaconOptions) : boolean => {
+type SendBeaconOptions = {|
+    win : SameDomainWindowType,
+    url : string,
+    data : JSON,
+    useBlob : boolean
+|};
+
+const sendBeacon = ({ win = window, url, data, useBlob = true } : SendBeaconOptions) : boolean => {
     try {
         const json = JSON.stringify(data);
 
+        if (!win.navigator.sendBeacon) {
+            throw new Error(`No sendBeacon available`);
+        }
+
         if (useBlob) {
             const blob = new Blob([ json ], { type: 'application/json' });
-            return window.navigator.sendBeacon(url, blob);
+            return win.navigator.sendBeacon(url, blob);
         }
         
-        // eslint-disable-next-line compat/compat
-        return window.navigator.sendBeacon(url, json);
+        return win.navigator.sendBeacon(url, json);
     } catch (e) {
         return false;
     }

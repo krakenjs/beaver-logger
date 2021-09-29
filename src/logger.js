@@ -1,22 +1,13 @@
 /* @flow */
 
 import { ZalgoPromise } from 'zalgo-promise/src';
-import { request, isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
+import { isBrowser, promiseDebounce, noop, safeInterval, objFilter } from 'belter/src';
 
 import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from './config';
 import { LOG_LEVEL, PROTOCOL } from './constants';
-import { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon } from './util';
+import { extendIfDefined } from './util';
+import { type Transport, getHTTPTransport } from './http';
 import type { Payload } from './types';
-
-export type TransportOptions = {|
-    url : string,
-    method : string,
-    headers : { [string] : string },
-    json : Object,
-    enableSendBeacon? : boolean
-|};
-
-type Transport = (TransportOptions) => ZalgoPromise<void>;
 
 type LoggerOptions = {|
     url? : string,
@@ -55,23 +46,7 @@ export type LoggerType = {|
     configure : (LoggerOptions) => LoggerType
 |};
 
-function httpTransport({ url, method, headers, json, enableSendBeacon = false } : TransportOptions) : ZalgoPromise<void> {
-    return ZalgoPromise.try(() => {
-        let beaconResult = false;
-
-        if (canUseSendBeacon({ headers, enableSendBeacon })) {
-            if (isAmplitude(url)) {
-                beaconResult = sendBeacon({ url, data: json, useBlob: false });
-            } else {
-                beaconResult = sendBeacon({ url, data: json, useBlob: true });
-            }
-        }
-
-        return beaconResult ? beaconResult : request({ url, method, headers, json });
-    }).then(noop);
-}
-
-export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = httpTransport, amplitudeApiKey, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false } : LoggerOptions) : LoggerType {
+export function Logger({ url, prefix, logLevel = DEFAULT_LOG_LEVEL, transport = getHTTPTransport(), amplitudeApiKey, flushInterval = FLUSH_INTERVAL, enableSendBeacon = false } : LoggerOptions) : LoggerType {
 
     let events : Array<{| level : $Values<typeof LOG_LEVEL>, event : string, payload : Payload |}> = [];
     let tracking : Array<Payload> = [];
