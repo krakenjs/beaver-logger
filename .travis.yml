@@ -1,9 +1,0 @@
-language: node_js
-node_js:
-   - "lts/*"
-before_script:
-  - npm run flow-typed
-  - npm install -g codecov
-script: npm run build
-after_success:
-  - codecov
