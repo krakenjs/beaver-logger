@@ -85,7 +85,7 @@ export function log(req : ExpressRequest, logger : Logger, logs : {| events : $R
 
     if (logger.log) {
         events.forEach((event) => {
-            if (!event.event) {
+            if (!event.event || typeof event != 'string') {
                 return;
             }
 
