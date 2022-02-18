@@ -2,7 +2,7 @@
 
 import { ZalgoPromise } from 'zalgo-promise/src';
 import { request, noop } from 'belter/src';
-import { isSameDomain, assertSameDomain, type CrossDomainWindowType } from 'cross-domain-utils/src';
+import { isSameDomain, assertSameDomain, type CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 
 import { canUseSendBeacon, isAmplitude, sendBeacon } from './util';
 
