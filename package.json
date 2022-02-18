@@ -54,8 +54,8 @@
     "sync-browser-mocks": "^1.0.44"
   },
   "dependencies": {
+    "@krakenjs/cross-domain-utils": "^3.0.2",
     "belter": "^1.0.17",
-    "cross-domain-utils": "^2.0.36",
     "zalgo-promise": "^1.0.26"
   }
 }
