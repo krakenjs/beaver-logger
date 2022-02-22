@@ -1,5 +1,5 @@
 {
-  "name": "beaver-logger",
+  "name": "@krakenjs/beaver-logger",
   "version": "4.0.35",
   "description": "Client side logger.",
   "main": "dist/beaver-logger.js",
@@ -54,8 +54,8 @@
     "sync-browser-mocks": "^1.0.44"
   },
   "dependencies": {
-    "belter": "^1.0.17",
-    "cross-domain-utils": "^2.0.36",
-    "zalgo-promise": "^1.0.26"
+    "@krakenjs/belter": "^2.0.0",
+    "@krakenjs/cross-domain-utils": "^3.0.0",
+    "@krakenjs/zalgo-promise": "^2.0.0"
   }
 }
