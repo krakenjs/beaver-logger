@@ -15,14 +15,54 @@
     "webpack": "babel-node --config-file ./node_modules/grumbler-scripts/config/.babelrc-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/webpack --display-optimization-bailout --progress",
     "test": "npm run lint && npm run flow-typed && npm run flow && npm run karma",
     "build": "npm run test && npm run babel && npm run webpack",
-    "release": "./publish.sh",
-    "release:patch": "./publish.sh patch",
-    "release:minor": "./publish.sh minor",
-    "release:major": "./publish.sh major",
     "clean": "rimraf dist coverage",
     "reinstall": "rimraf flow-typed && rimraf node_modules && npm install && flow-typed install",
     "prepublishOnly": "npm run babel-server",
-    "postpublish": "git checkout server"
+    "postpublish": "git checkout server",
+    "prepare": "husky install",
+    "prerelease": "npm run clean && npm run build && git add dist && git commit -m 'ci: check in dist folder' || echo 'Nothing to distribute'",
+    "release": "standard-version",
+    "postrelease": "git push && git push --follow-tags && npm publish"
+  },
+  "standard-version": {
+    "types": [
+      {
+        "type": "feat",
+        "section": "Features"
+      },
+      {
+        "type": "fix",
+        "section": "Bug Fixes"
+      },
+      {
+        "type": "chore",
+        "hidden": false
+      },
+      {
+        "type": "docs",
+        "hidden": false
+      },
+      {
+        "type": "style",
+        "hidden": false
+      },
+      {
+        "type": "refactor",
+        "hidden": false
+      },
+      {
+        "type": "perf",
+        "hidden": false
+      },
+      {
+        "type": "test",
+        "hidden": false
+      },
+      {
+        "type": "ci",
+        "hidden": true
+      }
+    ]
   },
   "repository": {
     "type": "git",
@@ -48,9 +88,13 @@
   ],
   "readmeFilename": "README.md",
   "devDependencies": {
+    "@commitlint/cli": "^16.2.1",
+    "@commitlint/config-conventional": "^16.2.1",
     "flow-bin": "0.135.0",
     "grumbler-scripts": "^5.0.3",
+    "husky": "^7.0.4",
     "mocha": "^3.5.3",
+    "standard-version": "^9.3.2",
     "sync-browser-mocks": "^1.0.44"
   },
   "dependencies": {
