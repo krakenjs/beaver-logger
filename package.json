@@ -93,7 +93,7 @@
     "flow-bin": "0.135.0",
     "grumbler-scripts": "^5.0.3",
     "husky": "^7.0.4",
-    "mocha": "^3.5.3",
+    "mocha": "^4.0.0",
     "standard-version": "^9.3.2",
     "sync-browser-mocks": "^1.0.44"
   },
