@@ -1,6 +1,6 @@
-import { ZalgoPromise } from 'zalgo-promise/src';
-import { request, noop } from 'belter/src';
-import { isSameDomain, assertSameDomain } from 'cross-domain-utils/src';
+import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
+import { request, noop } from '@krakenjs/belter/src';
+import { isSameDomain, assertSameDomain } from '@krakenjs/cross-domain-utils/src';
 import { canUseSendBeacon, isAmplitude, sendBeacon } from './util';
 export function getHTTPTransport(httpWin) {
   if (httpWin === void 0) {
