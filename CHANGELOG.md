@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.1](https://github.com/krakenjs/beaver-logger/compare/v5.0.0...v5.0.1) (2022-04-09)
+
+
+* move devDependencies to [@krakenjs](https://github.com/krakenjs) scope ([#57](https://github.com/krakenjs/beaver-logger/issues/57)) ([c9d592c](https://github.com/krakenjs/beaver-logger/commit/c9d592cfbf281859f7265d58b43538f68b7065e0))
+
 ## [5.0.0](https://github.com/krakenjs/beaver-logger/compare/v4.0.35...v5.0.0) (2022-03-01)
 
 
