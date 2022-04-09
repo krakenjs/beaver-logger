@@ -1,6 +1,6 @@
 /* @flow */
 
-import { $mockEndpoint, patchXmlHttpRequest } from 'sync-browser-mocks/dist/sync-browser-mocks';
+import { $mockEndpoint, patchXmlHttpRequest } from '@krakenjs/sync-browser-mocks/dist/sync-browser-mocks';
 
 import { Logger, getHTTPTransport } from '../src';
 
