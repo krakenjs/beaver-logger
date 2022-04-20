@@ -8,12 +8,12 @@
     "lint": "eslint src/ server/ test/ *.js",
     "flow-typed": "rm -rf ./flow-typed && flow-typed install && flow-typed install express@4",
     "flow": "flow",
-    "karma": "cross-env NODE_ENV=test babel-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/karma start",
     "babel": "babel src/ --out-dir dist/module",
     "babel-server": "babel ./server/*.js --ignore=node_modules --out-dir ./server",
     "babel-server-test": "babel ./server/*.js --ignore=node_modules --out-dir ./demo/beaver-logger",
     "webpack": "babel-node --config-file ./node_modules/@krakenjs/grumbler-scripts/config/.babelrc-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/webpack --display-optimization-bailout --progress",
-    "test": "npm run lint && npm run flow-typed && npm run flow && npm run karma",
+    "jest": "jest",
+    "test": "npm run lint && npm run flow-typed && npm run flow && npm run jest",
     "build": "npm run test && npm run babel && npm run webpack",
     "clean": "rimraf dist coverage",
     "reinstall": "rimraf flow-typed && rimraf node_modules && npm install && flow-typed install",
@@ -23,6 +23,16 @@
     "prerelease": "npm run clean && npm run build && git add dist && git commit -m 'ci: check in dist folder' || echo 'Nothing to distribute'",
     "release": "standard-version",
     "postrelease": "git push && git push --follow-tags && npm publish"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "globals": {
+      "__DEBUG__": true
+    },
+    "testEnvironment": "jsdom",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@paypal|@krakenjs))"
+    ]
   },
   "standard-version": {
     "types": [
@@ -94,6 +104,7 @@
     "@krakenjs/sync-browser-mocks": "^3.0.0",
     "flow-bin": "0.135.0",
     "husky": "^7.0.4",
+    "jest": "^27.5.1",
     "mocha": "^4.0.0",
     "standard-version": "^9.3.2"
   },
