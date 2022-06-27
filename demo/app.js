@@ -3,20 +3,22 @@
 /* eslint-disable no-console */
 /* eslint-disable import/no-commonjs */
 
-const app = require('express')();
+const app = require("express")();
 
-const clientLogger = require('../dist/beaver-logger.js');
+const clientLogger = require("../dist/beaver-logger.js");
 
-const beaverLogger = require('./beaver-logger/server.js');
+const beaverLogger = require("./beaver-logger/server.js");
 
 const port = 3000;
 
-app.use(beaverLogger.expressEndpoint({
-    uri:        '/api/log',
-    logger:     clientLogger,
-    enableCors: true
-}));
+app.use(
+  beaverLogger.expressEndpoint({
+    uri: "/api/log",
+    logger: clientLogger,
+    enableCors: true,
+  })
+);
 
 app.listen(port, () => {
-    console.log(`Logger listening at http://localhost:${ port }`);
+  console.log(`Logger listening at http://localhost:${port}`);
 });

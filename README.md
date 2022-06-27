@@ -1,5 +1,4 @@
-beaver-logger
-------------
+## beaver-logger
 
 [![build status][build-badge]][build]
 [![code coverage][coverage-badge]][coverage]
@@ -19,14 +18,13 @@ Front-end logger, which will:
 
 This is a great tool to use if you want to do logging on the client side in the same way you do on the server, without worrying about sending off a million beacons. You can quickly get an idea of what's going on on your client, including error cases, page transitions, or anything else you care to log!
 
-Overview
----------
+## Overview
 
 ## Setup
 
 ```javascript
 var $logger = beaver.Logger({
-    url: '/my/logger/url'
+  url: "/my/logger/url",
 });
 ```
 
@@ -51,10 +49,10 @@ Call this to attach general tracking information to the current page. This is us
 Attach a method which is called and will attach general information to the logging payload whenever the logs are flushed
 
 ```javascript
-$logger.addMetaBuilder(function() {
-    return {
-        current_page: getMyCurrentPage()
-    };
+$logger.addMetaBuilder(function () {
+  return {
+    current_page: getMyCurrentPage(),
+  };
 });
 ```
 
@@ -63,10 +61,10 @@ $logger.addMetaBuilder(function() {
 Attach a method which is called and will attach values to **each individual log's payload** whenever the logs are flushed
 
 ```javascript
-$logger.addPayloadBuilder(function() {
-    return {
-        performance_ts: window.performance.now()
-    };
+$logger.addPayloadBuilder(function () {
+  return {
+    performance_ts: window.performance.now(),
+  };
 });
 ```
 
@@ -75,10 +73,10 @@ $logger.addPayloadBuilder(function() {
 Attach a method which is called and will attach values to **each individual log's tracking** whenever the logs are flushed
 
 ```javascript
-$logger.addTrackingBuilder(function() {
-    return {
-        pageLoadTime: getPageLoadTime()
-    };
+$logger.addTrackingBuilder(function () {
+  return {
+    pageLoadTime: getPageLoadTime(),
+  };
 });
 ```
 
@@ -87,10 +85,10 @@ $logger.addTrackingBuilder(function() {
 Attach a method which is called and will attach values to **each individual log requests' headers** whenever the logs are flushed
 
 ```javascript
-$logger.addHeaderBuilder(function() {
-    return {
-        'x-csrf-token': getCSRFToken()
-    };
+$logger.addHeaderBuilder(function () {
+  return {
+    "x-csrf-token": getCSRFToken(),
+  };
 });
 ```
 
@@ -98,9 +96,7 @@ $logger.addHeaderBuilder(function() {
 
 Flushes the logs to the server side. Recommended you don't call this manually, as it will happen automatically after a configured interval.
 
-
-Installing
-----------
+## Installing
 
 - Install via npm
 
@@ -115,54 +111,51 @@ Installing
 or
 
 ```javascript
-let $logger = require('beaver-logger');
+let $logger = require("beaver-logger");
 ```
 
-
-Configuration
--------------
+## Configuration
 
 Full configuration options:
 
 ```javascript
 var $logger = beaver.Logger({
+  // Url to send logs to
+  url: "/my/logger/url",
 
-    // Url to send logs to
-    url: '/my/logger/url',
+  // Prefix to prepend to all events
+  prefix: "myapp",
 
-    // Prefix to prepend to all events
-    prefix: 'myapp',
+  // Log level to display in the browser console
+  logLevel: beaver.LOG_LEVEL.WARN,
 
-    // Log level to display in the browser console
-    logLevel: beaver.LOG_LEVEL.WARN,
+  // Interval to flush logs to server
+  flushInterval: 60 * 1000,
 
-    // Interval to flush logs to server
-    flushInterval: 60 * 1000,
-
-    // Use sendBeacon if supported rather than XHR to send logs; defaults to false
-    enableSendBeacon: true,
+  // Use sendBeacon if supported rather than XHR to send logs; defaults to false
+  enableSendBeacon: true,
 });
 ```
 
-Server Side
------------
+## Server Side
 
 beaver-logger includes a small node endpoint which will automatically accept the logs sent from the client side. You can mount this really easily:
 
 ```javascript
-let beaverLogger = require('beaver-logger/server');
+let beaverLogger = require("beaver-logger/server");
 
-myapp.use(beaverLogger.expressEndpoint({
-
+myapp.use(
+  beaverLogger.expressEndpoint({
     // URI to recieve logs at
-    uri: '/api/log',
+    uri: "/api/log",
 
     // Custom logger (optional, by default logs to console)
     logger: myLogger,
 
     // Enable cross-origin requests to your logging endpoint
-    enableCors: false
-}))
+    enableCors: false,
+  })
+);
 ```
 
 Or if you're using kraken, you can add this in your `config.json` as a middleware:
@@ -183,27 +176,24 @@ Or if you're using kraken, you can add this in your `config.json` as a middlewar
       }
 ```
 
-Custom backend logger
----------------------
+## Custom backend logger
 
 Setting up a custom logger is really easy, if you need to transmit these logs to some backend logging service rather than just logging them to your server console:
 
 ```javascript
 module.exports = {
-
-    log: function(req, level, event, payload) {
-
-        logSocket.send(JSON.stringify({
-            level: level,
-            event: event,
-            payload: payload
-        }));
-    }
-}
+  log: function (req, level, event, payload) {
+    logSocket.send(
+      JSON.stringify({
+        level: level,
+        event: event,
+        payload: payload,
+      })
+    );
+  },
+};
 ```
 
-
-Data Flow
----------
+## Data Flow
 
 ![Flow](/flow.png?raw=true)
