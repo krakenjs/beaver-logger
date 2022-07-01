@@ -1,6 +1,6 @@
 /* @flow */
 
-import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { ZalgoPromise } from "@krakenjs/zalgo-promise";
 import {
   isBrowser,
   promiseDebounce,

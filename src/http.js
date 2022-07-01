@@ -1,12 +1,12 @@
 /* @flow */
 
-import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { ZalgoPromise } from "@krakenjs/zalgo-promise";
 import { request, noop } from "@krakenjs/belter/src";
 import {
   isSameDomain,
   assertSameDomain,
   type CrossDomainWindowType,
-} from "@krakenjs/cross-domain-utils/src";
+} from "@krakenjs/cross-domain-utils/dist/esm";
 
 import { canUseSendBeacon, isAmplitude, sendBeacon } from "./util";
 

@@ -1,6 +1,6 @@
 /* @flow */
 
-import { type SameDomainWindowType } from "@krakenjs/cross-domain-utils/src";
+import { type SameDomainWindowType } from "@krakenjs/cross-domain-utils/dist/esm";
 
 import { AMPLITUDE_URL } from "./config";
 import type { Payload } from "./types";
