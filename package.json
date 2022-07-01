@@ -108,7 +108,7 @@
   },
   "dependencies": {
     "@krakenjs/belter": "^2.0.0",
-    "@krakenjs/cross-domain-utils": "^3.0.0",
-    "@krakenjs/zalgo-promise": "^2.0.0"
+    "@krakenjs/cross-domain-utils": "^4.0.0-alpha.1",
+    "@krakenjs/zalgo-promise": "^3.0.0-alpha.1"
   }
 }
