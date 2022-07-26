@@ -1,32 +1,33 @@
-/* @flow */
-
 import {
   $mockEndpoint,
   patchXmlHttpRequest,
+  // @ts-ignore
 } from "@krakenjs/sync-browser-mocks/dist/sync-browser-mocks";
+import { describe, it } from "vitest";
 
 import { Logger, getHTTPTransport } from "../src";
+import type { Payload } from "../src/types";
 
 patchXmlHttpRequest();
-
 describe("beaver-logger tests", () => {
   it("should log something and flush it to the buffer", () => {
+    // @ts-ignore
     window.navigator.sendBeacon = undefined; // simulate IE 11 scenario
 
     const $logger = Logger({
       url: "/test/api/log",
     });
-
     $logger.info("hello_world", {
-      foo: "bar",
-      bar: true,
+      transitionName: "bar",
+      error: "true",
     });
-
     const logEndpoint = $mockEndpoint.register({
       method: "POST",
       uri: "/test/api/log",
+      // @ts-ignore
       handler: (req) => {
         const hasLog = req.data.events.some(
+          // @ts-ignore
           (event) => event.event === "hello_world" && event.level === "info"
         );
 
@@ -37,29 +38,27 @@ describe("beaver-logger tests", () => {
         return {};
       },
     });
-
     logEndpoint.expectCalls();
     return $logger.flush().then(() => {
       logEndpoint.done();
     });
   });
-
   it("should log something and flush it to the buffer using sendBeacon", () => {
     const $logger = Logger({
       url: "/test/api/log",
       enableSendBeacon: true,
     });
-
     $logger.info("hello_world", {
-      foo: "bar",
-      bar: true,
+      transitionName: "bar",
+      error: "true",
     });
-
     const logEndpoint = $mockEndpoint.register({
       method: "POST",
       uri: "/test/api/log",
+      // @ts-ignore
       handler: (req) => {
         const hasLog = req.data.events.some(
+          // @ts-ignore
           (event) => event.event === "hello_world" && event.level === "info"
         );
 
@@ -70,11 +69,11 @@ describe("beaver-logger tests", () => {
         return {};
       },
     });
-
     let sendBeaconCalled = false;
 
     window.navigator.sendBeacon = () => {
       sendBeaconCalled = true;
+      return sendBeaconCalled;
     };
 
     return $logger.flush().then(() => {
@@ -87,7 +86,6 @@ describe("beaver-logger tests", () => {
       }
     });
   });
-
   it("should not log using sendBeacon if custom headers are passed", () => {
     const $logger = Logger({
       url: "/test/api/log",
@@ -96,19 +94,19 @@ describe("beaver-logger tests", () => {
     $logger.addHeaderBuilder(() => {
       return {
         "x-custom-header": "hunter2",
-      };
+      } as Payload;
     });
-
     $logger.info("hello_world", {
-      foo: "bar",
-      bar: true,
+      transitionName: "bar",
+      error: "true",
     });
-
     const logEndpoint = $mockEndpoint.register({
       method: "POST",
       uri: "/test/api/log",
+      // @ts-ignore
       handler: (req) => {
         const hasLog = req.data.events.some(
+          // @ts-ignore
           (event) => event.event === "hello_world" && event.level === "info"
         );
 
@@ -119,11 +117,11 @@ describe("beaver-logger tests", () => {
         return {};
       },
     });
-
     let sendBeaconCalled = false;
 
     window.navigator.sendBeacon = () => {
       sendBeaconCalled = true;
+      return sendBeaconCalled;
     };
 
     logEndpoint.expectCalls();
@@ -137,27 +135,22 @@ describe("beaver-logger tests", () => {
       }
     });
   });
-
   it("should log something using XMLHttpRequest and a custom transport", () => {
-    let XMLHttpRequestCalled = false;
-
-    const win = {
-      ...window,
-      XMLHttpRequest: () => {
-        XMLHttpRequestCalled = true;
-      },
-    };
-
+    const XMLHttpRequestCalled = false;
+    // const win = {
+    //   ...window,
+    //   XMLHttpRequest: () => {
+    //     XMLHttpRequestCalled = true;
+    //   },
+    // };
     const $logger = Logger({
       url: "/test/api/log",
-      transport: getHTTPTransport(win),
+      transport: getHTTPTransport(), // defaults to window
     });
-
     $logger.info("hello_world", {
-      foo: "bar",
-      bar: true,
+      transitionName: "bar",
+      error: "true",
     });
-
     return $logger.flush().then(() => {
       if (!XMLHttpRequestCalled) {
         throw new Error(
@@ -166,38 +159,32 @@ describe("beaver-logger tests", () => {
       }
     });
   });
-
   it("should log something using sendBeacon and a custom transport", () => {
-    let sendBeaconCalled = false;
-
-    const win = {
-      ...window,
-      navigator: {
-        ...window.navigator,
-        sendBeacon: () => {
-          sendBeaconCalled = true;
-        },
-      },
-    };
-
+    const sendBeaconCalled = false;
+    // const win = {
+    //   ...window,
+    //   navigator: {
+    //     ...window.navigator,
+    //     sendBeacon: () => {
+    //       sendBeaconCalled = true;
+    //     },
+    //   },
+    // };
     const $logger = Logger({
       url: "/test/api/log",
       enableSendBeacon: true,
-      transport: getHTTPTransport(win),
+      transport: getHTTPTransport(), // defaults to window
     });
-
     $logger.info("hello_world", {
-      foo: "bar",
-      bar: true,
+      transitionName: "bar",
+      error: "true",
     });
-
     return $logger.flush().then(() => {
       if (!sendBeaconCalled) {
         throw new Error("Expected sendBeacon on custom window to be called.");
       }
     });
   });
-
   describe("Amplitude", () => {
     it("should log something and flush it to the buffer using sendBeacon if Amplitude API key is present", () => {
       const $logger = Logger({
@@ -205,18 +192,18 @@ describe("beaver-logger tests", () => {
         amplitudeApiKey: "test_key",
         enableSendBeacon: true,
       });
-
       $logger.track({
-        foo: "bar",
-        bar: true,
-        user_id: "abc123",
+        transitionName: "bar",
+        error: "true",
+        userId: "abc123",
       });
-
       const logEndpoint = $mockEndpoint.register({
         method: "POST",
         uri: "https://api2.amplitude.com/2/httpapi",
+        // @ts-ignore
         handler: (req) => {
           const hasLog = req.data.events.some(
+            // @ts-ignore
             (event) => event.foo === "bar" && event.user_id === "abc123"
           );
 
@@ -227,11 +214,11 @@ describe("beaver-logger tests", () => {
           return {};
         },
       });
-
       let sendBeaconCalled = false;
 
       window.navigator.sendBeacon = () => {
         sendBeaconCalled = true;
+        return sendBeaconCalled;
       };
 
       return $logger.flush().then(() => {

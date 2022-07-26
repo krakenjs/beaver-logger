@@ -1,0 +1,3 @@
+{
+  "extends": "@krakenjs/grumbler-scripts/config/tsconfig.json"
+}

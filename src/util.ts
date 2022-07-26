@@ -1,22 +1,23 @@
-/* @flow */
-
-import { type SameDomainWindowType } from "@krakenjs/cross-domain-utils/src";
+// @ts-ignore
+import type { SameDomainWindowType } from "@krakenjs/cross-domain-utils";
 
 import { AMPLITUDE_URL } from "./config";
 import type { Payload } from "./types";
 
-type CanUseBeaconOptions = {|
-  headers: { [string]: string },
-  enableSendBeacon: boolean,
-|};
+type CanUseBeaconOptions = {
+  headers: Record<string, unknown>;
+  enableSendBeacon: boolean;
+};
 
 const canUseSendBeacon = ({
   headers,
   enableSendBeacon,
 }: CanUseBeaconOptions): boolean => {
   const hasHeaders = headers && Object.keys(headers).length;
+
   if (
     window &&
+    // @ts-ignore
     window.navigator.sendBeacon &&
     !hasHeaders &&
     enableSendBeacon &&
@@ -36,12 +37,12 @@ const isAmplitude = (url: string): boolean => {
   return false;
 };
 
-type SendBeaconOptions = {|
-  win: SameDomainWindowType,
-  url: string,
-  data: JSON,
-  useBlob: boolean,
-|};
+type SendBeaconOptions = {
+  win: SameDomainWindowType;
+  url: string;
+  data: JSON;
+  useBlob: boolean;
+};
 
 const sendBeacon = ({
   win = window,
@@ -57,7 +58,9 @@ const sendBeacon = ({
     }
 
     if (useBlob) {
-      const blob = new Blob([json], { type: "application/json" });
+      const blob = new Blob([json], {
+        type: "application/json",
+      });
       return win.navigator.sendBeacon(url, blob);
     }
 
@@ -67,9 +70,10 @@ const sendBeacon = ({
   }
 };
 
-const extendIfDefined = (target: Payload, source: Payload) => {
+const extendIfDefined = (target: Payload, source: Payload): void => {
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
+      // @ts-ignore
       target[key] = source[key];
     }
   }

@@ -1,4 +1,4 @@
-/* @flow */
+import { describe, it } from "vitest";
 
 import { extendIfDefined } from "../src/util";
 
@@ -10,21 +10,23 @@ describe("util", () => {
         mo: "jo",
         fo: "flo",
       };
-
+      // @ts-ignore mocking
       extendIfDefined(target, source);
 
+      // @ts-ignore mocking
       if (!target.mo && target.mo !== "jo") {
         throw new Error(
           `Target not extended correctly. target.mo should equal 'jo'.`
         );
       }
+
+      // @ts-ignore mocking
       if (!target.fo && target.fo !== "flo") {
         throw new Error(
           `Target not extended correctly. target.fo should equal 'flo'.`
         );
       }
     });
-
     it("should override target value if already declared", () => {
       const target = {
         mo: "jo",
@@ -35,6 +37,7 @@ describe("util", () => {
         fo: "jo",
       };
 
+      // @ts-ignore mocking
       extendIfDefined(target, source);
 
       if (target.mo !== "flo") {
@@ -42,6 +45,7 @@ describe("util", () => {
           `Target not extended correctly. target.mo should equal 'flo'.`
         );
       }
+
       if (target.fo !== "jo") {
         throw new Error(
           `Target not extended correctly. target.fo should equal 'jo'.`

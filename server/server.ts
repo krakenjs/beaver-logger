@@ -1,43 +1,38 @@
-/* @flow */
+import { $Values } from "utility-types";
+
 /* eslint no-console: 0 */
-
-import url from "url";
-
+import * as url from "url";
 import { LOG_LEVEL, HTTP_HEADER, HTTP_METHOD, WILDCARD } from "./constants";
+import {
+  Request as ExpressRequest,
+  Response as ExpressResponse,
+} from "express";
 
-type ExpressRequest = express$Request; // eslint-disable-line no-undef
-type ExpressResponse = express$Response; // eslint-disable-line no-undef
-
-type Payload = { [string]: string };
-
-type Logger = {|
+type Payload = Record<string, string>;
+type Logger = {
   log: (
     req: ExpressRequest,
     level: $Values<typeof LOG_LEVEL>,
     name: string,
     payload: Payload,
     meta?: Payload
-  ) => void,
-  track: (req: ExpressRequest, payload: Payload, meta?: Payload) => void,
-  meta: (req: ExpressRequest, meta: Payload) => void,
-|};
-
-type Event = {|
-  event: string,
-  payload: { [string]: string },
-  level: $Values<typeof LOG_LEVEL>,
-|};
-
-type Tracking = { [string]: string };
-
-type Meta = { [string]: string };
+  ) => void;
+  track: (req: ExpressRequest, payload: Payload, meta?: Payload) => void;
+  meta: (req: ExpressRequest, meta: Payload) => void;
+};
+type Event = {
+  event: string;
+  payload: Record<string, any>;
+  level: $Values<typeof LOG_LEVEL>;
+};
+type Tracking = Record<string, string>;
+type Meta = Record<string, string>;
 
 export const defaultLogger: Logger = {
   log(req, level, name, payload) {
     const date = payload.timestamp
       ? new Date(payload.timestamp).toString()
       : new Date().toString();
-
     const str = [
       name,
       "\t[ ",
@@ -50,7 +45,6 @@ export const defaultLogger: Logger = {
         .join("\n"),
       "\n",
     ].join("");
-
     console[level](str);
   },
 
@@ -82,11 +76,11 @@ export const defaultLogger: Logger = {
 export function log(
   req: ExpressRequest,
   logger: Logger,
-  logs: {|
-    events: $ReadOnlyArray<Event>,
-    tracking?: $ReadOnlyArray<Tracking>,
-    meta?: Meta,
-  |}
+  logs: {
+    events: ReadonlyArray<Event>;
+    tracking?: ReadonlyArray<Tracking>;
+    meta?: Meta;
+  }
 ) {
   const events = logs.events || [];
   const tracking = logs.tracking || [];
@@ -105,7 +99,6 @@ export function log(
       const name = event.event.replace(/_*[^a-zA-Z0-9_]+_*/g, "_");
       const level = event.level || LOG_LEVEL.INFO;
       const payload = event.payload || {};
-
       return logger.log(req, level, name, payload, meta);
     });
   }
@@ -118,33 +111,36 @@ export function log(
 }
 
 type Query = {
-  event: string,
-  level?: $Values<typeof LOG_LEVEL>,
-  [string]: string,
+  event?: any;
+  level?: $Values<typeof LOG_LEVEL>;
+  key?: string;
 };
 
-type Body = {|
-  events: $ReadOnlyArray<Event>,
-  tracking?: $ReadOnlyArray<Tracking>,
-  meta: Meta,
-|};
+type Body = {
+  events: ReadonlyArray<Event>;
+  tracking?: ReadonlyArray<Tracking>;
+  meta: Meta;
+};
 
 export function handleRequest(req: ExpressRequest, logger: Logger) {
   // $FlowFixMe
-  const method: $Values<typeof HTTP_METHOD> = req.method || HTTP_METHOD.GET;
+  const method: $Values<typeof HTTP_METHOD> =
+    (req.method as "get" | "post" | "options") || HTTP_METHOD.GET;
 
   // $FlowFixMe
   const query: Query = req.query;
-
   // $FlowFixMe
   const body: Body = req.body || {};
 
   if (method.toLowerCase() === "post") {
     const { events, tracking, meta } = body;
-    log(req, logger, { events, tracking, meta });
+    log(req, logger, {
+      events,
+      tracking,
+      meta,
+    });
   } else {
     const { event, level = LOG_LEVEL.INFO, ...payload } = query;
-
     log(req, logger, {
       events: [
         {
@@ -157,17 +153,17 @@ export function handleRequest(req: ExpressRequest, logger: Logger) {
   }
 }
 
-type ExpressEndpointOptions = {|
-  uri?: string,
-  logger?: Logger,
-  enableCors?: boolean,
-|};
+type ExpressEndpointOptions = {
+  uri?: string;
+  logger?: Logger;
+  enableCors?: boolean;
+};
 
 function sendCorsHeaders(req: ExpressRequest, res: ExpressResponse) {
   const origin = req.get(HTTP_HEADER.ORIGIN);
 
   if (origin) {
-    const parsedUrl = url.parse(origin) || {};
+    const parsedUrl = url.parse(origin);
 
     if (!parsedUrl.protocol || !parsedUrl.host) {
       res.header(HTTP_HEADER.ACCESS_CONTROL_ALLOW_ORIGIN, WILDCARD);
@@ -202,10 +198,11 @@ export function expressEndpoint({
   uri = "/",
   logger = defaultLogger,
   enableCors = false,
-}: ExpressEndpointOptions = {}): mixed {
+}: ExpressEndpointOptions = {}): unknown {
   // $FlowFixMe
   const app = require("express")();
 
+  // @ts-ignore parent implicit any
   app.on("mount", (parent) => {
     // $FlowFixMe
     app.settings = Object.create(parent.settings);
@@ -232,6 +229,7 @@ export function expressEndpoint({
         .header(HTTP_HEADER.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true")
         .json({});
     } catch (err) {
+      // @ts-ignore err of type unknown
       console.error(err.stack || err.toString());
       res
         .status(500)

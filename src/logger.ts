@@ -1,13 +1,14 @@
-/* @flow */
-
-import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+// @ts-ignore
+import { ZalgoPromise } from "@krakenjs/zalgo-promise";
 import {
   isBrowser,
   promiseDebounce,
   noop,
   safeInterval,
   objFilter,
-} from "@krakenjs/belter/src";
+  // @ts-ignore
+} from "@krakenjs/belter";
+import type { $Values } from "utility-types";
 
 import {
   DEFAULT_LOG_LEVEL,
@@ -18,46 +19,42 @@ import {
 } from "./config";
 import { LOG_LEVEL, PROTOCOL } from "./constants";
 import { extendIfDefined } from "./util";
-import { type Transport, getHTTPTransport } from "./http";
+import type { Transport } from "./http";
+import { getHTTPTransport } from "./http";
 import type { Payload } from "./types";
 
-type LoggerOptions = {|
-  url?: string,
-  prefix?: string,
-  logLevel?: $Values<typeof LOG_LEVEL>,
-  transport?: Transport,
-  flushInterval?: number,
-  enableSendBeacon?: boolean,
-  amplitudeApiKey?: string,
-|};
-
+type LoggerOptions = {
+  url?: string;
+  prefix?: string;
+  logLevel?: string;
+  transport?: Transport;
+  flushInterval?: number;
+  enableSendBeacon?: boolean;
+  amplitudeApiKey?: string;
+};
 type ClientPayload = Payload;
-type Log = (name: string, payload?: ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
-type Track = (payload: ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
+type Log = (name: string, payload?: ClientPayload) => LoggerType;
 
-type Builder = (Payload) => ClientPayload;
-type AddBuilder = (Builder) => LoggerType; // eslint-disable-line no-use-before-define
+type Track = (payload: ClientPayload) => LoggerType;
 
-export type LoggerType = {|
-  debug: Log,
-  info: Log,
-  warn: Log,
-  error: Log,
+type Builder = (arg0: Payload) => ClientPayload;
+type AddBuilder = (arg0: Builder) => LoggerType;
 
-  track: Track,
-
-  flush: () => ZalgoPromise<void>,
-  immediateFlush: () => ZalgoPromise<void>,
-
-  addPayloadBuilder: AddBuilder,
-  addMetaBuilder: AddBuilder,
-  addTrackingBuilder: AddBuilder,
-  addHeaderBuilder: AddBuilder,
-
-  setTransport: (Transport) => LoggerType,
-  configure: (LoggerOptions) => LoggerType,
-|};
-
+export type LoggerType = {
+  debug: Log;
+  info: Log;
+  warn: Log;
+  error: Log;
+  track: Track;
+  flush: () => ZalgoPromise<void>;
+  immediateFlush: () => ZalgoPromise<void>;
+  addPayloadBuilder: AddBuilder;
+  addMetaBuilder: AddBuilder;
+  addTrackingBuilder: AddBuilder;
+  addHeaderBuilder: AddBuilder;
+  setTransport: (arg0: Transport) => LoggerType;
+  configure: (arg0: LoggerOptions) => LoggerType;
+};
 export function Logger({
   url,
   prefix,
@@ -67,13 +64,12 @@ export function Logger({
   flushInterval = FLUSH_INTERVAL,
   enableSendBeacon = false,
 }: LoggerOptions): LoggerType {
-  let events: Array<{|
-    level: $Values<typeof LOG_LEVEL>,
-    event: string,
-    payload: Payload,
-  |}> = [];
+  let events: Array<{
+    level: $Values<typeof LOG_LEVEL>;
+    event: string;
+    payload: Payload;
+  }> = [];
   let tracking: Array<Payload> = [];
-
   const payloadBuilders: Array<Builder> = [];
   const metaBuilders: Array<Builder> = [];
   const trackingBuilders: Array<Builder> = [];
@@ -83,19 +79,19 @@ export function Logger({
     level: $Values<typeof LOG_LEVEL>,
     event: string,
     payload: Payload
-  ) {
+  ): void {
     if (!isBrowser() || !window.console || !window.console.log) {
       return;
     }
 
     if (
-      LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel)
+      LOG_LEVEL_PRIORITY.indexOf(level) >
+      LOG_LEVEL_PRIORITY.indexOf(logLevel as $Values<typeof LOG_LEVEL>)
     ) {
       return;
     }
 
-    const args = [event];
-
+    const args: Array<string | unknown> = [event as Payload];
     args.push(payload);
 
     if (payload.error || payload.warning) {
@@ -103,6 +99,7 @@ export function Logger({
     }
 
     try {
+      // @ts-ignore
       if (window.console[level] && window.console[level].apply) {
         window.console[level].apply(window.console, args);
       } else if (window.console.log && window.console.log.apply) {
@@ -124,11 +121,13 @@ export function Logger({
       }
 
       const meta = {};
+
       for (const builder of metaBuilders) {
         extendIfDefined(meta, builder(meta));
       }
 
       const headers = {};
+
       for (const builder of headerBuilders) {
         extendIfDefined(headers, builder(headers));
       }
@@ -159,7 +158,7 @@ export function Logger({
             events: tracking.map((payload: Payload) => {
               // $FlowFixMe
               return {
-                event_type: payload.transition_name || "event",
+                event_type: payload.transitionName || "event",
                 event_properties: payload,
                 ...payload,
               };
@@ -171,7 +170,6 @@ export function Logger({
 
       events = [];
       tracking = [];
-
       return ZalgoPromise.resolve(res).then(noop);
     });
   }
@@ -182,25 +180,57 @@ export function Logger({
     level: $Values<typeof LOG_LEVEL>,
     event: string,
     payload: Payload
-  ) {
+  ): void {
     events.push({
       level,
       event,
       payload,
     });
-
+    // @ts-ignore
     if (AUTO_FLUSH_LEVEL.indexOf(level) !== -1) {
       flush();
     }
   }
 
+  function debug(event: string, payload: Payload): LoggerType {
+    return log(LOG_LEVEL.DEBUG, event, payload);
+  }
+
+  function info(event: string, payload: Payload): LoggerType {
+    return log(LOG_LEVEL.INFO, event, payload);
+  }
+
+  function warn(event: string, payload: Payload): LoggerType {
+    return log(LOG_LEVEL.WARN, event, payload);
+  }
+
+  function error(event: string, payload: Payload): LoggerType {
+    return log(LOG_LEVEL.ERROR, event, payload);
+  }
+
+  const logger = {
+    debug,
+    info,
+    warn,
+    error,
+    track,
+    flush,
+    immediateFlush,
+    addPayloadBuilder,
+    addMetaBuilder,
+    addTrackingBuilder,
+    addHeaderBuilder,
+    setTransport,
+    configure,
+  } as LoggerType;
+
   function log(
     level: $Values<typeof LOG_LEVEL>,
     event: string,
-    payload = {}
+    payload: Payload
   ): LoggerType {
     if (!isBrowser()) {
-      return logger; // eslint-disable-line no-use-before-define
+      return logger;
     }
 
     if (prefix) {
@@ -219,49 +249,33 @@ export function Logger({
     enqueue(level, event, logPayload);
     print(level, event, logPayload);
 
-    return logger; // eslint-disable-line no-use-before-define
+    return logger;
   }
 
-  function addBuilder(builders, builder): LoggerType {
+  function addBuilder(builders: Array<unknown>, builder: unknown): LoggerType {
     builders.push(builder);
-    return logger; // eslint-disable-line no-use-before-define
+    return logger;
   }
 
-  function addPayloadBuilder(builder): LoggerType {
+  function addPayloadBuilder(builder: unknown): LoggerType {
     return addBuilder(payloadBuilders, builder);
   }
 
-  function addMetaBuilder(builder): LoggerType {
+  function addMetaBuilder(builder: unknown): LoggerType {
     return addBuilder(metaBuilders, builder);
   }
 
-  function addTrackingBuilder(builder): LoggerType {
+  function addTrackingBuilder(builder: unknown): LoggerType {
     return addBuilder(trackingBuilders, builder);
   }
 
-  function addHeaderBuilder(builder): LoggerType {
+  function addHeaderBuilder(builder: unknown): LoggerType {
     return addBuilder(headerBuilders, builder);
-  }
-
-  function debug(event, payload): LoggerType {
-    return log(LOG_LEVEL.DEBUG, event, payload);
-  }
-
-  function info(event, payload): LoggerType {
-    return log(LOG_LEVEL.INFO, event, payload);
-  }
-
-  function warn(event, payload): LoggerType {
-    return log(LOG_LEVEL.WARN, event, payload);
-  }
-
-  function error(event, payload): LoggerType {
-    return log(LOG_LEVEL.ERROR, event, payload);
   }
 
   function track(payload = {}): LoggerType {
     if (!isBrowser()) {
-      return logger; // eslint-disable-line no-use-before-define
+      return logger;
     }
 
     const trackingPayload: Payload = objFilter(payload);
@@ -273,12 +287,12 @@ export function Logger({
     print(LOG_LEVEL.DEBUG, "track", trackingPayload);
     tracking.push(trackingPayload);
 
-    return logger; // eslint-disable-line no-use-before-define
+    return logger;
   }
 
   function setTransport(newTransport: Transport): LoggerType {
     transport = newTransport;
-    return logger; // eslint-disable-line no-use-before-define
+    return logger;
   }
 
   function configure(opts: LoggerOptions): LoggerType {
@@ -310,7 +324,7 @@ export function Logger({
       enableSendBeacon = opts.enableSendBeacon;
     }
 
-    return logger; // eslint-disable-line no-use-before-define
+    return logger;
   }
 
   if (isBrowser()) {
@@ -321,31 +335,13 @@ export function Logger({
     window.addEventListener("beforeunload", () => {
       immediateFlush();
     });
-
     window.addEventListener("unload", () => {
       immediateFlush();
     });
-
     window.addEventListener("pagehide", () => {
       immediateFlush();
     });
   }
-
-  const logger = {
-    debug,
-    info,
-    warn,
-    error,
-    track,
-    flush,
-    immediateFlush,
-    addPayloadBuilder,
-    addMetaBuilder,
-    addTrackingBuilder,
-    addHeaderBuilder,
-    setTransport,
-    configure,
-  };
 
   return logger;
 }
