@@ -1,0 +1,34 @@
+import { ZalgoPromise } from "@krakenjs/zalgo-promise";
+import type { Transport } from "./http";
+import type { Payload } from "./types";
+declare type LoggerOptions = {
+    url?: string;
+    prefix?: string;
+    logLevel?: string;
+    transport?: Transport;
+    flushInterval?: number;
+    enableSendBeacon?: boolean;
+    amplitudeApiKey?: string;
+};
+declare type ClientPayload = Payload;
+declare type Log = (name: string, payload?: ClientPayload) => LoggerType;
+declare type Track = (payload: ClientPayload) => LoggerType;
+declare type Builder = (arg0: Payload) => ClientPayload;
+declare type AddBuilder = (arg0: Builder) => LoggerType;
+export declare type LoggerType = {
+    debug: Log;
+    info: Log;
+    warn: Log;
+    error: Log;
+    track: Track;
+    flush: () => ZalgoPromise<void>;
+    immediateFlush: () => ZalgoPromise<void>;
+    addPayloadBuilder: AddBuilder;
+    addMetaBuilder: AddBuilder;
+    addTrackingBuilder: AddBuilder;
+    addHeaderBuilder: AddBuilder;
+    setTransport: (arg0: Transport) => LoggerType;
+    configure: (arg0: LoggerOptions) => LoggerType;
+};
+export declare function Logger({ url, prefix, logLevel, transport, amplitudeApiKey, flushInterval, enableSendBeacon, }: LoggerOptions): LoggerType;
+export {};
