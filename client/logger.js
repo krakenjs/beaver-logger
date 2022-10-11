@@ -208,6 +208,10 @@ export function prefix(name) {
             return log('error', `${name}_${event}`, payload);
         },
 
+        metric(event, payload) {
+            return log('metric', event, payload); // ignore the prefix for .metric
+        },
+
         track(payload) {
             return track(payload);
         },
@@ -232,6 +236,10 @@ export function warn(event, payload) {
 
 export function error(event, payload) {
     return log('error', event, payload);
+}
+
+export function metric(event, payload) {
+    return log('metric', event, payload);
 }
 
 export function track(payload) {

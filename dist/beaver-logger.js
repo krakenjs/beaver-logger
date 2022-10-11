@@ -168,6 +168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.info = info;
 	exports.warn = warn;
 	exports.error = error;
+	exports.metric = metric;
 
 	var _util = __webpack_require__(3);
 
@@ -418,6 +419,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        error: function error(event, payload) {
 	            return log('error', name + '_' + event, payload);
 	        },
+	        metric: function metric(event, payload) {
+	            return log('metric', event, payload); // ignore the prefix for .metric
+	        },
 	        track: function track(payload) {
 	            return _track(payload);
 	        },
@@ -441,6 +445,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function error(event, payload) {
 	    return log('error', event, payload);
+	}
+
+	function metric(event, payload) {
+	    return log('metric', event, payload);
 	}
 
 	function _track(payload) {
@@ -767,6 +775,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }
+	    // eslint-disable-next-line flowtype/no-mutable-array
+
 
 	    _createClass(ZalgoPromise, [{
 	        key: 'resolve',
@@ -829,8 +839,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'dispatch',
 	        value: function dispatch() {
-	            var _this3 = this;
-
 	            var dispatching = this.dispatching,
 	                resolved = this.resolved,
 	                rejected = this.rejected,
@@ -848,73 +856,72 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.dispatching = true;
 	            (0, _flush.startActive)();
 
-	            var _loop = function _loop(i) {
+	            var chain = function chain(firstPromise, secondPromise) {
+	                return firstPromise.then(function (res) {
+	                    secondPromise.resolve(res);
+	                }, function (err) {
+	                    secondPromise.reject(err);
+	                });
+	            };
+
+	            for (var i = 0; i < handlers.length; i++) {
 	                var _handlers$i = handlers[i],
-	                    onSuccess = _handlers$i.onSuccess,
-	                    onError = _handlers$i.onError,
-	                    promise = _handlers$i.promise;
+	                    _onSuccess = _handlers$i.onSuccess,
+	                    _onError = _handlers$i.onError,
+	                    _promise = _handlers$i.promise;
 
 
-	                var result = void 0;
+	                var _result2 = void 0;
 
 	                if (resolved) {
 
 	                    try {
-	                        result = onSuccess ? onSuccess(_this3.value) : _this3.value;
+	                        _result2 = _onSuccess ? _onSuccess(this.value) : this.value;
 	                    } catch (err) {
-	                        promise.reject(err);
-	                        return 'continue';
+	                        _promise.reject(err);
+	                        continue;
 	                    }
 	                } else if (rejected) {
 
-	                    if (!onError) {
-	                        promise.reject(_this3.error);
-	                        return 'continue';
+	                    if (!_onError) {
+	                        _promise.reject(this.error);
+	                        continue;
 	                    }
 
 	                    try {
-	                        result = onError(_this3.error);
+	                        _result2 = _onError(this.error);
 	                    } catch (err) {
-	                        promise.reject(err);
-	                        return 'continue';
+	                        _promise.reject(err);
+	                        continue;
 	                    }
 	                }
 
-	                if (result instanceof ZalgoPromise && (result.resolved || result.rejected)) {
+	                if (_result2 instanceof ZalgoPromise && (_result2.resolved || _result2.rejected)) {
+	                    var promiseResult = _result2;
 
-	                    if (result.resolved) {
-	                        promise.resolve(result.value);
+	                    if (promiseResult.resolved) {
+	                        _promise.resolve(promiseResult.value);
 	                    } else {
-	                        promise.reject(result.error);
+	                        _promise.reject(promiseResult.error);
 	                    }
 
-	                    result.errorHandled = true;
-	                } else if ((0, _utils.isPromise)(result)) {
+	                    promiseResult.errorHandled = true;
+	                } else if ((0, _utils.isPromise)(_result2)) {
 
-	                    if (result instanceof ZalgoPromise && (result.resolved || result.rejected)) {
-	                        if (result.resolved) {
-	                            promise.resolve(result.value);
+	                    if (_result2 instanceof ZalgoPromise && (_result2.resolved || _result2.rejected)) {
+	                        if (_result2.resolved) {
+	                            _promise.resolve(_result2.value);
 	                        } else {
-	                            promise.reject(result.error);
+	                            _promise.reject(_result2.error);
 	                        }
 	                    } else {
 	                        // $FlowFixMe
-	                        result.then(function (res) {
-	                            promise.resolve(res);
-	                        }, function (err) {
-	                            promise.reject(err);
-	                        });
+	                        chain(_result2, _promise);
 	                    }
 	                } else {
 
-	                    promise.resolve(result);
+	                    _promise.resolve(_result2);
 	                }
-	            };
-
-	            for (var i = 0; i < handlers.length; i++) {
-	                var _ret = _loop(i);
-
-	                if (_ret === 'continue') continue;
 	            }
 
 	            handlers.length = 0;
@@ -950,7 +957,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'catch',
 	        value: function _catch(onError) {
-	            return this.then(undefined, onError);
+	            // $FlowFixMe incompatible-call
+	            var resultPromise = this.then(undefined, onError);
+	            return resultPromise;
 	        }
 	    }, {
 	        key: 'finally',
@@ -973,7 +982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'timeout',
 	        value: function timeout(time, err) {
-	            var _this4 = this;
+	            var _this3 = this;
 
 	            if (this.resolved || this.rejected) {
 	                return this;
@@ -981,11 +990,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var timeout = setTimeout(function () {
 
-	                if (_this4.resolved || _this4.rejected) {
+	                if (_this3.resolved || _this3.rejected) {
 	                    return;
 	                }
 
-	                _this4.reject(err || new Error('Promise timed out after ' + time + 'ms'));
+	                _this3.reject(err || new Error('Promise timed out after ' + time + 'ms'));
 	            }, time);
 
 	            return this.then(function (result) {
@@ -1006,12 +1015,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // $FlowFixMe
 	            return Promise.resolve(this); // eslint-disable-line compat/compat
 	        }
+	    }, {
+	        key: 'lazy',
+	        value: function lazy() {
+	            this.errorHandled = true;
+	            return this;
+	        }
 	    }], [{
 	        key: 'resolve',
 	        value: function resolve(value) {
 
 	            if (value instanceof ZalgoPromise) {
-	                return value;
+	                // $FlowFixMe incompatible-type-arg
+	                var _result3 = value;
+	                return _result3;
 	            }
 
 	            if ((0, _utils.isPromise)(value)) {
@@ -1040,43 +1057,42 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var promise = new ZalgoPromise();
 	            var count = promises.length;
-	            var results = [];
+	            // eslint-disable-next-line no-undef
+	            var results = [].slice();
 
 	            if (!count) {
 	                promise.resolve(results);
 	                return promise;
 	            }
 
-	            var _loop2 = function _loop2(i) {
+	            var chain = function chain(i, firstPromise, secondPromise) {
+	                return firstPromise.then(function (res) {
+	                    results[i] = res;
+	                    count -= 1;
+	                    if (count === 0) {
+	                        promise.resolve(results);
+	                    }
+	                }, function (err) {
+	                    secondPromise.reject(err);
+	                });
+	            };
+
+	            for (var i = 0; i < promises.length; i++) {
 	                var prom = promises[i];
 
 	                if (prom instanceof ZalgoPromise) {
 	                    if (prom.resolved) {
 	                        results[i] = prom.value;
 	                        count -= 1;
-	                        return 'continue';
+	                        continue;
 	                    }
 	                } else if (!(0, _utils.isPromise)(prom)) {
 	                    results[i] = prom;
 	                    count -= 1;
-	                    return 'continue';
+	                    continue;
 	                }
 
-	                ZalgoPromise.resolve(prom).then(function (result) {
-	                    results[i] = result;
-	                    count -= 1;
-	                    if (count === 0) {
-	                        promise.resolve(results);
-	                    }
-	                }, function (err) {
-	                    promise.reject(err);
-	                });
-	            };
-
-	            for (var i = 0; i < promises.length; i++) {
-	                var _ret2 = _loop2(i);
-
-	                if (_ret2 === 'continue') continue;
+	                chain(i, ZalgoPromise.resolve(prom), promise);
 	            }
 
 	            if (count === 0) {
@@ -1090,12 +1106,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function hash(promises) {
 	            // eslint-disable-line no-undef
 	            var result = {};
+	            var awaitPromises = [];
 
-	            return ZalgoPromise.all(Object.keys(promises).map(function (key) {
-	                return ZalgoPromise.resolve(promises[key]).then(function (value) {
-	                    result[key] = value;
-	                });
-	            })).then(function () {
+	            var _loop = function _loop(key) {
+	                if (promises.hasOwnProperty(key)) {
+	                    var value = promises[key];
+
+	                    if ((0, _utils.isPromise)(value)) {
+	                        awaitPromises.push(value.then(function (res) {
+	                            result[key] = res;
+	                        }));
+	                    } else {
+	                        result[key] = value;
+	                    }
+	                }
+	            };
+
+	            for (var key in promises) {
+	                _loop(key);
+	            }
+
+	            return ZalgoPromise.all(awaitPromises).then(function () {
 	                return result;
 	            });
 	        }
@@ -1123,7 +1154,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            (0, _flush.startActive)();
 
 	            try {
-	                // $FlowFixMe
 	                result = method.apply(context, args || []);
 	            } catch (err) {
 	                (0, _flush.endActive)();
@@ -1132,7 +1162,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            (0, _flush.endActive)();
 
-	            return ZalgoPromise.resolve(result);
+	            // $FlowFixMe incompatible-call
+	            var resultPromise = ZalgoPromise.resolve(result);
+
+	            return resultPromise;
 	        }
 	    }, {
 	        key: 'delay',
@@ -1183,11 +1216,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return true;
 	        }
 
-	        if (typeof window !== 'undefined' && window.Window && item instanceof window.Window) {
+	        if (typeof window !== 'undefined' && typeof window.Window === 'function' && item instanceof window.Window) {
 	            return false;
 	        }
 
-	        if (typeof window !== 'undefined' && window.constructor && item instanceof window.constructor) {
+	        if (typeof window !== 'undefined' && typeof window.constructor === 'function' && item instanceof window.constructor) {
 	            return false;
 	        }
 

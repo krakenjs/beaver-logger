@@ -70,5 +70,8 @@
   },
   "dependencies": {
     "zalgo-promise": "^1.0.26"
+  },
+  "volta": {
+    "node": "10.24.1"
   }
 }
