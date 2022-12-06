@@ -1,28 +1,26 @@
 /* @flow */
 /* eslint import/no-nodejs-modules: off, import/no-default-export: off */
 
-import type { WebpackConfig } from "@krakenjs/grumbler-scripts/config/types";
-// @ts-ignore the config import
-import { getWebpackConfig } from "@krakenjs/grumbler-scripts/config/webpack.config";
+import { getWebpackConfig } from "@krakenjs/webpack-config-grumbler";
 
 const FILE_NAME = "beaver-logger";
 const MODULE_NAME = "beaver";
 
-export const WEBPACK_CONFIG: WebpackConfig = getWebpackConfig({
+export const WEBPACK_CONFIG = getWebpackConfig({
   entry: "./src/index.ts",
   filename: FILE_NAME,
   modulename: MODULE_NAME,
   minify: false,
 });
 
-export const WEBPACK_CONFIG_MIN: WebpackConfig = getWebpackConfig({
+export const WEBPACK_CONFIG_MIN = getWebpackConfig({
   entry: "./src/index.ts",
   filename: FILE_NAME,
   modulename: MODULE_NAME,
   minify: true,
 });
 
-export const WEBPACK_CONFIG_TEST: WebpackConfig = getWebpackConfig({
+export const WEBPACK_CONFIG_TEST = getWebpackConfig({
   entry: "./src/index.ts",
   modulename: MODULE_NAME,
   test: true,

@@ -1,4 +1,4 @@
 module.exports = {
-  extends: "@krakenjs/grumbler-scripts/config/.babelrc-browser",
-  presets: ["@krakenjs/grumbler-scripts/config/flow-ts-babel-preset"],
+  extends: "@krakenjs/babel-config-grumbler/babelrc-browser",
+  presets: ["@krakenjs/babel-config-grumbler/flow-ts-babel-preset"],
 };
