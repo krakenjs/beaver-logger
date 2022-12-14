@@ -8,8 +8,8 @@
 [build]: https://github.com/krakenjs/beaver-logger/actions?query=workflow:build
 [coverage-badge]: https://img.shields.io/codecov/c/github/krakenjs/beaver-logger.svg?style=flat-square
 [coverage]: https://codecov.io/github/krakenjs/beaver-logger/
-[version-badge]: https://img.shields.io/npm/v/beaver-logger.svg?style=flat-square
-[package]: https://www.npmjs.com/package/beaver-logger
+[version-badge]: https://img.shields.io/npm/v/@krakenjs/beaver-logger.svg?style=flat-square
+[package]: https://www.npmjs.com/package/@krakenjs/beaver-logger
 
 Front-end logger, which will:
 
