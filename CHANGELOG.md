@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/krakenjs/beaver-logger/compare/v5.0.1...v5.1.0) (2022-12-14)
+
+
+### Features
+
+* upgrade to grumbler scripts 8 ([#61](https://github.com/krakenjs/beaver-logger/issues/61)) ([f625bea](https://github.com/krakenjs/beaver-logger/commit/f625beafb426fe7da4b4e9c50d0bac033348f775))
+
+
+### Bug Fixes
+
+* issues/49 'Reference error: window undefined' error in SSR components ([#62](https://github.com/krakenjs/beaver-logger/issues/62)) ([1420083](https://github.com/krakenjs/beaver-logger/commit/142008356d8217f14f9e292c4613c0eb7ad1a5ff))
+
+
+* fix publish process ([#63](https://github.com/krakenjs/beaver-logger/issues/63)) ([1a08927](https://github.com/krakenjs/beaver-logger/commit/1a08927b96faf2575e498759920ed0af3432fac3))
+* **release:** 5.1.0 ([60f901e](https://github.com/krakenjs/beaver-logger/commit/60f901e4cfcf4e260cb6aa94ada6807a0bf1a8d2))
+* use prettier for code formatting ([#58](https://github.com/krakenjs/beaver-logger/issues/58)) ([288257d](https://github.com/krakenjs/beaver-logger/commit/288257d89af4d2a872b30723df28b7dda5605601))
+
 ### [5.0.1](https://github.com/krakenjs/beaver-logger/compare/v5.0.0...v5.0.1) (2022-04-09)
 
 
