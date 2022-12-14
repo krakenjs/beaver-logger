@@ -20,11 +20,7 @@ export type TransportOptions = {|
 
 export type Transport = (TransportOptions) => ZalgoPromise<void>;
 
-export function getHTTPTransport(
-  httpWin: CrossDomainWindowType = window
-): Transport {
-  const win = isSameDomain(httpWin) ? assertSameDomain(httpWin) : window;
-
+export function getHTTPTransport(httpWin?: CrossDomainWindowType): Transport {
   return ({
     url,
     method,
@@ -33,6 +29,10 @@ export function getHTTPTransport(
     enableSendBeacon = false,
   }: TransportOptions): ZalgoPromise<void> => {
     return ZalgoPromise.try(() => {
+      const httpWindow = httpWin ? httpWin : window;
+      const win = isSameDomain(httpWindow)
+        ? assertSameDomain(httpWindow)
+        : window;
       let beaconResult = false;
 
       if (canUseSendBeacon({ headers, enableSendBeacon })) {
