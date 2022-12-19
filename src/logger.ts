@@ -7,7 +7,7 @@ import {
   safeInterval,
   objFilter,
   // @ts-ignore
-} from "@krakenjs/belter";
+} from "@krakenjs/belter/dist/esm";
 import type { $Values } from "utility-types";
 
 import {
@@ -188,7 +188,7 @@ export function Logger({
     });
     // @ts-ignore
     if (AUTO_FLUSH_LEVEL.indexOf(level) !== -1) {
-      flush();
+      void flush();
     }
   }
 
@@ -239,6 +239,7 @@ export function Logger({
 
     const logPayload: Payload = {
       ...objFilter(payload),
+      // @ts-expect-error idk
       timestamp: Date.now().toString(),
     };
 

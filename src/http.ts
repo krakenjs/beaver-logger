@@ -1,7 +1,7 @@
 // @ts-ignore
 import { ZalgoPromise } from "@krakenjs/zalgo-promise";
 // @ts-ignore
-import { request, noop } from "@krakenjs/belter/src"; // eslint-disable-line import/named
+import { request, noop } from "@krakenjs/belter/dist/esm"; // eslint-disable-line import/named
 import type { CrossDomainWindowType } from "@krakenjs/cross-domain-utils/dist/esm";
 import {
   isSameDomain,
@@ -63,6 +63,7 @@ export function getHTTPTransport(
             win,
             url,
             method,
+            // @ts-expect-error idk
             headers,
             json,
           });

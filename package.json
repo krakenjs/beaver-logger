@@ -113,12 +113,12 @@
     "prettier": "2.7.1",
     "standard-version": "^9.3.2",
     "ts-node": "^10.5.0",
-    "typescript": "4.6.3",
+    "typescript": "4.9.3",
     "utility-types": "^3.10.0",
     "vitest": "0.16.0"
   },
   "dependencies": {
-    "@krakenjs/belter": "^2.0.0",
+    "@krakenjs/belter": "^3.0.0-typescript.1",
     "@krakenjs/cross-domain-utils": "^4.0.0-alpha.2",
     "@krakenjs/zalgo-promise": "^2.0.0"
   }
