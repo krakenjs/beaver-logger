@@ -4,7 +4,7 @@
 [![code coverage][coverage-badge]][coverage]
 [![npm version][version-badge]][package]
 
-[build-badge]: https://img.shields.io/github/workflow/status/krakenjs/beaver-logger/build?logo=github&style=flat-square
+[build-badge]: https://img.shields.io/github/actions/workflow/status/krakenjs/beaver-logger/main.yml?branch=main&logo=github&style=flat-square
 [build]: https://github.com/krakenjs/beaver-logger/actions?query=workflow:build
 [coverage-badge]: https://img.shields.io/codecov/c/github/krakenjs/beaver-logger.svg?style=flat-square
 [coverage]: https://codecov.io/github/krakenjs/beaver-logger/
