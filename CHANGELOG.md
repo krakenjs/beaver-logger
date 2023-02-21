@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.2.0](https://github.com/krakenjs/beaver-logger/compare/v5.1.0...v5.2.0) (2023-02-21)
+
+
+### Features
+
+* add 'metric' logger method to accept otel metrics ([#65](https://github.com/krakenjs/beaver-logger/issues/65)) ([3983c31](https://github.com/krakenjs/beaver-logger/commit/3983c312be47d2f11456647cd7dcb92cdd85d487))
+
+
+* **docs:** update github actions badge url ([#66](https://github.com/krakenjs/beaver-logger/issues/66)) ([becce9f](https://github.com/krakenjs/beaver-logger/commit/becce9fb9df89bc27f8096677b7e516e2a5524b8))
+* fix npm badge in readme ([#64](https://github.com/krakenjs/beaver-logger/issues/64)) ([efc83a3](https://github.com/krakenjs/beaver-logger/commit/efc83a3814bbc70062d87a5f8e968ba7e23efc30))
+
 ## [5.1.0](https://github.com/krakenjs/beaver-logger/compare/v5.0.1...v5.1.0) (2022-12-14)
 
 
