@@ -19,6 +19,7 @@ export function Logger(_ref) {
     enableSendBeacon = _ref$enableSendBeacon === void 0 ? false : _ref$enableSendBeacon;
   var events = [];
   var tracking = [];
+  var metrics = [];
   var payloadBuilders = [];
   var metaBuilders = [];
   var trackingBuilders = [];
@@ -48,7 +49,7 @@ export function Logger(_ref) {
       if (!isBrowser() || window.location.protocol === PROTOCOL.FILE) {
         return;
       }
-      if (!events.length && !tracking.length) {
+      if (!events.length && !tracking.length && !metrics.length) {
         return;
       }
       var meta = {};
@@ -70,7 +71,8 @@ export function Logger(_ref) {
           json: {
             events: events,
             meta: meta,
-            tracking: tracking
+            tracking: tracking,
+            metrics: metrics
           },
           enableSendBeacon: enableSendBeacon
         }).catch(noop);
@@ -94,6 +96,7 @@ export function Logger(_ref) {
       }
       events = [];
       tracking = [];
+      metrics = [];
       return ZalgoPromise.resolve(res).then(noop);
     });
   }
@@ -173,6 +176,14 @@ export function Logger(_ref) {
     tracking.push(trackingPayload);
     return logger;
   }
+  function metric(metricPayload) {
+    if (!isBrowser()) {
+      return logger;
+    }
+    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.name, metricPayload.dimensions);
+    metrics.push(metricPayload);
+    return logger;
+  }
   function setTransport(newTransport) {
     transport = newTransport;
     return logger;
@@ -221,6 +232,7 @@ export function Logger(_ref) {
     warn: warn,
     error: error,
     track: track,
+    metric: metric,
     flush: flush,
     immediateFlush: immediateFlush,
     addPayloadBuilder: addPayloadBuilder,

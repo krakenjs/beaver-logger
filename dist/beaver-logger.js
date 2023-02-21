@@ -1104,6 +1104,7 @@
             var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? DEFAULT_LOG_LEVEL : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, amplitudeApiKey = _ref.amplitudeApiKey, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
             var events = [];
             var tracking = [];
+            var metrics = [];
             var payloadBuilders = [];
             var metaBuilders = [];
             var trackingBuilders = [];
@@ -1120,7 +1121,7 @@
             }
             function immediateFlush() {
                 return promise_ZalgoPromise.try((function() {
-                    if (dom_isBrowser() && window.location.protocol !== constants_PROTOCOL.FILE && (events.length || tracking.length)) {
+                    if (dom_isBrowser() && window.location.protocol !== constants_PROTOCOL.FILE && (events.length || tracking.length || metrics.length)) {
                         var meta = {};
                         for (var _i2 = 0; _i2 < metaBuilders.length; _i2++) extendIfDefined(meta, (0, metaBuilders[_i2])(meta));
                         var headers = {};
@@ -1134,7 +1135,8 @@
                             json: {
                                 events: events,
                                 meta: meta,
-                                tracking: tracking
+                                tracking: tracking,
+                                metrics: metrics
                             },
                             enableSendBeacon: enableSendBeacon
                         }).catch(src_util_noop));
@@ -1155,6 +1157,7 @@
                         }).catch(src_util_noop);
                         events = [];
                         tracking = [];
+                        metrics = [];
                         return promise_ZalgoPromise.resolve(res).then(src_util_noop);
                     }
                 }));
@@ -1241,6 +1244,12 @@
                     trackingBuilders[_i8])(trackingPayload));
                     print(LOG_LEVEL.DEBUG, "track", trackingPayload);
                     tracking.push(trackingPayload);
+                    return logger;
+                },
+                metric: function(metricPayload) {
+                    if (!dom_isBrowser()) return logger;
+                    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.name, metricPayload.dimensions);
+                    metrics.push(metricPayload);
                     return logger;
                 },
                 flush: flush,
