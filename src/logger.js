@@ -19,7 +19,7 @@ import {
 import { LOG_LEVEL, PROTOCOL } from "./constants";
 import { extendIfDefined } from "./util";
 import { type Transport, getHTTPTransport } from "./http";
-import type { Payload } from "./types";
+import type { Metric, Payload } from "./types";
 
 type LoggerOptions = {|
   url?: string,
@@ -34,6 +34,7 @@ type LoggerOptions = {|
 type ClientPayload = Payload;
 type Log = (name: string, payload?: ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 type Track = (payload: ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
+type LogMetric = (payload: Metric) => LoggerType; // eslint-disable-line no-use-before-define
 
 type Builder = (Payload) => ClientPayload;
 type AddBuilder = (Builder) => LoggerType; // eslint-disable-line no-use-before-define
@@ -45,6 +46,7 @@ export type LoggerType = {|
   error: Log,
 
   track: Track,
+  metric: LogMetric,
 
   flush: () => ZalgoPromise<void>,
   immediateFlush: () => ZalgoPromise<void>,
@@ -73,6 +75,7 @@ export function Logger({
     payload: Payload,
   |}> = [];
   let tracking: Array<Payload> = [];
+  let metrics: Array<Metric> = [];
 
   const payloadBuilders: Array<Builder> = [];
   const metaBuilders: Array<Builder> = [];
@@ -119,7 +122,7 @@ export function Logger({
         return;
       }
 
-      if (!events.length && !tracking.length) {
+      if (!events.length && !tracking.length && !metrics.length) {
         return;
       }
 
@@ -144,6 +147,7 @@ export function Logger({
             events,
             meta,
             tracking,
+            metrics,
           },
           enableSendBeacon,
         }).catch(noop);
@@ -171,6 +175,7 @@ export function Logger({
 
       events = [];
       tracking = [];
+      metrics = [];
 
       return ZalgoPromise.resolve(res).then(noop);
     });
@@ -276,6 +281,22 @@ export function Logger({
     return logger; // eslint-disable-line no-use-before-define
   }
 
+  function metric(metricPayload: Metric): LoggerType {
+    if (!isBrowser()) {
+      return logger; // eslint-disable-line no-use-before-define
+    }
+
+    print(
+      LOG_LEVEL.DEBUG,
+      `metric.${metricPayload.name}`,
+      metricPayload.dimensions
+    );
+
+    metrics.push(metricPayload);
+
+    return logger; // eslint-disable-line no-use-before-define
+  }
+
   function setTransport(newTransport: Transport): LoggerType {
     transport = newTransport;
     return logger; // eslint-disable-line no-use-before-define
@@ -337,6 +358,7 @@ export function Logger({
     warn,
     error,
     track,
+    metric,
     flush,
     immediateFlush,
     addPayloadBuilder,

@@ -10,6 +10,11 @@ type ExpressResponse = express$Response; // eslint-disable-line no-undef
 
 type Payload = { [string]: string };
 
+export type Metric = {|
+  name: string,
+  dimensions: Payload,
+|};
+
 type Logger = {|
   log: (
     req: ExpressRequest,
@@ -19,6 +24,7 @@ type Logger = {|
     meta?: Payload
   ) => void,
   track: (req: ExpressRequest, payload: Payload, meta?: Payload) => void,
+  metric: (req: ExpressRequest, payload: Metric, meta?: Payload) => void,
   meta: (req: ExpressRequest, meta: Payload) => void,
 |};
 
@@ -66,6 +72,18 @@ export const defaultLogger: Logger = {
     );
   },
 
+  metric(req, metric) {
+    console.log(
+      `[metric].${metric.name}\n`,
+      Object.keys(metric.dimensions)
+        .map((key) => {
+          return `\t${key}: ${metric.dimensions[key]}`;
+        })
+        .join("\n"),
+      "\n"
+    );
+  },
+
   meta(req, meta) {
     console.log(
       "[meta]\n",
@@ -85,11 +103,13 @@ export function log(
   logs: {|
     events: $ReadOnlyArray<Event>,
     tracking?: $ReadOnlyArray<Tracking>,
+    metrics?: $ReadOnlyArray<Metric>,
     meta?: Meta,
   |}
 ) {
   const events = logs.events || [];
   const tracking = logs.tracking || [];
+  const metrics = logs.metrics || [];
   const meta = logs.meta || {};
 
   if (logger.meta) {
@@ -115,6 +135,12 @@ export function log(
       logger.track(req, track, meta);
     });
   }
+
+  if (logger.metric) {
+    metrics.forEach((metric) => {
+      logger.metric(req, metric);
+    });
+  }
 }
 
 type Query = {
@@ -126,6 +152,7 @@ type Query = {
 type Body = {|
   events: $ReadOnlyArray<Event>,
   tracking?: $ReadOnlyArray<Tracking>,
+  metrics?: $ReadOnlyArray<Metric>,
   meta: Meta,
 |};
 
@@ -140,8 +167,8 @@ export function handleRequest(req: ExpressRequest, logger: Logger) {
   const body: Body = req.body || {};
 
   if (method.toLowerCase() === "post") {
-    const { events, tracking, meta } = body;
-    log(req, logger, { events, tracking, meta });
+    const { events, tracking, metrics, meta } = body;
+    log(req, logger, { events, tracking, metrics, meta });
   } else {
     const { event, level = LOG_LEVEL.INFO, ...payload } = query;
 
