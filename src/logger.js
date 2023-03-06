@@ -58,6 +58,16 @@ export type LoggerType = {|
 
   setTransport: (Transport) => LoggerType,
   configure: (LoggerOptions) => LoggerType,
+
+  __buffer__: {|
+    events: $ReadOnlyArray<{|
+      level: $Values<typeof LOG_LEVEL>,
+      event: string,
+      payload: Payload,
+    |}>,
+    tracking: $ReadOnlyArray<Payload>,
+    metrics: $ReadOnlyArray<Metric>,
+  |},
 |};
 
 export function Logger({
@@ -289,7 +299,7 @@ export function Logger({
     print(
       LOG_LEVEL.DEBUG,
       `metric.${metricPayload.name}`,
-      metricPayload.dimensions
+      metricPayload.dimensions || {}
     );
 
     metrics.push(metricPayload);
@@ -367,7 +377,20 @@ export function Logger({
     addHeaderBuilder,
     setTransport,
     configure,
+
+    // exposed primarily for testing
+    __buffer__: {
+      events,
+      tracking,
+      metrics,
+    },
   };
+
+  // mark the __buffer__ prop as readonly
+  Object.defineProperty(logger, "__buffer__", { writable: false });
+
+  // mark logger.__buffer__ props as readOnly, though array methods on the children still work.
+  Object.freeze(logger.__buffer__);
 
   return logger;
 }
