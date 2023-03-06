@@ -9,6 +9,13 @@ export default function configKarma(karma: Object) {
   const karmaConfig = getKarmaConfig(karma, {
     basePath: __dirname,
     webpack: WEBPACK_CONFIG_TEST,
+    // un-comment to show console.log() during tests
+    // client: {
+    //   captureConsole: true,
+    //   mocha: {
+    //     bail: true,
+    //   },
+    // },
   });
 
   karma.set(karmaConfig);
