@@ -1,6 +1,6 @@
 {
   "name": "@krakenjs/beaver-logger",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "description": "Client side logger.",
   "main": "dist/beaver-logger.js",
   "scripts": {

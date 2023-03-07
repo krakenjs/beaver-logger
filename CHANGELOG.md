@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.2.1](https://github.com/krakenjs/beaver-logger/compare/v5.2.0...v5.2.1) (2023-03-07)
+
+
+* **logger:** expose logger._buffer={}, add tests ([#69](https://github.com/krakenjs/beaver-logger/issues/69)) ([03cee51](https://github.com/krakenjs/beaver-logger/commit/03cee5197e23d3003aebab3fb94f444b09cbbacf))
+
 ## [5.2.0](https://github.com/krakenjs/beaver-logger/compare/v5.1.0...v5.2.0) (2023-02-21)
 
 
