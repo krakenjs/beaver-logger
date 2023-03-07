@@ -1248,7 +1248,7 @@
                 },
                 metric: function(metricPayload) {
                     if (!dom_isBrowser()) return logger;
-                    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.name, metricPayload.dimensions);
+                    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.name, metricPayload.dimensions || {});
                     metrics.push(metricPayload);
                     return logger;
                 },
@@ -1279,8 +1279,17 @@
                     opts.flushInterval && (flushInterval = opts.flushInterval);
                     opts.enableSendBeacon && (enableSendBeacon = opts.enableSendBeacon);
                     return logger;
+                },
+                __buffer__: {
+                    events: events,
+                    tracking: tracking,
+                    metrics: metrics
                 }
             };
+            Object.defineProperty(logger, "__buffer__", {
+                writable: !1
+            });
+            Object.freeze(logger.__buffer__);
             return logger;
         }
     } ]);
