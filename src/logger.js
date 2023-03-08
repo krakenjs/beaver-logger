@@ -35,6 +35,11 @@ type ClientPayload = Payload;
 type Log = (name: string, payload?: ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 type Track = (payload: ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 type LogMetric = (payload: Metric) => LoggerType; // eslint-disable-line no-use-before-define
+type LogEvent = {|
+  level: $Values<typeof LOG_LEVEL>,
+  event: string,
+  payload: Payload,
+|};
 
 type Builder = (Payload) => ClientPayload;
 type AddBuilder = (Builder) => LoggerType; // eslint-disable-line no-use-before-define
@@ -60,13 +65,9 @@ export type LoggerType = {|
   configure: (LoggerOptions) => LoggerType,
 
   __buffer__: {|
-    events: $ReadOnlyArray<{|
-      level: $Values<typeof LOG_LEVEL>,
-      event: string,
-      payload: Payload,
-    |}>,
-    tracking: $ReadOnlyArray<Payload>,
-    metrics: $ReadOnlyArray<Metric>,
+    get events(): $ReadOnlyArray<LogEvent>,
+    get tracking(): $ReadOnlyArray<Payload>,
+    get metrics(): $ReadOnlyArray<Metric>,
   |},
 |};
 
@@ -79,11 +80,7 @@ export function Logger({
   flushInterval = FLUSH_INTERVAL,
   enableSendBeacon = false,
 }: LoggerOptions): LoggerType {
-  let events: Array<{|
-    level: $Values<typeof LOG_LEVEL>,
-    event: string,
-    payload: Payload,
-  |}> = [];
+  let events: Array<LogEvent> = [];
   let tracking: Array<Payload> = [];
   let metrics: Array<Metric> = [];
 
@@ -379,18 +376,22 @@ export function Logger({
     configure,
 
     // exposed primarily for testing
+    // exposes these buffers as readonly getters only
     __buffer__: {
-      events,
-      tracking,
-      metrics,
+      get events(): $ReadOnlyArray<LogEvent> {
+        return events;
+      },
+      get tracking(): $ReadOnlyArray<Payload> {
+        return tracking;
+      },
+      get metrics(): $ReadOnlyArray<Metric> {
+        return metrics;
+      },
     },
   };
 
   // mark the __buffer__ prop as readonly
   Object.defineProperty(logger, "__buffer__", { writable: false });
-
-  // mark logger.__buffer__ props as readOnly, though array methods on the children still work.
-  Object.freeze(logger.__buffer__);
 
   return logger;
 }
