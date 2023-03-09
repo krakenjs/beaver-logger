@@ -183,8 +183,9 @@ describe("a beaver-logger instance exposes logger.__buffer__={} prop as a readon
     expect(() => (loggerInstance.__buffer__ = {})).toThrow(
       "Cannot assign to read only property '__buffer__' of object '#<Object>'"
     );
+
     expect(() => (loggerInstance.__buffer__.events = [])).toThrow(
-      "Cannot assign to read only property 'events' of object '#<Object>'"
+      "Cannot set property events of #<Object> which has only a getter"
     );
 
     // but using the buffer array methods directly is still allowed
@@ -200,18 +201,52 @@ describe("a beaver-logger instance exposes logger.__buffer__={} prop as a readon
   });
 });
 
-/*
-    TODO: Need to write unit tests for these exposed methods:
-    ush,
-    immediateFlush,
-    addPayloadBuilder,
-    addMetaBuilder,
-    addTrackingBuilder,
-    addHeaderBuilder,
-    setTransport,
-    configure,
-    
-    describe(' ', () => {
-  
+describe("beaver logger provides flushing methods that send events to the server and clear the buffer ...", () => {
+  beforeEach(() => {
+    // create a new logger with a new buffer
+    logger = Logger({
+      url: "/test/api/log",
+    });
+
+    logBuf = logger.__buffer__;
+
+    // verify empty (clean slate)
+    expect(logBuf.events).toHaveLength(0);
+    expect(logBuf.tracking).toHaveLength(0);
+    expect(logBuf.metrics).toHaveLength(0);
   });
+
+  it(".flush() clears the buffers (after sending data to server))", async () => {
+    logger.info("testing");
+    expect(logBuf.events).toHaveLength(1);
+
+    await logger.flush();
+    expect(logBuf.events).toHaveLength(0);
+  });
+
+  // it(".flush() debounces then calls immediateFlush()) ", async () => {
+  // TODO:  need to test the promiseDebounce. Was unable to figure out how to do that. (zalgo...)
+  // });
+
+  it(".immediateflush() clears the buffers (after sending data to server))", async () => {
+    logger.info("testing");
+    expect(logBuf.events).toHaveLength(1);
+
+    await logger.immediateFlush();
+    expect(logBuf.events).toHaveLength(0);
+  });
+});
+
+/*
+ TODO: Need to write unit tests for these exposed methods:
+ addPayloadBuilder,
+ addMetaBuilder,
+ addTrackingBuilder,
+ addHeaderBuilder,
+ setTransport,
+ configure,
+ 
+ describe(' ', () => {
+ 
+});
 */
