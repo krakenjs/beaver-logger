@@ -1281,15 +1281,20 @@
                     return logger;
                 },
                 __buffer__: {
-                    events: events,
-                    tracking: tracking,
-                    metrics: metrics
+                    get events() {
+                        return events;
+                    },
+                    get tracking() {
+                        return tracking;
+                    },
+                    get metrics() {
+                        return metrics;
+                    }
                 }
             };
             Object.defineProperty(logger, "__buffer__", {
                 writable: !1
             });
-            Object.freeze(logger.__buffer__);
             return logger;
         }
     } ]);
