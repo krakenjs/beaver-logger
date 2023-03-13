@@ -196,4 +196,12 @@ module.exports = {
 
 ## Data Flow
 
-![Flow](/flow.png?raw=true)
+```mermaid
+flowchart TD
+    A[Client-Side Log statement] --> B[beaver-logger/client]
+    B[beaver-logger/client] --> C[beaver-logger/server]
+    C[beaver-logger/server] --> D[your-custom-logger]
+    D[your-customer-logger] --> E[Backend 1]
+    D[your-customer-logger] --> F[Backend 2]
+    G[Server-Side Log statement] --> D[your-custom-logger]
+```
