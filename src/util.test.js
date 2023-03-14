@@ -1,6 +1,8 @@
 /* @flow */
 
-import { extendIfDefined } from "../src/util";
+import { describe, it } from "vitest";
+
+import { extendIfDefined } from ".";
 
 describe("util", () => {
   describe("extendIfDefined", () => {

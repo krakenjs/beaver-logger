@@ -1,9 +1,16 @@
 /* eslint-disable flowtype/require-valid-file-annotation, eslint-comments/disable-enable-pair */
 
-import expect from "@storybook/expect";
-// https://jestjs.io/docs/expect
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Logger } from "../src";
+import { Logger } from ".";
+
+const XMLHttpRequestMock = vi.fn(() => ({
+  open: vi.fn(),
+  send: vi.fn(),
+  setRequestHeader: vi.fn(),
+}));
+
+vi.stubGlobal("XMLHttpRequest", XMLHttpRequestMock);
 
 let logger;
 let logBuf;
