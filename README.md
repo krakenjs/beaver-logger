@@ -42,6 +42,10 @@ For example:
 
 Call this to attach general tracking information to the current page. This is useful if the data is not associated with a specific event, and will be sent to the server the next time the logs are flushed.
 
+### `$logger.metric(<event>, <payload>);`
+
+Queues a metric
+
 ## Advanced
 
 ### `$logger.addMetaBuilder(<function>);`
