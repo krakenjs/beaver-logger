@@ -8,7 +8,7 @@ import {
   type CrossDomainWindowType,
 } from "@krakenjs/cross-domain-utils/src";
 
-import { canUseSendBeacon, isAmplitude, sendBeacon } from "./util";
+import { canUseSendBeacon, sendBeacon } from "./util";
 
 export type TransportOptions = {|
   url: string,
@@ -36,11 +36,7 @@ export function getHTTPTransport(httpWin?: CrossDomainWindowType): Transport {
       let beaconResult = false;
 
       if (canUseSendBeacon({ headers, enableSendBeacon })) {
-        if (isAmplitude(url)) {
-          beaconResult = sendBeacon({ win, url, data: json, useBlob: false });
-        } else {
-          beaconResult = sendBeacon({ win, url, data: json, useBlob: true });
-        }
+        beaconResult = sendBeacon({ win, url, data: json, useBlob: true });
       }
 
       return beaconResult

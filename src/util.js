@@ -2,7 +2,6 @@
 
 import { type SameDomainWindowType } from "@krakenjs/cross-domain-utils/src";
 
-import { AMPLITUDE_URL } from "./config";
 import type { Payload } from "./types";
 
 type CanUseBeaconOptions = {|
@@ -22,14 +21,6 @@ const canUseSendBeacon = ({
     enableSendBeacon &&
     window.Blob
   ) {
-    return true;
-  }
-
-  return false;
-};
-
-const isAmplitude = (url: string): boolean => {
-  if (url === AMPLITUDE_URL) {
     return true;
   }
 
@@ -75,4 +66,4 @@ const extendIfDefined = (target: Payload, source: Payload) => {
   }
 };
 
-export { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon };
+export { canUseSendBeacon, extendIfDefined, sendBeacon };

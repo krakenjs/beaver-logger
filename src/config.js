@@ -16,5 +16,3 @@ export const FLUSH_INTERVAL = 60 * 1000;
 export const DEFAULT_LOG_LEVEL: $Values<typeof LOG_LEVEL> = __DEBUG__
   ? LOG_LEVEL.DEBUG
   : LOG_LEVEL.WARN;
-
-export const AMPLITUDE_URL = "https://api2.amplitude.com/2/httpapi";
