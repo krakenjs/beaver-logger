@@ -14,7 +14,6 @@ import {
   LOG_LEVEL_PRIORITY,
   AUTO_FLUSH_LEVEL,
   FLUSH_INTERVAL,
-  AMPLITUDE_URL,
 } from "./config";
 import { LOG_LEVEL, PROTOCOL } from "./constants";
 import { extendIfDefined } from "./util";
@@ -28,7 +27,6 @@ type LoggerOptions = {|
   transport?: Transport,
   flushInterval?: number,
   enableSendBeacon?: boolean,
-  amplitudeApiKey?: string,
 |};
 
 type ClientPayload = Payload;
@@ -76,7 +74,6 @@ export function Logger({
   prefix,
   logLevel = DEFAULT_LOG_LEVEL,
   transport = getHTTPTransport(),
-  amplitudeApiKey,
   flushInterval = FLUSH_INTERVAL,
   enableSendBeacon = false,
 }: LoggerOptions): LoggerType {
@@ -155,26 +152,6 @@ export function Logger({
             meta,
             tracking,
             metrics,
-          },
-          enableSendBeacon,
-        }).catch(noop);
-      }
-
-      if (amplitudeApiKey) {
-        transport({
-          method: "POST",
-          url: AMPLITUDE_URL,
-          headers: {},
-          json: {
-            api_key: amplitudeApiKey,
-            events: tracking.map((payload: Payload) => {
-              // $FlowFixMe
-              return {
-                event_type: payload.transition_name || "event",
-                event_properties: payload,
-                ...payload,
-              };
-            }),
           },
           enableSendBeacon,
         }).catch(noop);
@@ -324,10 +301,6 @@ export function Logger({
 
     if (opts.transport) {
       transport = opts.transport;
-    }
-
-    if (opts.amplitudeApiKey) {
-      amplitudeApiKey = opts.amplitudeApiKey;
     }
 
     if (opts.flushInterval) {
