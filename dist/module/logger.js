@@ -1,7 +1,7 @@
 import _extends from "@babel/runtime/helpers/esm/extends";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 import { isBrowser, promiseDebounce, noop, safeInterval, objFilter } from "@krakenjs/belter/src";
-import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL, AMPLITUDE_URL } from "./config";
+import { DEFAULT_LOG_LEVEL, LOG_LEVEL_PRIORITY, AUTO_FLUSH_LEVEL, FLUSH_INTERVAL } from "./config";
 import { LOG_LEVEL, PROTOCOL } from "./constants";
 import { extendIfDefined } from "./util";
 import { getHTTPTransport } from "./http";
@@ -12,7 +12,6 @@ export function Logger(_ref) {
     logLevel = _ref$logLevel === void 0 ? DEFAULT_LOG_LEVEL : _ref$logLevel,
     _ref$transport = _ref.transport,
     transport = _ref$transport === void 0 ? getHTTPTransport() : _ref$transport,
-    amplitudeApiKey = _ref.amplitudeApiKey,
     _ref$flushInterval = _ref.flushInterval,
     flushInterval = _ref$flushInterval === void 0 ? FLUSH_INTERVAL : _ref$flushInterval,
     _ref$enableSendBeacon = _ref.enableSendBeacon,
@@ -73,23 +72,6 @@ export function Logger(_ref) {
             meta: meta,
             tracking: tracking,
             metrics: metrics
-          },
-          enableSendBeacon: enableSendBeacon
-        }).catch(noop);
-      }
-      if (amplitudeApiKey) {
-        transport({
-          method: "POST",
-          url: AMPLITUDE_URL,
-          headers: {},
-          json: {
-            api_key: amplitudeApiKey,
-            events: tracking.map(function (payload) {
-              return _extends({
-                event_type: payload.transition_name || "event",
-                event_properties: payload
-              }, payload);
-            })
           },
           enableSendBeacon: enableSendBeacon
         }).catch(noop);
@@ -200,9 +182,6 @@ export function Logger(_ref) {
     }
     if (opts.transport) {
       transport = opts.transport;
-    }
-    if (opts.amplitudeApiKey) {
-      amplitudeApiKey = opts.amplitudeApiKey;
     }
     if (opts.flushInterval) {
       flushInterval = opts.flushInterval;

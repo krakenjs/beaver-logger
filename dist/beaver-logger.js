@@ -77,9 +77,6 @@
         __webpack_require__.d(__webpack_exports__, "extendIfDefined", (function() {
             return extendIfDefined;
         }));
-        __webpack_require__.d(__webpack_exports__, "isAmplitude", (function() {
-            return util_isAmplitude;
-        }));
         __webpack_require__.d(__webpack_exports__, "sendBeacon", (function() {
             return sendBeacon;
         }));
@@ -986,9 +983,6 @@
             var hasHeaders = headers && Object.keys(headers).length;
             return !!(window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob);
         };
-        var util_isAmplitude = function(url) {
-            return "https://api2.amplitude.com/2/httpapi" === url;
-        };
         var sendBeacon = function(_ref2) {
             var _ref2$win = _ref2.win, win = void 0 === _ref2$win ? window : _ref2$win, url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
             try {
@@ -1021,12 +1015,7 @@
                     canUseSendBeacon({
                         headers: headers,
                         enableSendBeacon: enableSendBeacon
-                    }) && (beaconResult = util_isAmplitude(url) ? sendBeacon({
-                        win: win,
-                        url: url,
-                        data: json,
-                        useBlob: !1
-                    }) : sendBeacon({
+                    }) && (beaconResult = sendBeacon({
                         win: win,
                         url: url,
                         data: json,
@@ -1101,7 +1090,7 @@
             };
         }
         function Logger(_ref) {
-            var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? DEFAULT_LOG_LEVEL : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, amplitudeApiKey = _ref.amplitudeApiKey, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
+            var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? DEFAULT_LOG_LEVEL : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
             var events = [];
             var tracking = [];
             var metrics = [];
@@ -1140,21 +1129,6 @@
                             },
                             enableSendBeacon: enableSendBeacon
                         }).catch(src_util_noop));
-                        amplitudeApiKey && transport({
-                            method: "POST",
-                            url: "https://api2.amplitude.com/2/httpapi",
-                            headers: {},
-                            json: {
-                                api_key: amplitudeApiKey,
-                                events: tracking.map((function(payload) {
-                                    return _extends({
-                                        event_type: payload.transition_name || "event",
-                                        event_properties: payload
-                                    }, payload);
-                                }))
-                            },
-                            enableSendBeacon: enableSendBeacon
-                        }).catch(src_util_noop);
                         events = [];
                         tracking = [];
                         metrics = [];
@@ -1275,7 +1249,6 @@
                     opts.prefix && (prefix = opts.prefix);
                     opts.logLevel && (logLevel = opts.logLevel);
                     opts.transport && (transport = opts.transport);
-                    opts.amplitudeApiKey && (amplitudeApiKey = opts.amplitudeApiKey);
                     opts.flushInterval && (flushInterval = opts.flushInterval);
                     opts.enableSendBeacon && (enableSendBeacon = opts.enableSendBeacon);
                     return logger;

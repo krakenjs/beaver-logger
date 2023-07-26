@@ -1,7 +1,7 @@
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 import { request, noop } from "@krakenjs/belter/src";
 import { isSameDomain, assertSameDomain } from "@krakenjs/cross-domain-utils/src";
-import { canUseSendBeacon, isAmplitude, sendBeacon } from "./util";
+import { canUseSendBeacon, sendBeacon } from "./util";
 export function getHTTPTransport(httpWin) {
   return function (_ref) {
     var url = _ref.url,
@@ -18,21 +18,12 @@ export function getHTTPTransport(httpWin) {
         headers: headers,
         enableSendBeacon: enableSendBeacon
       })) {
-        if (isAmplitude(url)) {
-          beaconResult = sendBeacon({
-            win: win,
-            url: url,
-            data: json,
-            useBlob: false
-          });
-        } else {
-          beaconResult = sendBeacon({
-            win: win,
-            url: url,
-            data: json,
-            useBlob: true
-          });
-        }
+        beaconResult = sendBeacon({
+          win: win,
+          url: url,
+          data: json,
+          useBlob: true
+        });
       }
       return beaconResult ? beaconResult : request({
         win: win,

@@ -1,15 +1,8 @@
-import { AMPLITUDE_URL } from "./config";
 var canUseSendBeacon = function canUseSendBeacon(_ref) {
   var headers = _ref.headers,
     enableSendBeacon = _ref.enableSendBeacon;
   var hasHeaders = headers && Object.keys(headers).length;
   if (window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob) {
-    return true;
-  }
-  return false;
-};
-var isAmplitude = function isAmplitude(url) {
-  if (url === AMPLITUDE_URL) {
     return true;
   }
   return false;
@@ -44,4 +37,4 @@ var extendIfDefined = function extendIfDefined(target, source) {
     }
   }
 };
-export { canUseSendBeacon, extendIfDefined, isAmplitude, sendBeacon };
+export { canUseSendBeacon, extendIfDefined, sendBeacon };
