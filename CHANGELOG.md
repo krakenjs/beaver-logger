@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.3.0](https://github.com/krakenjs/beaver-logger/compare/v5.2.2...v5.3.0) (2023-07-26)
+
+
+### Features
+
+* remove logging for amplitude ([#76](https://github.com/krakenjs/beaver-logger/issues/76)) ([3988758](https://github.com/krakenjs/beaver-logger/commit/3988758f4cfe2d05f38c2f66f7c00aa8a014db3e))
+
+
+* move to vitest ([#72](https://github.com/krakenjs/beaver-logger/issues/72)) ([28b9d57](https://github.com/krakenjs/beaver-logger/commit/28b9d57f85ab3b168dc1eb6cea626f0d64ee6aca))
+* remove token from publish action ([#73](https://github.com/krakenjs/beaver-logger/issues/73)) ([528d080](https://github.com/krakenjs/beaver-logger/commit/528d080adb0056f2b8784b89b30e980ea1416f61))
+
 ### [5.2.2](https://github.com/krakenjs/beaver-logger/compare/v5.2.1...v5.2.2) (2023-03-09)
 
 
