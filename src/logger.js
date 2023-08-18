@@ -18,7 +18,7 @@ import {
 import { LOG_LEVEL, PROTOCOL } from "./constants";
 import { extendIfDefined } from "./util";
 import { type Transport, getHTTPTransport } from "./http";
-import type { Metric, Payload } from "./types";
+import type { MetricPayload, Payload } from "./types";
 
 type LoggerOptions = {|
   url?: string,
@@ -32,7 +32,7 @@ type LoggerOptions = {|
 type ClientPayload = Payload;
 type Log = (name: string, payload?: ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
 type Track = (payload: ClientPayload) => LoggerType; // eslint-disable-line no-use-before-define
-type LogMetric = (payload: Metric) => LoggerType; // eslint-disable-line no-use-before-define
+type LogMetric = (payload: MetricPayload) => LoggerType; // eslint-disable-line no-use-before-define
 type LogEvent = {|
   level: $Values<typeof LOG_LEVEL>,
   event: string,
@@ -65,7 +65,7 @@ export type LoggerType = {|
   __buffer__: {|
     get events(): $ReadOnlyArray<LogEvent>,
     get tracking(): $ReadOnlyArray<Payload>,
-    get metrics(): $ReadOnlyArray<Metric>,
+    get metrics(): $ReadOnlyArray<MetricPayload>,
   |},
 |};
 
@@ -79,7 +79,7 @@ export function Logger({
 }: LoggerOptions): LoggerType {
   let events: Array<LogEvent> = [];
   let tracking: Array<Payload> = [];
-  let metrics: Array<Metric> = [];
+  let metrics: Array<MetricPayload> = [];
 
   const payloadBuilders: Array<Builder> = [];
   const metaBuilders: Array<Builder> = [];
@@ -265,14 +265,15 @@ export function Logger({
     return logger; // eslint-disable-line no-use-before-define
   }
 
-  function metric(metricPayload: Metric): LoggerType {
+  function metric(metricPayload: MetricPayload): LoggerType {
     if (!isBrowser()) {
       return logger; // eslint-disable-line no-use-before-define
     }
 
     print(
       LOG_LEVEL.DEBUG,
-      `metric.${metricPayload.name}`,
+      `metric.${metricPayload.metricNamespace}`,
+      // $FlowIssue difference between Payload and metric dimensions
       metricPayload.dimensions || {}
     );
 
@@ -357,7 +358,7 @@ export function Logger({
       get tracking(): $ReadOnlyArray<Payload> {
         return tracking;
       },
-      get metrics(): $ReadOnlyArray<Metric> {
+      get metrics(): $ReadOnlyArray<MetricPayload> {
         return metrics;
       },
     },
