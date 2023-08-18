@@ -1,6 +1,6 @@
 /* @flow */
 
-export type Payload = { [string]: string | boolean | null | void };
+export type Payload = { [string]: mixed };
 
 export type MetricPayload = {|
   metricNamespace: string, // the name of the metric that's used for charting / finding in signalFx
@@ -12,5 +12,5 @@ export type MetricPayload = {|
    * - https://engineering.paypalcorp.com/confluence/pages/viewpage.action?pageId=981633893
    * - https://engineering.paypalcorp.com/confluence/display/Checkout/Checkout+Observability+Overview
    */
-  dimensions?: { [string]: string },
+  dimensions?: { [string]: mixed },
 |};
