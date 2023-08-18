@@ -162,7 +162,7 @@ export function Logger(_ref) {
     if (!isBrowser()) {
       return logger;
     }
-    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.name, metricPayload.dimensions || {});
+    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
     metrics.push(metricPayload);
     return logger;
   }
