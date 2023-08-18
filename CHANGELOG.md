@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.4.0](https://github.com/krakenjs/beaver-logger/compare/v5.3.0...v5.4.0) (2023-08-18)
+
+
+### Features
+
+* update metric type to match beaver-logger-paypal ([#77](https://github.com/krakenjs/beaver-logger/issues/77)) ([f52accb](https://github.com/krakenjs/beaver-logger/commit/f52accb9a58e3f632b30c7230ad2664597aa4b4f))
+
 ## [5.3.0](https://github.com/krakenjs/beaver-logger/compare/v5.2.2...v5.3.0) (2023-07-26)
 
 
