@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.5.0](https://github.com/krakenjs/beaver-logger/compare/v5.4.0...v5.5.0) (2023-08-18)
+
+
+### Features
+
+* used mixed for JSON-able types ([#78](https://github.com/krakenjs/beaver-logger/issues/78)) ([46d94fd](https://github.com/krakenjs/beaver-logger/commit/46d94fd9e26e4e1cfa65cd23b329ef750eac5b12))
+
 ## [5.4.0](https://github.com/krakenjs/beaver-logger/compare/v5.3.0...v5.4.0) (2023-08-18)
 
 
