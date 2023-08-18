@@ -273,7 +273,6 @@ export function Logger({
     print(
       LOG_LEVEL.DEBUG,
       `metric.${metricPayload.metricNamespace}`,
-      // $FlowIssue difference between Payload and metric dimensions
       metricPayload.dimensions || {}
     );
 
