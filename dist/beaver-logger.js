@@ -1097,6 +1097,7 @@
             var payloadBuilders = [];
             var metaBuilders = [];
             var trackingBuilders = [];
+            var metricDimensionBuilders = [];
             var headerBuilders = [];
             function print(level, event, payload) {
                 if (dom_isBrowser() && window.console && window.console.log && !(LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel))) {
@@ -1222,6 +1223,9 @@
                 },
                 metric: function(metricPayload) {
                     if (!dom_isBrowser()) return logger;
+                    metricDimensionBuilders.length > 0 && !metricPayload.dimensions && (metricPayload.dimensions = {});
+                    for (var _i10 = 0; _i10 < metricDimensionBuilders.length; _i10++) extendIfDefined(metricPayload.dimensions || {}, (0, 
+                    metricDimensionBuilders[_i10])(metricPayload.dimensions || {}));
                     print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
                     metrics.push(metricPayload);
                     return logger;
@@ -1233,6 +1237,9 @@
                 },
                 addMetaBuilder: function(builder) {
                     return addBuilder(metaBuilders, builder);
+                },
+                addMetricDimensionBuilder: function(builder) {
+                    return addBuilder(metricDimensionBuilders, builder);
                 },
                 addTrackingBuilder: function(builder) {
                     return addBuilder(trackingBuilders, builder);

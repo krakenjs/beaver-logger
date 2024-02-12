@@ -1,5 +1,6 @@
+import _extends from "@babel/runtime/helpers/esm/extends";
 import _asyncToGenerator from "@babel/runtime/helpers/esm/asyncToGenerator";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { Logger } from ".";
 var XMLHttpRequestMock = vi.fn(function () {
   return {
@@ -11,6 +12,23 @@ var XMLHttpRequestMock = vi.fn(function () {
 vi.stubGlobal("XMLHttpRequest", XMLHttpRequestMock);
 var logger;
 var logBuf;
+var initLogger = function initLogger(_temp) {
+  var _ref = _temp === void 0 ? {} : _temp,
+    _ref$url = _ref.url,
+    url = _ref$url === void 0 ? "/test/api/log" : _ref$url;
+  return Logger({
+    url: url
+  });
+};
+var getLoggerBuffer = function getLoggerBuffer(testLogger) {
+  return testLogger.__buffer__;
+};
+var validMetricPayload = {
+  metricNamespace: "namespace",
+  metricEventName: "event",
+  metricType: "counter",
+  metricValue: 1
+};
 describe("beaver exposes the Logger() function that returns a logger instance with the following methods... ", function () {
   beforeEach(function () {
     logger = Logger({
@@ -20,7 +38,7 @@ describe("beaver exposes the Logger() function that returns a logger instance wi
     expect(logger.__buffer__.events).toHaveLength(0);
     expect(logger.__buffer__.tracking).toHaveLength(0);
   });
-  it(".info(evtName, payload?) sends an info event obj to the events[] buffer ready for logging", function () {
+  test(".info(evtName, payload?) sends an info event obj to the events[] buffer ready for logging", function () {
     var expected = {
       event: "testing",
       level: "info",
@@ -42,7 +60,7 @@ describe("beaver exposes the Logger() function that returns a logger instance wi
     expect(logBuf.events).toHaveLength(2);
     expect(logBuf.events[1]).toMatchObject(expectedWithPayload);
   });
-  it(".warn(evtName, payload?) sends a warn event obj to the events[] buffer ready for logging", function () {
+  test(".warn(evtName, payload?) sends a warn event obj to the events[] buffer ready for logging", function () {
     var expected = {
       event: "testing",
       level: "warn",
@@ -64,7 +82,7 @@ describe("beaver exposes the Logger() function that returns a logger instance wi
     expect(logBuf.events).toHaveLength(2);
     expect(logBuf.events[1]).toMatchObject(expectedWithPayload);
   });
-  it(".error(evtName, payload?) sends an error event obj to the events[] buffer ready for logging", function () {
+  test(".error(evtName, payload?) sends an error event obj to the events[] buffer ready for logging", function () {
     var expected = {
       event: "house is on fire!!!",
       level: "error",
@@ -86,7 +104,7 @@ describe("beaver exposes the Logger() function that returns a logger instance wi
     expect(logBuf.events).toHaveLength(2);
     expect(logBuf.events[1]).toMatchObject(expectedWithPayload);
   });
-  it(".debug(evtName, payload?) sends a debug event obj to the events[] buffer ready for logging", function () {
+  test(".debug(evtName, payload?) sends a debug event obj to the events[] buffer ready for logging", function () {
     var expected = {
       event: "gollum_personality_count",
       level: "debug",
@@ -108,7 +126,7 @@ describe("beaver exposes the Logger() function that returns a logger instance wi
     expect(logBuf.events).toHaveLength(2);
     expect(logBuf.events[1]).toMatchObject(expectedWithPayload);
   });
-  it(".track(payload) sends general tracking info to the tracking[] buffer and will be sent with next flush", function () {
+  test(".track(payload) sends general tracking info to the tracking[] buffer and will be sent with next flush", function () {
     var expected = {
       token: "12345",
       country: "FR",
@@ -121,9 +139,10 @@ describe("beaver exposes the Logger() function that returns a logger instance wi
     expect(logBuf.tracking).toHaveLength(1);
     expect(logBuf.tracking[0]).toMatchObject(expected);
   });
-  it(".metric(payload) sends general tracking info to the metrics[] buffer and will be sent with next flush", function () {
+  test(".metric(payload) sends general tracking info to the metrics[] buffer and will be sent with next flush", function () {
     var expected = {
-      name: "pp.xo.ui.lite.weasley.fallback-error",
+      metricNamespace: "pp.xo.ui.lite.weasley.fallback-error",
+      metricEventName: "event",
       metricValue: 5,
       dimensions: {
         country: "FR",
@@ -139,7 +158,7 @@ describe("beaver exposes the Logger() function that returns a logger instance wi
   });
 });
 describe("a beaver-logger instance exposes logger.__buffer__={} prop as a readonly object that...", function () {
-  it("doesn't allow its immedate children props to be reassigned", function () {
+  test("doesn't allow its immedate children props to be reassigned", function () {
     var loggerInstance = Logger({
       url: "/test/api/log"
     });
@@ -174,16 +193,81 @@ describe("beaver logger provides flushing methods that send events to the server
     expect(logBuf.tracking).toHaveLength(0);
     expect(logBuf.metrics).toHaveLength(0);
   });
-  it(".flush() clears the buffers (after sending data to server))", _asyncToGenerator(function* () {
+  test(".flush() clears the buffers (after sending data to server))", _asyncToGenerator(function* () {
     logger.info("testing");
     expect(logBuf.events).toHaveLength(1);
     yield logger.flush();
     expect(logBuf.events).toHaveLength(0);
   }));
-  it(".immediateflush() clears the buffers (after sending data to server))", _asyncToGenerator(function* () {
+  test(".immediateflush() clears the buffers (after sending data to server))", _asyncToGenerator(function* () {
     logger.info("testing");
     expect(logBuf.events).toHaveLength(1);
     yield logger.immediateFlush();
     expect(logBuf.events).toHaveLength(0);
   }));
+});
+describe("addMetricDimensionBuilder", function () {
+  test("should add dimensions from builder", function () {
+    var testLogger = initLogger();
+    testLogger.addMetricDimensionBuilder(function () {
+      return {
+        dimension1: "1",
+        dimension2: "2",
+        dimension3: "3"
+      };
+    });
+    testLogger.metric(validMetricPayload);
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual(expect.objectContaining({
+      dimensions: {
+        dimension1: "1",
+        dimension2: "2",
+        dimension3: "3"
+      }
+    }));
+  });
+  test("should overwrite existing dimensions", function () {
+    var testLogger = initLogger();
+    testLogger.addMetricDimensionBuilder(function () {
+      return {
+        dimension1: "overwrite1",
+        dimension2: "overwrite2",
+        dimension3: "overwrite3"
+      };
+    });
+    testLogger.metric(_extends({}, validMetricPayload, {
+      dimensions: {
+        dimension1: "1",
+        dimension2: "2",
+        dimension3: "3"
+      }
+    }));
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual(expect.objectContaining({
+      dimensions: {
+        dimension1: "overwrite1",
+        dimension2: "overwrite2",
+        dimension3: "overwrite3"
+      }
+    }));
+  });
+  test("should merge dimensions", function () {
+    var testLogger = initLogger();
+    testLogger.addMetricDimensionBuilder(function () {
+      return {
+        dimension1: "1",
+        dimension3: "3"
+      };
+    });
+    testLogger.metric(_extends({}, validMetricPayload, {
+      dimensions: {
+        dimension2: "2"
+      }
+    }));
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual(expect.objectContaining({
+      dimensions: {
+        dimension1: "1",
+        dimension2: "2",
+        dimension3: "3"
+      }
+    }));
+  });
 });

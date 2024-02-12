@@ -22,6 +22,7 @@ export function Logger(_ref) {
   var payloadBuilders = [];
   var metaBuilders = [];
   var trackingBuilders = [];
+  var metricDimensionBuilders = [];
   var headerBuilders = [];
   function print(level, event, payload) {
     if (!isBrowser() || !window.console || !window.console.log) {
@@ -127,6 +128,9 @@ export function Logger(_ref) {
   function addTrackingBuilder(builder) {
     return addBuilder(trackingBuilders, builder);
   }
+  function addMetricDimensionBuilder(builder) {
+    return addBuilder(metricDimensionBuilders, builder);
+  }
   function addHeaderBuilder(builder) {
     return addBuilder(headerBuilders, builder);
   }
@@ -161,6 +165,13 @@ export function Logger(_ref) {
   function metric(metricPayload) {
     if (!isBrowser()) {
       return logger;
+    }
+    if (metricDimensionBuilders.length > 0 && !metricPayload.dimensions) {
+      metricPayload.dimensions = {};
+    }
+    for (var _i10 = 0; _i10 < metricDimensionBuilders.length; _i10++) {
+      var builder = metricDimensionBuilders[_i10];
+      extendIfDefined(metricPayload.dimensions || {}, builder(metricPayload.dimensions || {}));
     }
     print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
     metrics.push(metricPayload);
@@ -216,6 +227,7 @@ export function Logger(_ref) {
     immediateFlush: immediateFlush,
     addPayloadBuilder: addPayloadBuilder,
     addMetaBuilder: addMetaBuilder,
+    addMetricDimensionBuilder: addMetricDimensionBuilder,
     addTrackingBuilder: addTrackingBuilder,
     addHeaderBuilder: addHeaderBuilder,
     setTransport: setTransport,
