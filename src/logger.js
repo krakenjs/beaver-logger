@@ -57,6 +57,7 @@ export type LoggerType = {|
   addPayloadBuilder: AddBuilder,
   addMetaBuilder: AddBuilder,
   addTrackingBuilder: AddBuilder,
+  addMetricDimensionBuilder: AddBuilder,
   addHeaderBuilder: AddBuilder,
 
   setTransport: (Transport) => LoggerType,
@@ -84,6 +85,7 @@ export function Logger({
   const payloadBuilders: Array<Builder> = [];
   const metaBuilders: Array<Builder> = [];
   const trackingBuilders: Array<Builder> = [];
+  const metricDimensionBuilders: Array<Builder> = [];
   const headerBuilders: Array<Builder> = [];
 
   function print(
@@ -228,6 +230,10 @@ export function Logger({
     return addBuilder(trackingBuilders, builder);
   }
 
+  function addMetricDimensionBuilder(builder): LoggerType {
+    return addBuilder(metricDimensionBuilders, builder);
+  }
+
   function addHeaderBuilder(builder): LoggerType {
     return addBuilder(headerBuilders, builder);
   }
@@ -268,6 +274,17 @@ export function Logger({
   function metric(metricPayload: MetricPayload): LoggerType {
     if (!isBrowser()) {
       return logger; // eslint-disable-line no-use-before-define
+    }
+
+    if (metricDimensionBuilders.length > 0 && !metricPayload.dimensions) {
+      metricPayload.dimensions = {};
+    }
+
+    for (const builder of metricDimensionBuilders) {
+      extendIfDefined(
+        metricPayload.dimensions || {},
+        builder(metricPayload.dimensions || {})
+      );
     }
 
     print(
@@ -343,6 +360,7 @@ export function Logger({
     immediateFlush,
     addPayloadBuilder,
     addMetaBuilder,
+    addMetricDimensionBuilder,
     addTrackingBuilder,
     addHeaderBuilder,
     setTransport,
