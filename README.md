@@ -56,6 +56,20 @@ logger.metricCounter({
 })
 ```
 
+#### Using a namespace prefix
+
+```
+const logger = new Logger({...options, metricNamespacePrefix: "company.team.app"})
+
+logger.metricCounter({
+  namespace: "product.feature",
+  event: "button_click",
+})
+
+// creates metric with namespace of
+// company.team.app.product.feature
+```
+
 ### `$logger.metricGauge(<event>, <payload>);`
 
 Queues a gauge metric, helper wrapping `logger.metric`
@@ -69,6 +83,21 @@ logger.metricGauge({
     method: "GET"
   }
 })
+```
+
+#### Using a namespace prefix
+
+```
+const logger = new Logger({...options, metricNamespacePrefix: "company.team.app"})
+
+logger.metricGauge({
+  namespace: "product.feature",
+  event: "request_latency",
+  value: 100
+})
+
+// creates metric with namespace of
+// company.team.app.product.feature
 ```
 
 ### Deprecated - `$logger.metric(<event>, <payload>);`
