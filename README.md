@@ -42,9 +42,38 @@ For example:
 
 Call this to attach general tracking information to the current page. This is useful if the data is not associated with a specific event, and will be sent to the server the next time the logs are flushed.
 
-### `$logger.metric(<event>, <payload>);`
+### `$logger.metricCounter(<event>, <payload>);`
 
-Queues a metric
+Queues a counter metric, helper wrapping `logger.metric`
+
+```
+logger.metricCounter({
+  namespace: "pp.team.product.feature",
+  event: "button_click",
+  dimensions: {
+    type: "paypal"
+  }
+})
+```
+
+### `$logger.metricGauge(<event>, <payload>);`
+
+Queues a gauge metric, helper wrapping `logger.metric`
+
+```
+logger.metricGauge({
+  namespace: "pp.team.product.feature",
+  event: "request_latency",
+  value: 100,
+  dimensions: {
+    method: "GET"
+  }
+})
+```
+
+### Deprecated - `$logger.metric(<event>, <payload>);`
+
+Queues a metric. We suggest using the `metricCount` or `metricGauge` interface for better type safety and clearer intention in your code.
 
 ## Advanced
 
@@ -58,6 +87,17 @@ $logger.addMetaBuilder(function () {
     current_page: getMyCurrentPage(),
   };
 });
+```
+
+### `$logger.addMetricDimensionBuilder(<function>);`
+
+Attach a method which is called and will attach values to **each metric's dimensions** whenever the logs are flushed
+
+```javascript
+$logger.addMetricDimensionBuilder(() => ({
+  token_used: true,
+  type: "user_id_token",
+}));
 ```
 
 ### `$logger.addPayloadBuilder(<function>);`
