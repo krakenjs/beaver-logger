@@ -25,9 +25,10 @@ import type {
   MetricPayloadGauge,
 } from "./types";
 
-type LoggerOptions = {|
+export type LoggerOptions = {|
   url?: string,
   prefix?: string,
+  metricNamespacePrefix?: string,
   logLevel?: $Values<typeof LOG_LEVEL>,
   transport?: Transport,
   flushInterval?: number,
@@ -80,6 +81,7 @@ export type LoggerType = {|
 export function Logger({
   url,
   prefix,
+  metricNamespacePrefix,
   logLevel = DEFAULT_LOG_LEVEL,
   transport = getHTTPTransport(),
   flushInterval = FLUSH_INTERVAL,
@@ -281,6 +283,10 @@ export function Logger({
   function metric(metricPayload: MetricPayload): LoggerType {
     if (!isBrowser()) {
       return logger; // eslint-disable-line no-use-before-define
+    }
+
+    if (metricNamespacePrefix) {
+      metricPayload.metricNamespace = `${metricNamespacePrefix}.${metricPayload.metricNamespace}`;
     }
 
     if (metricDimensionBuilders.length > 0 && !metricPayload.dimensions) {

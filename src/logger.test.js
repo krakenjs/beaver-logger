@@ -3,7 +3,7 @@
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { Logger } from ".";
+import { Logger, type LoggerOptions } from ".";
 
 const XMLHttpRequestMock = vi.fn(() => ({
   open: vi.fn(),
@@ -16,9 +16,13 @@ vi.stubGlobal("XMLHttpRequest", XMLHttpRequestMock);
 let logger;
 let logBuf;
 
-const initLogger = ({ url = "/test/api/log" } = {}) =>
+const initLogger = ({
+  url = "/test/api/log",
+  metricNamespacePrefix,
+}: $Shape<LoggerOptions> = {}) =>
   Logger({
     url,
+    metricNamespacePrefix,
   });
 const getLoggerBuffer = (testLogger) => testLogger.__buffer__;
 
@@ -266,7 +270,7 @@ describe("beaver logger provides flushing methods that send events to the server
 });
 
 describe("metricCounter", () => {
-  test("should add metrics of counter type", () => {
+  test("adds metrics of counter type", () => {
     const testLogger = initLogger();
 
     testLogger.metricCounter({
@@ -306,10 +310,27 @@ describe("metricCounter", () => {
       },
     });
   });
+
+  test("uses metric namespace prefix", () => {
+    const testLogger = initLogger({
+      metricNamespacePrefix: "prefix",
+    });
+
+    testLogger.metricCounter({
+      namespace: "namespace",
+      event: "no_value",
+    });
+
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual(
+      expect.objectContaining({
+        metricNamespace: "prefix.namespace",
+      })
+    );
+  });
 });
 
 describe("metricGauge", () => {
-  test("should add metrics of gauge type", () => {
+  test("adds metrics of gauge type", () => {
     const testLogger = initLogger();
 
     testLogger.metricGauge({
@@ -331,10 +352,28 @@ describe("metricGauge", () => {
       },
     });
   });
+
+  test("uses metric namespace prefix", () => {
+    const testLogger = initLogger({
+      metricNamespacePrefix: "prefix",
+    });
+
+    testLogger.metricGauge({
+      namespace: "namespace",
+      event: "load",
+      value: 100,
+    });
+
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual(
+      expect.objectContaining({
+        metricNamespace: "prefix.namespace",
+      })
+    );
+  });
 });
 
 describe("addMetricDimensionBuilder", () => {
-  test("should add dimensions from builder", () => {
+  test("adds dimensions from builder", () => {
     const testLogger = initLogger();
 
     testLogger.addMetricDimensionBuilder(() => ({
@@ -356,7 +395,7 @@ describe("addMetricDimensionBuilder", () => {
     );
   });
 
-  test("should overwrite existing dimensions", () => {
+  test("overwrites existing dimensions", () => {
     const testLogger = initLogger();
 
     testLogger.addMetricDimensionBuilder(() => ({
@@ -385,7 +424,7 @@ describe("addMetricDimensionBuilder", () => {
     );
   });
 
-  test("should merge dimensions", () => {
+  test("merges dimensions", () => {
     const testLogger = initLogger();
 
     testLogger.addMetricDimensionBuilder(() => ({
