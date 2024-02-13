@@ -15,9 +15,11 @@ var logBuf;
 var initLogger = function initLogger(_temp) {
   var _ref = _temp === void 0 ? {} : _temp,
     _ref$url = _ref.url,
-    url = _ref$url === void 0 ? "/test/api/log" : _ref$url;
+    url = _ref$url === void 0 ? "/test/api/log" : _ref$url,
+    metricNamespacePrefix = _ref.metricNamespacePrefix;
   return Logger({
-    url: url
+    url: url,
+    metricNamespacePrefix: metricNamespacePrefix
   });
 };
 var getLoggerBuffer = function getLoggerBuffer(testLogger) {
@@ -206,8 +208,93 @@ describe("beaver logger provides flushing methods that send events to the server
     expect(logBuf.events).toHaveLength(0);
   }));
 });
+describe("metricCounter", function () {
+  test("adds metrics of counter type", function () {
+    var testLogger = initLogger();
+    testLogger.metricCounter({
+      namespace: "namespace",
+      event: "no_value",
+      dimensions: {
+        one: "1"
+      }
+    });
+    testLogger.metricCounter({
+      namespace: "namespace",
+      event: "value",
+      value: 3,
+      dimensions: {
+        one: "1"
+      }
+    });
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual({
+      metricNamespace: "namespace",
+      metricEventName: "no_value",
+      metricValue: 1,
+      metricType: "counter",
+      dimensions: {
+        one: "1"
+      }
+    });
+    expect(getLoggerBuffer(testLogger).metrics[1]).toEqual({
+      metricNamespace: "namespace",
+      metricEventName: "value",
+      metricValue: 3,
+      metricType: "counter",
+      dimensions: {
+        one: "1"
+      }
+    });
+  });
+  test("uses metric namespace prefix", function () {
+    var testLogger = initLogger({
+      metricNamespacePrefix: "prefix"
+    });
+    testLogger.metricCounter({
+      namespace: "namespace",
+      event: "no_value"
+    });
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual(expect.objectContaining({
+      metricNamespace: "prefix.namespace"
+    }));
+  });
+});
+describe("metricGauge", function () {
+  test("adds metrics of gauge type", function () {
+    var testLogger = initLogger();
+    testLogger.metricGauge({
+      namespace: "namespace",
+      event: "load",
+      value: 100,
+      dimensions: {
+        one: "1"
+      }
+    });
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual({
+      metricNamespace: "namespace",
+      metricEventName: "load",
+      metricValue: 100,
+      metricType: "gauge",
+      dimensions: {
+        one: "1"
+      }
+    });
+  });
+  test("uses metric namespace prefix", function () {
+    var testLogger = initLogger({
+      metricNamespacePrefix: "prefix"
+    });
+    testLogger.metricGauge({
+      namespace: "namespace",
+      event: "load",
+      value: 100
+    });
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual(expect.objectContaining({
+      metricNamespace: "prefix.namespace"
+    }));
+  });
+});
 describe("addMetricDimensionBuilder", function () {
-  test("should add dimensions from builder", function () {
+  test("adds dimensions from builder", function () {
     var testLogger = initLogger();
     testLogger.addMetricDimensionBuilder(function () {
       return {
@@ -225,7 +312,7 @@ describe("addMetricDimensionBuilder", function () {
       }
     }));
   });
-  test("should overwrite existing dimensions", function () {
+  test("overwrites existing dimensions", function () {
     var testLogger = initLogger();
     testLogger.addMetricDimensionBuilder(function () {
       return {
@@ -249,7 +336,7 @@ describe("addMetricDimensionBuilder", function () {
       }
     }));
   });
-  test("should merge dimensions", function () {
+  test("merges dimensions", function () {
     var testLogger = initLogger();
     testLogger.addMetricDimensionBuilder(function () {
       return {

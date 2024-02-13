@@ -1090,7 +1090,7 @@
             };
         }
         function Logger(_ref) {
-            var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? DEFAULT_LOG_LEVEL : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
+            var url = _ref.url, prefix = _ref.prefix, metricNamespacePrefix = _ref.metricNamespacePrefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? DEFAULT_LOG_LEVEL : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
             var events = [];
             var tracking = [];
             var metrics = [];
@@ -1180,6 +1180,16 @@
                 builders.push(builder);
                 return logger;
             }
+            function metric(metricPayload) {
+                if (!dom_isBrowser()) return logger;
+                metricNamespacePrefix && (metricPayload.metricNamespace = metricNamespacePrefix + "." + metricPayload.metricNamespace);
+                metricDimensionBuilders.length > 0 && !metricPayload.dimensions && (metricPayload.dimensions = {});
+                for (var _i10 = 0; _i10 < metricDimensionBuilders.length; _i10++) extendIfDefined(metricPayload.dimensions || {}, (0, 
+                metricDimensionBuilders[_i10])(metricPayload.dimensions || {}));
+                print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
+                metrics.push(metricPayload);
+                return logger;
+            }
             dom_isBrowser() && (method = flush, time = flushInterval, function loop() {
                 setTimeout((function() {
                     method();
@@ -1221,14 +1231,25 @@
                     tracking.push(trackingPayload);
                     return logger;
                 },
-                metric: function(metricPayload) {
-                    if (!dom_isBrowser()) return logger;
-                    metricDimensionBuilders.length > 0 && !metricPayload.dimensions && (metricPayload.dimensions = {});
-                    for (var _i10 = 0; _i10 < metricDimensionBuilders.length; _i10++) extendIfDefined(metricPayload.dimensions || {}, (0, 
-                    metricDimensionBuilders[_i10])(metricPayload.dimensions || {}));
-                    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
-                    metrics.push(metricPayload);
-                    return logger;
+                metric: metric,
+                metricCounter: function(metricPayload) {
+                    var _metricPayload$value;
+                    return metric({
+                        metricNamespace: metricPayload.namespace,
+                        metricEventName: metricPayload.event,
+                        metricValue: null != (_metricPayload$value = metricPayload.value) ? _metricPayload$value : 1,
+                        metricType: "counter",
+                        dimensions: metricPayload.dimensions
+                    });
+                },
+                metricGauge: function(metricPayload) {
+                    return metric({
+                        metricNamespace: metricPayload.namespace,
+                        metricEventName: metricPayload.event,
+                        metricValue: metricPayload.value,
+                        metricType: "gauge",
+                        dimensions: metricPayload.dimensions
+                    });
                 },
                 flush: flush,
                 immediateFlush: immediateFlush,

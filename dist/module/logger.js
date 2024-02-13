@@ -8,6 +8,7 @@ import { getHTTPTransport } from "./http";
 export function Logger(_ref) {
   var url = _ref.url,
     prefix = _ref.prefix,
+    metricNamespacePrefix = _ref.metricNamespacePrefix,
     _ref$logLevel = _ref.logLevel,
     logLevel = _ref$logLevel === void 0 ? DEFAULT_LOG_LEVEL : _ref$logLevel,
     _ref$transport = _ref.transport,
@@ -166,6 +167,9 @@ export function Logger(_ref) {
     if (!isBrowser()) {
       return logger;
     }
+    if (metricNamespacePrefix) {
+      metricPayload.metricNamespace = metricNamespacePrefix + "." + metricPayload.metricNamespace;
+    }
     if (metricDimensionBuilders.length > 0 && !metricPayload.dimensions) {
       metricPayload.dimensions = {};
     }
@@ -176,6 +180,25 @@ export function Logger(_ref) {
     print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
     metrics.push(metricPayload);
     return logger;
+  }
+  function metricCounter(metricPayload) {
+    var _metricPayload$value;
+    return metric({
+      metricNamespace: metricPayload.namespace,
+      metricEventName: metricPayload.event,
+      metricValue: (_metricPayload$value = metricPayload.value) != null ? _metricPayload$value : 1,
+      metricType: "counter",
+      dimensions: metricPayload.dimensions
+    });
+  }
+  function metricGauge(metricPayload) {
+    return metric({
+      metricNamespace: metricPayload.namespace,
+      metricEventName: metricPayload.event,
+      metricValue: metricPayload.value,
+      metricType: "gauge",
+      dimensions: metricPayload.dimensions
+    });
   }
   function setTransport(newTransport) {
     transport = newTransport;
@@ -223,6 +246,8 @@ export function Logger(_ref) {
     error: error,
     track: track,
     metric: metric,
+    metricCounter: metricCounter,
+    metricGauge: metricGauge,
     flush: flush,
     immediateFlush: immediateFlush,
     addPayloadBuilder: addPayloadBuilder,
