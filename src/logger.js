@@ -18,7 +18,12 @@ import {
 import { LOG_LEVEL, PROTOCOL } from "./constants";
 import { extendIfDefined } from "./util";
 import { type Transport, getHTTPTransport } from "./http";
-import type { MetricPayload, Payload } from "./types";
+import type {
+  MetricPayload,
+  Payload,
+  MetricPayloadCounter,
+  MetricPayloadGauge,
+} from "./types";
 
 type LoggerOptions = {|
   url?: string,
@@ -50,6 +55,8 @@ export type LoggerType = {|
 
   track: Track,
   metric: LogMetric,
+  metricCounter: (payload: MetricPayloadCounter) => LoggerType,
+  metricGauge: (payload: MetricPayloadGauge) => LoggerType,
 
   flush: () => ZalgoPromise<void>,
   immediateFlush: () => ZalgoPromise<void>,
@@ -298,6 +305,26 @@ export function Logger({
     return logger; // eslint-disable-line no-use-before-define
   }
 
+  function metricCounter(metricPayload: MetricPayloadCounter): LoggerType {
+    return metric({
+      metricNamespace: metricPayload.namespace,
+      metricEventName: metricPayload.event,
+      metricValue: metricPayload.value ?? 1,
+      metricType: "counter",
+      dimensions: metricPayload.dimensions,
+    });
+  }
+
+  function metricGauge(metricPayload: MetricPayloadGauge): LoggerType {
+    return metric({
+      metricNamespace: metricPayload.namespace,
+      metricEventName: metricPayload.event,
+      metricValue: metricPayload.value,
+      metricType: "gauge",
+      dimensions: metricPayload.dimensions,
+    });
+  }
+
   function setTransport(newTransport: Transport): LoggerType {
     transport = newTransport;
     return logger; // eslint-disable-line no-use-before-define
@@ -356,6 +383,8 @@ export function Logger({
     error,
     track,
     metric,
+    metricCounter,
+    metricGauge,
     flush,
     immediateFlush,
     addPayloadBuilder,

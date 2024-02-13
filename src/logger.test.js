@@ -265,6 +265,74 @@ describe("beaver logger provides flushing methods that send events to the server
   });
 });
 
+describe("metricCounter", () => {
+  test("should add metrics of counter type", () => {
+    const testLogger = initLogger();
+
+    testLogger.metricCounter({
+      namespace: "namespace",
+      event: "no_value",
+      dimensions: {
+        one: "1",
+      },
+    });
+
+    testLogger.metricCounter({
+      namespace: "namespace",
+      event: "value",
+      value: 3,
+      dimensions: {
+        one: "1",
+      },
+    });
+
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual({
+      metricNamespace: "namespace",
+      metricEventName: "no_value",
+      metricValue: 1,
+      metricType: "counter",
+      dimensions: {
+        one: "1",
+      },
+    });
+
+    expect(getLoggerBuffer(testLogger).metrics[1]).toEqual({
+      metricNamespace: "namespace",
+      metricEventName: "value",
+      metricValue: 3,
+      metricType: "counter",
+      dimensions: {
+        one: "1",
+      },
+    });
+  });
+});
+
+describe("metricGauge", () => {
+  test("should add metrics of gauge type", () => {
+    const testLogger = initLogger();
+
+    testLogger.metricGauge({
+      namespace: "namespace",
+      event: "load",
+      value: 100,
+      dimensions: {
+        one: "1",
+      },
+    });
+
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual({
+      metricNamespace: "namespace",
+      metricEventName: "load",
+      metricValue: 100,
+      metricType: "gauge",
+      dimensions: {
+        one: "1",
+      },
+    });
+  });
+});
+
 describe("addMetricDimensionBuilder", () => {
   test("should add dimensions from builder", () => {
     const testLogger = initLogger();
