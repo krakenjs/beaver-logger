@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.7.0](https://github.com/krakenjs/beaver-logger/compare/v5.6.0...v5.7.0) (2024-02-13)
+
+
+### Features
+
+* add new metric helpers for counters and gauges ([#80](https://github.com/krakenjs/beaver-logger/issues/80)) ([57c29db](https://github.com/krakenjs/beaver-logger/commit/57c29db9b92119a2603b0efcf56d73f492eace1c))
+* add prefix option for metric namespace ([#81](https://github.com/krakenjs/beaver-logger/issues/81)) ([0c0cc1e](https://github.com/krakenjs/beaver-logger/commit/0c0cc1e987e0e020855f348cfe057fd1719b0bd0))
+
 ## [5.6.0](https://github.com/krakenjs/beaver-logger/compare/v5.5.0...v5.6.0) (2024-02-12)
 
 
