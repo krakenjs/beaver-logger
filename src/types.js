@@ -3,6 +3,11 @@
 export type Payload = { [string]: mixed };
 
 export type MetricPayload = {|
+  /**
+   * Auxiliary data that will be used to customize dashboards by segments.
+   * It will include data, such as merchant ID, merchant country, etc...
+   */
+  auxiliaryData?: { [string]: mixed },
   metricNamespace: string, // the name of the metric that's used for charting / finding in signalFx
   metricEventName: string, // assigned to event_name dimension in signalFx
   metricValue?: number, // in most cases this will be 1 if we want to count 1 instance of an event happening.
