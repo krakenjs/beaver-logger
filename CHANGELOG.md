@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.8.0](https://github.com/krakenjs/beaver-logger/compare/v5.7.0...v5.8.0) (2024-11-12)
+
+
+### Features
+
+* **metrics:** add histogram to metrics for logger ([#83](https://github.com/krakenjs/beaver-logger/issues/83)) ([e941584](https://github.com/krakenjs/beaver-logger/commit/e94158426482dfcf9356f57504ac5e543fd010bd))
+
+
+* update flow-typed; add flow-typed folder to repo ([#84](https://github.com/krakenjs/beaver-logger/issues/84)) ([b66703f](https://github.com/krakenjs/beaver-logger/commit/b66703feb2fada4a4434a0a9b5d87fea8635e35b))
+
 ## [5.7.0](https://github.com/krakenjs/beaver-logger/compare/v5.6.0...v5.7.0) (2024-02-13)
 
 
