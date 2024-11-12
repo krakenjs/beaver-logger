@@ -23,6 +23,7 @@ import type {
   Payload,
   MetricPayloadCounter,
   MetricPayloadGauge,
+  MetricPayloadHistogram,
 } from "./types";
 
 export type LoggerOptions = {|
@@ -58,6 +59,7 @@ export type LoggerType = {|
   metric: LogMetric,
   metricCounter: (payload: MetricPayloadCounter) => LoggerType,
   metricGauge: (payload: MetricPayloadGauge) => LoggerType,
+  metricHistogram: (payload: MetricPayloadHistogram) => LoggerType,
 
   flush: () => ZalgoPromise<void>,
   immediateFlush: () => ZalgoPromise<void>,
@@ -331,6 +333,16 @@ export function Logger({
     });
   }
 
+  function metricHistogram(metricPayload: MetricPayloadHistogram): LoggerType {
+    return metric({
+      metricNamespace: metricPayload.namespace,
+      metricEventName: metricPayload.event,
+      metricValue: metricPayload.value,
+      metricType: "histogram",
+      dimensions: metricPayload.dimensions,
+    });
+  }
+
   function setTransport(newTransport: Transport): LoggerType {
     transport = newTransport;
     return logger; // eslint-disable-line no-use-before-define
@@ -391,6 +403,7 @@ export function Logger({
     metric,
     metricCounter,
     metricGauge,
+    metricHistogram,
     flush,
     immediateFlush,
     addPayloadBuilder,

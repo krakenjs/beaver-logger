@@ -372,6 +372,49 @@ describe("metricGauge", () => {
   });
 });
 
+describe("metricHistogram", () => {
+  test("adds metrics of histogram type", () => {
+    const testLogger = initLogger();
+
+    testLogger.metricHistogram({
+      namespace: "namespace",
+      event: "load",
+      value: 100,
+      dimensions: {
+        one: "1",
+      },
+    });
+
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual({
+      metricNamespace: "namespace",
+      metricEventName: "load",
+      metricValue: 100,
+      metricType: "histogram",
+      dimensions: {
+        one: "1",
+      },
+    });
+  });
+
+  test("uses metric namespace prefix", () => {
+    const testLogger = initLogger({
+      metricNamespacePrefix: "prefix",
+    });
+
+    testLogger.metricHistogram({
+      namespace: "namespace",
+      event: "load",
+      value: 100,
+    });
+
+    expect(getLoggerBuffer(testLogger).metrics[0]).toEqual(
+      expect.objectContaining({
+        metricNamespace: "prefix.namespace",
+      })
+    );
+  });
+});
+
 describe("addMetricDimensionBuilder", () => {
   test("adds dimensions from builder", () => {
     const testLogger = initLogger();
