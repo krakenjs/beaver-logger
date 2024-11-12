@@ -7,7 +7,6 @@ plato-reports
 *.log
 checkstyle.xml
 xunit.xml
-flow-typed
 .DS_Store
 package-lock.json
 .vscode/
