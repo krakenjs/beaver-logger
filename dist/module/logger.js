@@ -200,6 +200,15 @@ export function Logger(_ref) {
       dimensions: metricPayload.dimensions
     });
   }
+  function metricHistogram(metricPayload) {
+    return metric({
+      metricNamespace: metricPayload.namespace,
+      metricEventName: metricPayload.event,
+      metricValue: metricPayload.value,
+      metricType: "histogram",
+      dimensions: metricPayload.dimensions
+    });
+  }
   function setTransport(newTransport) {
     transport = newTransport;
     return logger;
@@ -248,6 +257,7 @@ export function Logger(_ref) {
     metric: metric,
     metricCounter: metricCounter,
     metricGauge: metricGauge,
+    metricHistogram: metricHistogram,
     flush: flush,
     immediateFlush: immediateFlush,
     addPayloadBuilder: addPayloadBuilder,

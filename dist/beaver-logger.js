@@ -877,16 +877,13 @@
             return result;
         }
         var util_ExtendableError = function(_Error) {
-            _inheritsLoose(ExtendableError, _Error);
             function ExtendableError(message) {
                 var _this6;
                 (_this6 = _Error.call(this, message) || this).name = _this6.constructor.name;
-                "function" == typeof Error.captureStackTrace ? Error.captureStackTrace(function(self) {
-                    if (void 0 === self) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-                    return self;
-                }(_this6), _this6.constructor) : _this6.stack = new Error(message).stack;
+                "function" == typeof Error.captureStackTrace ? Error.captureStackTrace(_this6, _this6.constructor) : _this6.stack = new Error(message).stack;
                 return _this6;
             }
+            _inheritsLoose(ExtendableError, _Error);
             return ExtendableError;
         }(wrapNativeSuper_wrapNativeSuper(Error));
         function isDocumentReady() {
@@ -1248,6 +1245,15 @@
                         metricEventName: metricPayload.event,
                         metricValue: metricPayload.value,
                         metricType: "gauge",
+                        dimensions: metricPayload.dimensions
+                    });
+                },
+                metricHistogram: function(metricPayload) {
+                    return metric({
+                        metricNamespace: metricPayload.namespace,
+                        metricEventName: metricPayload.event,
+                        metricValue: metricPayload.value,
+                        metricType: "histogram",
                         dimensions: metricPayload.dimensions
                     });
                 },
