@@ -1,6 +1,6 @@
 {
   "name": "@krakenjs/beaver-logger",
-  "version": "5.8.0",
+  "version": "5.9.0-alpha.0",
   "description": "Client side logger.",
   "main": "dist/beaver-logger.js",
   "scripts": {
@@ -25,10 +25,10 @@
     "prebuild:release": "npm run clean && npm run build && git add dist && git commit -m 'ci: check in dist folder' || echo 'Nothing to distribute'",
     "prerelease": "npm run prebuild:release",
     "release": "standard-version",
-    "postrelease": "git push && git push --follow-tags && npm publish",
+    "postrelease": "git push && git push --follow-tags && npm publish --dry-run",
     "prerelease:alpha": "npm run prebuild:release",
     "release:alpha": "standard-version --prerelease alpha",
-    "postrelease:alpha": "git push && git push --follow-tags && npm publish --tag alpha"
+    "postrelease:alpha": "git push && git push --follow-tags && npm publish --dry-run --tag alpha"
   },
   "lint-staged": {
     "*": [

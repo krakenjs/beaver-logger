@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.9.0-alpha.0](https://github.com/krakenjs/beaver-logger/compare/v5.8.0...v5.9.0-alpha.0) (2026-01-06)
+
+
+### Features
+
+* allow publishing of alpha versions to npm ([5bd4372](https://github.com/krakenjs/beaver-logger/commit/5bd437205d9158ec3ee0b3cbfa6c30179cf2640c))
+
 ## [5.8.0](https://github.com/krakenjs/beaver-logger/compare/v5.7.0...v5.8.0) (2024-11-12)
 
 
