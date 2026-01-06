@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.9.0-alpha.0](https://github.com/krakenjs/beaver-logger/compare/v5.8.0...v5.9.0-alpha.0) (2026-01-06)
+
+
+### Features
+
+* conditionally add unload event listener ([557ed4a](https://github.com/krakenjs/beaver-logger/commit/557ed4a3ac9d066ec8d13516f395a7ec8789c3a9))
+* update npm token ([c22a32f](https://github.com/krakenjs/beaver-logger/commit/c22a32f2b5acf7266c715e34d32c1bbee034c1e7))
+
 ## [5.8.0](https://github.com/krakenjs/beaver-logger/compare/v5.7.0...v5.8.0) (2024-11-12)
 
 
