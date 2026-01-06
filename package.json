@@ -22,9 +22,13 @@
     "prepublishOnly": "npm run babel-server",
     "postpublish": "git checkout server",
     "prepare": "husky install",
-    "prerelease": "npm run clean && npm run build && git add dist && git commit -m 'ci: check in dist folder' || echo 'Nothing to distribute'",
+    "prebuild:release": "npm run clean && npm run build && git add dist && git commit -m 'ci: check in dist folder' || echo 'Nothing to distribute'",
+    "prerelease": "npm run prebuild:release",
     "release": "standard-version",
-    "postrelease": "git push && git push --follow-tags && npm publish"
+    "postrelease": "git push && git push --follow-tags && npm publish",
+    "prerelease:alpha": "npm run prebuild:release",
+    "release:alpha": "standard-version --prerelease alpha",
+    "postrelease:alpha": "git push && git push --follow-tags && npm publish --tag alpha"
   },
   "lint-staged": {
     "*": [
