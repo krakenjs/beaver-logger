@@ -1,4 +1,4 @@
-// flow-typed signature: 6a98ed0f35bb234cc8ec865023faa025
+// flow-typed signature: 18155f69e0b3369d529a2232b942bdeb
 // flow-typed version: <<STUB>>/vite_v^4.1.4/flow_v0.155.0
 
 /**
@@ -26,11 +26,11 @@ declare module 'vite/bin/vite' {
   declare module.exports: any;
 }
 
-declare module 'vite/dist/node/chunks/dep-630a47a3' {
+declare module 'vite/dist/node/chunks/dep-7ec6f216' {
   declare module.exports: any;
 }
 
-declare module 'vite/dist/node/chunks/dep-b2890f90' {
+declare module 'vite/dist/node/chunks/dep-827b23df' {
   declare module.exports: any;
 }
 
@@ -38,11 +38,11 @@ declare module 'vite/dist/node/chunks/dep-c423598f' {
   declare module.exports: any;
 }
 
-declare module 'vite/dist/node/chunks/dep-cce3c9dc' {
+declare module 'vite/dist/node/chunks/dep-f0c7dae0' {
   declare module.exports: any;
 }
 
-declare module 'vite/dist/node/chunks/dep-f0c7dae0' {
+declare module 'vite/dist/node/chunks/dep-f1e8587f' {
   declare module.exports: any;
 }
 
@@ -62,20 +62,20 @@ declare module 'vite/dist/node' {
 declare module 'vite/bin/vite.js' {
   declare module.exports: $Exports<'vite/bin/vite'>;
 }
-declare module 'vite/dist/node/chunks/dep-630a47a3.js' {
-  declare module.exports: $Exports<'vite/dist/node/chunks/dep-630a47a3'>;
+declare module 'vite/dist/node/chunks/dep-7ec6f216.js' {
+  declare module.exports: $Exports<'vite/dist/node/chunks/dep-7ec6f216'>;
 }
-declare module 'vite/dist/node/chunks/dep-b2890f90.js' {
-  declare module.exports: $Exports<'vite/dist/node/chunks/dep-b2890f90'>;
+declare module 'vite/dist/node/chunks/dep-827b23df.js' {
+  declare module.exports: $Exports<'vite/dist/node/chunks/dep-827b23df'>;
 }
 declare module 'vite/dist/node/chunks/dep-c423598f.js' {
   declare module.exports: $Exports<'vite/dist/node/chunks/dep-c423598f'>;
 }
-declare module 'vite/dist/node/chunks/dep-cce3c9dc.js' {
-  declare module.exports: $Exports<'vite/dist/node/chunks/dep-cce3c9dc'>;
-}
 declare module 'vite/dist/node/chunks/dep-f0c7dae0.js' {
   declare module.exports: $Exports<'vite/dist/node/chunks/dep-f0c7dae0'>;
+}
+declare module 'vite/dist/node/chunks/dep-f1e8587f.js' {
+  declare module.exports: $Exports<'vite/dist/node/chunks/dep-f1e8587f'>;
 }
 declare module 'vite/dist/node/cli.js' {
   declare module.exports: $Exports<'vite/dist/node/cli'>;

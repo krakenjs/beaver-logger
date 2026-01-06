@@ -11,7 +11,7 @@
     "babel": "babel src/ --out-dir dist/module",
     "babel-server": "babel ./server/*.js --ignore=node_modules --out-dir ./server",
     "babel-server-test": "babel ./server/*.js --ignore=node_modules --out-dir ./demo/beaver-logger",
-    "webpack": "babel-node --config-file ./node_modules/@krakenjs/grumbler-scripts/config/.babelrc-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/webpack --progress",
+    "webpack": "babel-node --config-file ./node_modules/@krakenjs/grumbler-scripts/config/.babelrc-node --plugins=@babel/plugin-transform-modules-commonjs ./node_modules/.bin/webpack --progress",
     "format": "prettier --write --ignore-unknown .",
     "format:check": "prettier --check .",
     "vitest": "vitest",
@@ -22,9 +22,13 @@
     "prepublishOnly": "npm run babel-server",
     "postpublish": "git checkout server",
     "prepare": "husky install",
-    "prerelease": "npm run clean && npm run build && git add dist && git commit -m 'ci: check in dist folder' || echo 'Nothing to distribute'",
+    "prebuild:release": "npm run clean && npm run build && git add dist && git commit -m 'ci: check in dist folder' || echo 'Nothing to distribute'",
+    "prerelease": "npm run prebuild:release",
     "release": "standard-version",
-    "postrelease": "git push && git push --follow-tags && npm publish"
+    "postrelease": "git push && git push --follow-tags && npm publish",
+    "prerelease:alpha": "npm run prebuild:release",
+    "release:alpha": "standard-version --prerelease alpha",
+    "postrelease:alpha": "git push && git push --follow-tags && npm publish --tag alpha"
   },
   "lint-staged": {
     "*": [
