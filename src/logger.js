@@ -385,13 +385,16 @@ export function Logger({
       immediateFlush();
     });
 
-    window.addEventListener("unload", () => {
-      immediateFlush();
-    });
-
-    window.addEventListener("pagehide", () => {
-      immediateFlush();
-    });
+    // Use pagehide if available, fallback to unload
+    if ("onpagehide" in window) {
+      window.addEventListener("pagehide", () => {
+        immediateFlush();
+      });
+    } else {
+      window.addEventListener("unload", () => {
+        immediateFlush();
+      });
+    }
   }
 
   const logger = {
