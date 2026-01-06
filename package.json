@@ -11,7 +11,7 @@
     "babel": "babel src/ --out-dir dist/module",
     "babel-server": "babel ./server/*.js --ignore=node_modules --out-dir ./server",
     "babel-server-test": "babel ./server/*.js --ignore=node_modules --out-dir ./demo/beaver-logger",
-    "webpack": "babel-node --config-file ./node_modules/@krakenjs/grumbler-scripts/config/.babelrc-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/webpack --progress",
+    "webpack": "babel-node --config-file ./node_modules/@krakenjs/grumbler-scripts/config/.babelrc-node --plugins=@babel/plugin-transform-modules-commonjs ./node_modules/.bin/webpack --progress",
     "format": "prettier --write --ignore-unknown .",
     "format:check": "prettier --check .",
     "vitest": "vitest",
