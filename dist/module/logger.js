@@ -173,8 +173,8 @@ export function Logger(_ref) {
     if (metricDimensionBuilders.length > 0 && !metricPayload.dimensions) {
       metricPayload.dimensions = {};
     }
-    for (var _i10 = 0; _i10 < metricDimensionBuilders.length; _i10++) {
-      var builder = metricDimensionBuilders[_i10];
+    for (var _i0 = 0; _i0 < metricDimensionBuilders.length; _i0++) {
+      var builder = metricDimensionBuilders[_i0];
       extendIfDefined(metricPayload.dimensions || {}, builder(metricPayload.dimensions || {}));
     }
     print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
@@ -241,12 +241,15 @@ export function Logger(_ref) {
     window.addEventListener("beforeunload", function () {
       immediateFlush();
     });
-    window.addEventListener("unload", function () {
-      immediateFlush();
-    });
-    window.addEventListener("pagehide", function () {
-      immediateFlush();
-    });
+    if ("onpagehide" in window) {
+      window.addEventListener("pagehide", function () {
+        immediateFlush();
+      });
+    } else {
+      window.addEventListener("unload", function () {
+        immediateFlush();
+      });
+    }
   }
   var logger = {
     debug: debug,

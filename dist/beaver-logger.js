@@ -98,9 +98,9 @@
                 if ("undefined" != typeof Promise && item instanceof Promise) return !0;
                 if ("undefined" != typeof window && "function" == typeof window.Window && item instanceof window.Window) return !1;
                 if ("undefined" != typeof window && "function" == typeof window.constructor && item instanceof window.constructor) return !1;
-                var _toString = {}.toString;
-                if (_toString) {
-                    var name = _toString.call(item);
+                var toString = {}.toString;
+                if (toString) {
+                    var name = toString.call(item);
                     if ("[object Window]" === name || "[object global]" === name || "[object DOMWindow]" === name) return !1;
                 }
                 if ("function" == typeof item.then) return !0;
@@ -925,8 +925,8 @@
                     var stackDetails = /.*at [^(]*\((.*):(.+):(.+)\)$/gi.exec(stack);
                     var scriptLocation = stackDetails && stackDetails[1];
                     if (!scriptLocation) return;
-                    for (var _i22 = 0, _Array$prototype$slic2 = [].slice.call(document.getElementsByTagName("script")).reverse(); _i22 < _Array$prototype$slic2.length; _i22++) {
-                        var script = _Array$prototype$slic2[_i22];
+                    for (var _i20 = 0, _Array$prototype$slic2 = [].slice.call(document.getElementsByTagName("script")).reverse(); _i20 < _Array$prototype$slic2.length; _i20++) {
+                        var script = _Array$prototype$slic2[_i20];
                         if (script.src && script.src === scriptLocation) return script;
                     }
                 } catch (err) {}
@@ -962,6 +962,11 @@
             script.setAttribute("data-uid-auto", uid);
             return uid;
         }));
+        function _arrayLikeToArray(r, a) {
+            (null == a || a > r.length) && (a = r.length);
+            for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+            return n;
+        }
         var http_headerBuilders = [];
         var LOG_LEVEL = {
             DEBUG: "debug",
@@ -1042,7 +1047,7 @@
                                     void 0 === rawHeaders && (rawHeaders = "");
                                     var result = {};
                                     for (var _i2 = 0, _rawHeaders$trim$spli2 = rawHeaders.trim().split("\n"); _i2 < _rawHeaders$trim$spli2.length; _i2++) {
-                                        var _line$split = _rawHeaders$trim$spli2[_i2].split(":"), _key = _line$split[0], values = _line$split.slice(1);
+                                        var _line$split = _rawHeaders$trim$spli2[_i2].split(":"), _key = _line$split[0], values = _arrayLikeToArray(_line$split).slice(1);
                                         result[_key.toLowerCase()] = values.join(":").trim();
                                     }
                                     return result;
@@ -1181,8 +1186,8 @@
                 if (!dom_isBrowser()) return logger;
                 metricNamespacePrefix && (metricPayload.metricNamespace = metricNamespacePrefix + "." + metricPayload.metricNamespace);
                 metricDimensionBuilders.length > 0 && !metricPayload.dimensions && (metricPayload.dimensions = {});
-                for (var _i10 = 0; _i10 < metricDimensionBuilders.length; _i10++) extendIfDefined(metricPayload.dimensions || {}, (0, 
-                metricDimensionBuilders[_i10])(metricPayload.dimensions || {}));
+                for (var _i0 = 0; _i0 < metricDimensionBuilders.length; _i0++) extendIfDefined(metricPayload.dimensions || {}, (0, 
+                metricDimensionBuilders[_i0])(metricPayload.dimensions || {}));
                 print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
                 metrics.push(metricPayload);
                 return logger;
@@ -1198,10 +1203,9 @@
                 window.addEventListener("beforeunload", (function() {
                     immediateFlush();
                 }));
-                window.addEventListener("unload", (function() {
+                "onpagehide" in window ? window.addEventListener("pagehide", (function() {
                     immediateFlush();
-                }));
-                window.addEventListener("pagehide", (function() {
+                })) : window.addEventListener("unload", (function() {
                     immediateFlush();
                 }));
             }
