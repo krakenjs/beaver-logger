@@ -242,10 +242,12 @@ export function Logger(_ref) {
       immediateFlush();
     });
     if ("onpagehide" in window) {
+      console.log("[bfcache] - termination event pagehide added");
       window.addEventListener("pagehide", function () {
         immediateFlush();
       });
     } else {
+      console.log("[bfcache] - termination event unload added");
       window.addEventListener("unload", function () {
         immediateFlush();
       });

@@ -1203,11 +1203,17 @@
                 window.addEventListener("beforeunload", (function() {
                     immediateFlush();
                 }));
-                "onpagehide" in window ? window.addEventListener("pagehide", (function() {
-                    immediateFlush();
-                })) : window.addEventListener("unload", (function() {
-                    immediateFlush();
-                }));
+                if ("onpagehide" in window) {
+                    console.log("[bfcache] - termination event pagehide added");
+                    window.addEventListener("pagehide", (function() {
+                        immediateFlush();
+                    }));
+                } else {
+                    console.log("[bfcache] - termination event unload added");
+                    window.addEventListener("unload", (function() {
+                        immediateFlush();
+                    }));
+                }
             }
             var logger = {
                 debug: function(event, payload) {
