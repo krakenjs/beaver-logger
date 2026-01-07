@@ -387,10 +387,12 @@ export function Logger({
 
     // Use pagehide if available, fallback to unload
     if ("onpagehide" in window) {
+      console.log(`[bfcache] - termination event pagehide added`);
       window.addEventListener("pagehide", () => {
         immediateFlush();
       });
     } else {
+      console.log(`[bfcache] - termination event unload added`);
       window.addEventListener("unload", () => {
         immediateFlush();
       });
