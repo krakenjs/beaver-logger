@@ -118,7 +118,7 @@
     "vitest": "^0.29.2"
   },
   "dependencies": {
-    "@krakenjs/belter": "^2.0.0",
+    "@krakenjs/belter": "2.10.0-alpha.2",
     "@krakenjs/cross-domain-utils": "^3.0.0",
     "@krakenjs/zalgo-promise": "^2.0.0"
   }
