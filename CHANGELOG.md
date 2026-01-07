@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.9.0-alpha.1](https://github.com/krakenjs/beaver-logger/compare/v5.9.0-alpha.0...v5.9.0-alpha.1) (2026-01-07)
+
+
+### Features
+
+* add logs ([9993ce0](https://github.com/krakenjs/beaver-logger/commit/9993ce034a3863feb1badee9988b903e3796b511))
+* use alpha of belter ([4bba937](https://github.com/krakenjs/beaver-logger/commit/4bba937c583df563da712646d3231e1eb67a7310))
+
 ## [5.9.0-alpha.0](https://github.com/krakenjs/beaver-logger/compare/v5.8.0...v5.9.0-alpha.0) (2026-01-06)
 
 
