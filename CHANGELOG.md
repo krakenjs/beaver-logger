@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.9.0-alpha.2](https://github.com/krakenjs/beaver-logger/compare/v5.9.0-alpha.1...v5.9.0-alpha.2) (2026-01-07)
+
+
+### Features
+
+* remove test ([1f44caf](https://github.com/krakenjs/beaver-logger/commit/1f44caf1f5428ecae22f18c56225a8b3a6935fe0))
+
 ## [5.9.0-alpha.1](https://github.com/krakenjs/beaver-logger/compare/v5.9.0-alpha.0...v5.9.0-alpha.1) (2026-01-07)
 
 
